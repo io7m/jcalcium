@@ -32,4 +32,16 @@ public interface CaBoneNameType
 
   @Value.Parameter
   String value();
+
+  /**
+   * Check preconditions for the type.
+   */
+
+  @Value.Check
+  default void checkPreconditions()
+  {
+    if (this.value().isEmpty()) {
+      throw new IllegalArgumentException("Bone name must not be empty");
+    }
+  }
 }

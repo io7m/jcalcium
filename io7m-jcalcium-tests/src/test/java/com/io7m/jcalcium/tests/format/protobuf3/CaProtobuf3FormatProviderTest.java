@@ -14,12 +14,15 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.tests.format.json.jackson;
+package com.io7m.jcalcium.tests.format.protobuf3;
 
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
+import com.io7m.jcalcium.format.protobuf3.CaProtobuf3FormatProvider;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseErrorType;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import javaslang.collection.List;
 import javaslang.control.Validation;
 import org.junit.Assert;
@@ -27,61 +30,50 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public final class CaJSONFormatProviderTest
+public final class CaProtobuf3FormatProviderTest
 {
   private static final Logger LOG;
 
   static {
-    LOG = LoggerFactory.getLogger(CaJSONFormatProviderTest.class);
+    LOG = LoggerFactory.getLogger(CaProtobuf3FormatProviderTest.class);
   }
 
   @Test
-  public void testEmpty()
+  public void testRoundTripAllv1_0()
+    throws IOException
   {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
-      p.parseSkeletonFromStream(resource("empty.caj"), uri("empty.caj"));
+    final CaDefinitionParserType pj =
+      new CaJSONFormatProvider().parserCreate();
+    final CaDefinitionSerializerType sj =
+      new CaJSONFormatProvider().serializerCreate(CaFormatVersion.of(1, 0));
 
-    dump(r);
-    Assert.assertTrue(r.isValid());
-    Assert.assertEquals("empty", r.get().name().value());
-  }
+    final CaDefinitionParserType pp =
+      new CaProtobuf3FormatProvider().parserCreate();
+    final CaDefinitionSerializerType sp =
+      new CaProtobuf3FormatProvider().serializerCreate(CaFormatVersion.of(1, 0));
 
-  @Test
-  public void testNoVersion()
-  {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
-      p.parseSkeletonFromStream(resource("no_version.caj"), uri("no_version.caj"));
+    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> rj =
+      pj.parseSkeletonFromStream(resource("all-1.0.caj"), uri("all-1.0.caj"));
+    dump(rj);
+    Assert.assertTrue(rj.isValid());
 
-    dump(r);
-    Assert.assertFalse(r.isValid());
-  }
+    final ByteArrayOutputStream bao = new ByteArrayOutputStream();
+    sp.serializeSkeletonToStream(rj.get(), bao);
 
-  @Test
-  public void testBadVersion()
-  {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
-      p.parseSkeletonFromStream(resource("bad_version.caj"), uri("bad_version.caj"));
+    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> rp =
+      pp.parseSkeletonFromStream(new ByteArrayInputStream(bao.toByteArray()),
+      uri("all-1.0.caj"));
 
-    dump(r);
-    Assert.assertFalse(r.isValid());
-  }
-
-  @Test
-  public void testAll()
-  {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
-      p.parseSkeletonFromStream(resource("all-1.0.caj"), uri("all-1.0.caj"));
-
-    dump(r);
-    Assert.assertTrue(r.isValid());
+    dump(rp);
+    Assert.assertTrue(rp.isValid());
+    Assert.assertEquals(rj.get(), rp.get());
   }
 
   private static void dump(
@@ -97,7 +89,7 @@ public final class CaJSONFormatProviderTest
   private static URI uri(final String s)
   {
     try {
-      return CaJSONFormatProviderTest.class.getResource(s).toURI();
+      return CaProtobuf3FormatProviderTest.class.getResource(s).toURI();
     } catch (final URISyntaxException e) {
       throw new IllegalArgumentException(e);
     }
@@ -105,6 +97,6 @@ public final class CaJSONFormatProviderTest
 
   private static InputStream resource(final String s)
   {
-    return CaJSONFormatProviderTest.class.getResourceAsStream(s);
+    return CaProtobuf3FormatProviderTest.class.getResourceAsStream(s);
   }
 }
