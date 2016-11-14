@@ -20,9 +20,9 @@
     <module>io7m-jcalcium-cmdline</module>
     <module>io7m-jcalcium-core</module>
     <module>io7m-jcalcium-documentation</module>
+    <module>io7m-jcalcium-format-json-jackson</module>
+    <module>io7m-jcalcium-format-protobuf3</module>
     <module>io7m-jcalcium-parser-api</module>
-    <module>io7m-jcalcium-parser-json-jackson</module>
-    <module>io7m-jcalcium-parser-protobuf3</module>
     <module>io7m-jcalcium-tests</module>
   </modules>
 

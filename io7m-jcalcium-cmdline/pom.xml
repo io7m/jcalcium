@@ -31,12 +31,12 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-parser-json-jackson</artifactId>
+      <artifactId>io7m-jcalcium-format-json-jackson</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-parser-protobuf3</artifactId>
+      <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
       <version>${project.version}</version>
     </dependency>
 

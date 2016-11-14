@@ -10,11 +10,11 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-tests</artifactId>
+  <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
 
-  <packaging>jar</packaging>
-  <name>io7m-jcalcium-tests</name>
-  <description>Skeletal animation (Unit tests)</description>
+  <packaging>bundle</packaging>
+  <name>io7m-jcalcium-json</name>
+  <description>Skeletal animation (Protobuf3 format)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
@@ -31,12 +31,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-format-json-jackson</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
+      <artifactId>io7m-jcalcium-parser-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -50,39 +45,55 @@
     </dependency>
 
     <dependency>
-      <groupId>io.javaslang</groupId>
-      <artifactId>javaslang</artifactId>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.immutables</groupId>
-      <artifactId>value</artifactId>
-      <scope>provided</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- JMockit MUST appear before junit (fixed in junit 5) -->
-    <dependency>
-      <groupId>org.jmockit</groupId>
-      <artifactId>jmockit</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Generate protobuf sources -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Check style -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+
+      <!-- Produce OSGi bundle -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              com.io7m.jcalcium.parser.protobuf3,
+              com.io7m.jcalcium.parser.protobuf3.v1
+            </Export-Package>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
