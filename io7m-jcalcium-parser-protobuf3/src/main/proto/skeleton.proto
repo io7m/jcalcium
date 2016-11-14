@@ -15,6 +15,7 @@
 //
 
 syntax = "proto3";
+option optimize_for = LITE_RUNTIME;
 
 package com.io7m.jcalcium.parser.protobuf3.v1;
 
