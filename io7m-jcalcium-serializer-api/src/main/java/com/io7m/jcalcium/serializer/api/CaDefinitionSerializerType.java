@@ -14,33 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.parser.api;
+package com.io7m.jcalcium.serializer.api;
 
-import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
-import javaslang.collection.SortedSet;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * A provider of parsers for a given format.
+ * The type of serializers.
  */
 
-public interface CaDefinitionParserFormatProviderType
+public interface CaDefinitionSerializerType
 {
   /**
-   * @return The format that this provider supports
+   * Serialize a skeleton to a stream.
+   *
+   * @param skeleton The skeleton
+   * @param out      The output stream
+   *
+   * @throws IOException On I/O errors
    */
 
-  CaFormatDescriptionType parserFormat();
-
-  /**
-   * @return The supported versions of the format
-   */
-
-  SortedSet<CaFormatVersionType> parserSupportedVersions();
-
-  /**
-   * @return A new parser for the format
-   */
-
-  CaDefinitionParserType parserCreate();
+  void serializeSkeletonToStream(
+    CaDefinitionSkeletonType skeleton,
+    OutputStream out)
+    throws IOException;
 }

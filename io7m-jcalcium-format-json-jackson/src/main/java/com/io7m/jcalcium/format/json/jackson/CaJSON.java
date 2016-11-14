@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.format.json.jackson.v1.CaV1JSONParser;
+import com.io7m.jcalcium.format.json.jackson.v1.CaV1JSONFormat;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
@@ -64,15 +64,31 @@ public final class CaJSON
     final SimpleModule module = new SimpleModule();
     module.addDeserializer(
       PVectorI3D.class, new CaPVectorI3DDeserializer());
+    module.addSerializer(
+      new CaPVectorI3DSerializer());
+
     module.addDeserializer(
       VectorI3D.class, new CaVectorI3DDeserializer());
+    module.addSerializer(
+      VectorI3D.class, new CaVectorI3DSerializer());
+
     module.addDeserializer(
       QuaternionI4D.class, new CaQuaternionI4DDeserializer());
+    module.addSerializer(
+      QuaternionI4D.class, new CaQuaternionI4DSerializer());
+
     module.addDeserializer(
       CaCurveInterpolation.class,
-      new CaV1JSONParser.CaCurveInterpolationDeserializer());
+      new CaV1JSONFormat.CaCurveInterpolationDeserializer());
+    module.addSerializer(
+      CaCurveInterpolation.class,
+      new CaV1JSONFormat.CaCurveInterpolationSerializer());
+
     module.addDeserializer(
-      CaCurveEasing.class, new CaV1JSONParser.CaCurveEasingDeserializer());
+      CaCurveEasing.class, new CaV1JSONFormat.CaCurveEasingDeserializer());
+    module.addSerializer(
+      CaCurveEasing.class, new CaV1JSONFormat.CaCurveEasingSerializer());
+
     return module;
   }
 }

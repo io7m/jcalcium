@@ -14,33 +14,42 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.parser.api;
+package com.io7m.jcalcium.format.json.jackson;
 
-import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
-import javaslang.collection.SortedSet;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.io7m.jtensors.VectorI3D;
+
+import java.io.IOException;
 
 /**
- * A provider of parsers for a given format.
+ * A Jackson serializer for {@code VectorI3D} values.
  */
 
-public interface CaDefinitionParserFormatProviderType
+public final class CaVectorI3DSerializer
+  extends StdSerializer<VectorI3D>
 {
   /**
-   * @return The format that this provider supports
+   * Construct a serializer.
    */
 
-  CaFormatDescriptionType parserFormat();
+  public CaVectorI3DSerializer()
+  {
+    super(VectorI3D.class);
+  }
 
-  /**
-   * @return The supported versions of the format
-   */
-
-  SortedSet<CaFormatVersionType> parserSupportedVersions();
-
-  /**
-   * @return A new parser for the format
-   */
-
-  CaDefinitionParserType parserCreate();
+  @Override
+  public void serialize(
+    final VectorI3D value,
+    final JsonGenerator gen,
+    final SerializerProvider provider)
+    throws IOException
+  {
+    gen.writeArray(new double[]{
+      value.getXD(),
+      value.getYD(),
+      value.getZD(),
+    }, 0, 3);
+  }
 }

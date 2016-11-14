@@ -14,36 +14,44 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.definitions.actions;
+package com.io7m.jcalcium.core.definitions;
 
 import com.io7m.jcalcium.core.ImmutableStyleType;
-import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
-import javaslang.collection.List;
 import org.immutables.value.Value;
 
 /**
- * A curve that affects the orientation of a bone.
+ * A format version.
  */
 
-@ImmutableStyleType
 @Value.Immutable
-public interface CaDefinitionCurveOrientationType extends CaDefinitionCurveType
+@Value.Modifiable
+@ImmutableStyleType
+public interface CaFormatVersionType extends Comparable<CaFormatVersionType>
 {
-  @Override
-  default <A, B, E extends Exception> B matchCurve(
-    final A context,
-    final PartialBiFunctionType<A, CaDefinitionCurveTranslationType, B, E> on_translation,
-    final PartialBiFunctionType<A, CaDefinitionCurveOrientationType, B, E> on_orientation,
-    final PartialBiFunctionType<A, CaDefinitionCurveScaleType, B, E> on_scale)
-    throws E
-  {
-    return NullCheck.notNull(on_orientation, "on_orientation").call(context, this);
-  }
-
   /**
-   * @return The list of keyframes for the bone
+   * @return The major number for a format
    */
 
-  List<CaDefinitionCurveKeyframeOrientationType> keyframes();
+  @Value.Parameter
+  int major();
+
+  /**
+   * @return The minor number for a format
+   */
+
+  @Value.Parameter
+  int minor();
+
+  @Override
+  default int compareTo(final CaFormatVersionType o)
+  {
+    NullCheck.notNull(o, "Other");
+
+    final int r = Integer.compareUnsigned(this.major(), o.major());
+    if (r == 0) {
+      return Integer.compareUnsigned(this.minor(), o.minor());
+    }
+    return r;
+  }
 }

@@ -19,23 +19,28 @@ package com.io7m.jcalcium.format.protobuf3;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
+import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
+import com.io7m.jcalcium.format.protobuf3.v1.CaV1Protobuf3Format;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.parser.api.CaParseErrorType;
-import com.io7m.jcalcium.parser.api.CaParserVersion;
-import com.io7m.jcalcium.parser.api.CaParserVersionType;
-import com.io7m.jcalcium.format.protobuf3.v1.CaV1Protobuf3Parsing;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jlexing.core.ImmutableLexicalPosition;
 import com.io7m.jlexing.core.ImmutableLexicalPositionType;
+import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
+import javaslang.collection.SortedSet;
 import javaslang.control.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -50,7 +55,8 @@ import static javaslang.control.Validation.valid;
  */
 
 public final class CaProtobuf3FormatProvider implements
-  CaDefinitionParserFormatProviderType
+  CaDefinitionParserFormatProviderType,
+  CaDefinitionSerializerFormatProviderType
 {
   private static final Logger LOG;
   private static final CaFormatDescriptionType FORMAT;
@@ -78,21 +84,82 @@ public final class CaProtobuf3FormatProvider implements
   }
 
   @Override
-  public CaFormatDescriptionType format()
+  public CaFormatDescriptionType parserFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public List<CaParserVersionType> versions()
+  public SortedSet<CaFormatVersionType> parserSupportedVersions()
   {
-    return CaV1Protobuf3Parsing.supported();
+    return CaV1Protobuf3Format.supported();
   }
 
   @Override
-  public CaDefinitionParserType create()
+  public CaDefinitionParserType parserCreate()
   {
     return new DetectingParser();
+  }
+
+  @Override
+  public CaFormatDescriptionType serializerFormat()
+  {
+    return FORMAT;
+  }
+
+  @Override
+  public SortedSet<CaFormatVersionType> serializerSupportedVersions()
+  {
+    return CaV1Protobuf3Format.supported();
+  }
+
+  @Override
+  public CaDefinitionSerializerType serializerCreate(
+    final CaFormatVersionType v)
+    throws UnsupportedOperationException
+  {
+    for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
+      if (supported.major() == v.major() && supported.minor() == v.minor()) {
+        return new PrefixingSerializer(v);
+      }
+    }
+
+    throw new UnsupportedOperationException(
+      "The given version is not supported");
+  }
+
+  private static final class PrefixingSerializer implements
+    CaDefinitionSerializerType
+  {
+    private final CaFormatVersionType version;
+
+    PrefixingSerializer(
+      final CaFormatVersionType v)
+    {
+      this.version = NullCheck.notNull(v, "Version");
+    }
+
+    @Override
+    public void serializeSkeletonToStream(
+      final CaDefinitionSkeletonType skeleton,
+      final OutputStream out)
+      throws IOException
+    {
+      final byte[] buffer = new byte[2];
+      final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
+      wrapper.order(ByteOrder.BIG_ENDIAN);
+
+      out.write('C');
+      out.write('a');
+      out.write('\r');
+      out.write('\n');
+      wrapper.putShort(0, (short) (this.version.major() & 0xffff));
+      out.write(buffer);
+      wrapper.putShort(0, (short) (this.version.minor() & 0xffff));
+      out.write(buffer);
+
+      new CaV1Protobuf3Format().serializeSkeletonToStream(skeleton, out);
+    }
   }
 
   private static final class DetectingParser implements CaDefinitionParserType
@@ -102,7 +169,7 @@ public final class CaProtobuf3FormatProvider implements
 
     }
 
-    private static Validation<List<CaParseErrorType>, CaParserVersionType> parseVersion(
+    private static Validation<List<CaParseErrorType>, CaFormatVersionType> parseVersion(
       final InputStream is,
       final URI uri)
     {
@@ -160,7 +227,7 @@ public final class CaProtobuf3FormatProvider implements
             Integer.valueOf(minor));
         }
 
-        return valid(CaParserVersion.of(major, minor));
+        return valid(CaFormatVersion.of(major, minor));
       } catch (final IOException e) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Failed to read version number.");
@@ -248,12 +315,12 @@ public final class CaProtobuf3FormatProvider implements
     }
 
     private Validation<List<CaParseErrorType>, CaDefinitionParserType> parserForVersion(
-      final CaParserVersionType version,
+      final CaFormatVersionType version,
       final URI uri)
     {
-      for (final CaParserVersionType supported : CaV1Protobuf3Parsing.supported()) {
+      for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
         if (supported.equals(version)) {
-          return valid(new CaV1Protobuf3Parsing());
+          return valid(new CaV1Protobuf3Format());
         }
       }
 
@@ -268,7 +335,7 @@ public final class CaProtobuf3FormatProvider implements
       sb.append("  Supported: ");
       sb.append(System.lineSeparator());
 
-      for (final CaParserVersionType supported : CaV1Protobuf3Parsing.supported()) {
+      for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
         sb.append("    ");
         sb.append(supported.major());
         sb.append("");

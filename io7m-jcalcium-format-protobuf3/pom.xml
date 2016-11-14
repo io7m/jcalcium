@@ -34,6 +34,11 @@
       <artifactId>io7m-jcalcium-parser-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-serializer-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.jnull</groupId>

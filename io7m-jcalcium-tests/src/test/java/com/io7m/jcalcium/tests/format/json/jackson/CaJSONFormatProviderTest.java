@@ -42,7 +42,7 @@ public final class CaJSONFormatProviderTest
   @Test
   public void testEmpty()
   {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().create();
+    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
     final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("empty.caj"), uri("empty.caj"));
 
@@ -54,7 +54,7 @@ public final class CaJSONFormatProviderTest
   @Test
   public void testNoVersion()
   {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().create();
+    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
     final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("no_version.caj"), uri("no_version.caj"));
 
@@ -65,7 +65,7 @@ public final class CaJSONFormatProviderTest
   @Test
   public void testBadVersion()
   {
-    final CaDefinitionParserType p = new CaJSONFormatProvider().create();
+    final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
     final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("bad_version.caj"), uri("bad_version.caj"));
 

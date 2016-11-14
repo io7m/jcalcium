@@ -18,6 +18,8 @@ package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaBoneNameType;
 import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jfunctional.PartialBiFunctionType;
+import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import org.immutables.value.Value;
@@ -30,6 +32,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface CaDefinitionActionCurvesType extends CaDefinitionActionType
 {
+  @Override
+  default <A, B, E extends Exception> B matchAction(
+    final A context,
+    final PartialBiFunctionType<A, CaDefinitionActionCurvesType, B, E> on_curves)
+    throws E
+  {
+    return NullCheck.notNull(on_curves, "on_curves").call(context, this);
+  }
+
   /**
    * @return The curves for the action
    */

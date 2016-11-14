@@ -14,31 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.parser.api;
-
-import com.io7m.jcalcium.core.ImmutableStyleType;
-import org.immutables.value.Value;
-
 /**
- * A format version.
+ * Serializer API for skeleton definitions.
  */
 
-@Value.Immutable
-@Value.Modifiable
-@ImmutableStyleType
-public interface CaParserVersionType
-{
-  /**
-   * @return The major number for a format
-   */
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.jcalcium.serializer.api;
 
-  @Value.Parameter
-  int major();
-
-  /**
-   * @return The minor number for a format
-   */
-
-  @Value.Parameter
-  int minor();
-}

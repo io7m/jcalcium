@@ -18,6 +18,7 @@ package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
+import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import org.immutables.value.Value;
 
@@ -37,7 +38,7 @@ public interface CaDefinitionCurveTranslationType extends CaDefinitionCurveType
     final PartialBiFunctionType<A, CaDefinitionCurveScaleType, B, E> on_scale)
     throws E
   {
-    return on_translation.call(context, this);
+    return NullCheck.notNull(on_translation, "on_translation").call(context, this);
   }
 
   /**

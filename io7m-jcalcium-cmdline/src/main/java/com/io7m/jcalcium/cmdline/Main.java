@@ -22,19 +22,23 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseErrorType;
-import com.io7m.jcalcium.parser.api.CaParserVersionType;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jlexing.core.ImmutableLexicalPositionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
+import javaslang.collection.SortedSet;
 import javaslang.control.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,15 +75,18 @@ public final class Main implements Runnable
     final CommandRoot r = new CommandRoot();
     final CommandValidate validate = new CommandValidate();
     final CommandFormats formats = new CommandFormats();
+    final CommandTranscode transcode = new CommandTranscode();
 
     this.commands = new HashMap<>(8);
     this.commands.put("formats", formats);
     this.commands.put("validate", validate);
+    this.commands.put("transcode", transcode);
 
     this.commander = new JCommander(r);
     this.commander.setProgramName("calcium");
     this.commander.addCommand("validate", validate);
     this.commander.addCommand("formats", formats);
+    this.commander.addCommand("transcode", transcode);
   }
 
   /**
@@ -176,10 +183,7 @@ public final class Main implements Runnable
     {
       super.call();
 
-      final ServiceLoader<CaDefinitionParserFormatProviderType> loader =
-        ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
-      final Iterator<CaDefinitionParserFormatProviderType> providers =
-        loader.iterator();
+
 
       System.out.printf(
         "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
@@ -190,10 +194,15 @@ public final class Main implements Runnable
         "R/W",
         "Description");
 
-      while (providers.hasNext()) {
-        final CaDefinitionParserFormatProviderType provider = providers.next();
-        final CaFormatDescriptionType format = provider.format();
-        final List<CaParserVersionType> versions = provider.versions();
+      final ServiceLoader<CaDefinitionParserFormatProviderType> parser_loader =
+        ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
+      final Iterator<CaDefinitionParserFormatProviderType> parser_providers =
+        parser_loader.iterator();
+
+      while (parser_providers.hasNext()) {
+        final CaDefinitionParserFormatProviderType provider = parser_providers.next();
+        final CaFormatDescriptionType format = provider.parserFormat();
+        final SortedSet<CaFormatVersionType> versions = provider.parserSupportedVersions();
         versions.forEach(version -> {
           System.out.printf(
             "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
@@ -207,6 +216,111 @@ public final class Main implements Runnable
             "read",
             format.description());
         });
+      }
+
+      final ServiceLoader<CaDefinitionSerializerFormatProviderType> serializer_loader =
+        ServiceLoader.load(CaDefinitionSerializerFormatProviderType.class);
+      final Iterator<CaDefinitionSerializerFormatProviderType> serializer_providers =
+        serializer_loader.iterator();
+
+      while (serializer_providers.hasNext()) {
+        final CaDefinitionSerializerFormatProviderType provider = serializer_providers.next();
+        final CaFormatDescriptionType format = provider.serializerFormat();
+        final SortedSet<CaFormatVersionType> versions = provider.serializerSupportedVersions();
+        versions.forEach(version -> {
+          System.out.printf(
+            "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
+            format.name(),
+            format.suffix(),
+            format.mimeType(),
+            String.format(
+              "%d.%d",
+              Integer.valueOf(version.major()),
+              Integer.valueOf(version.minor())),
+            "write",
+            format.description());
+        });
+      }
+
+      return unit();
+    }
+  }
+
+  @Parameters(commandDescription = "Transcode a skeleton file")
+  private final class CommandTranscode extends CommandRoot
+  {
+    @Parameter(
+      names = "-file-in",
+      required = true,
+      description = "The input file")
+    private String file_in;
+
+    @Parameter(
+      names = "-format-in",
+      description = "The input file format")
+    private String format_in;
+
+    @Parameter(
+      names = "-file-out",
+      required = true,
+      description = "The output file")
+    private String file_out;
+
+    @Parameter(
+      names = "-format-out",
+      description = "The output file format")
+    private String format_out;
+
+    CommandTranscode()
+    {
+
+    }
+
+    @Override
+    public Unit call()
+      throws Exception
+    {
+      super.call();
+
+      final CaDefinitionParserFormatProviderType provider_parser =
+        findParserProvider(this.format_in, this.file_in);
+      final CaDefinitionSerializerFormatProviderType provider_serializer =
+        findSerializerProvider(this.format_out, this.file_out);
+
+      if (provider_parser != null && provider_serializer != null) {
+        final CaDefinitionParserType parser =
+          provider_parser.parserCreate();
+        final CaDefinitionSerializerType serializer =
+          provider_serializer.serializerCreate(
+            provider_serializer.serializerSupportedVersions().last());
+
+        final Path path_in =
+          Paths.get(this.file_in);
+        final Path path_out =
+          Paths.get(this.file_out);
+
+        try (final InputStream is = Files.newInputStream(path_in)) {
+          final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> result =
+            parser.parseSkeletonFromStream(is, URI.create(this.file_in));
+          if (result.isValid()) {
+            LOG.debug("parsed successfully");
+
+            try (final OutputStream out = Files.newOutputStream(path_out)) {
+              serializer.serializeSkeletonToStream(result.get(), out);
+            }
+
+          } else {
+            LOG.error("parsing failed");
+            result.getError().forEach(error -> {
+              final ImmutableLexicalPositionType<Path> lexical = error.lexical();
+              LOG.error(
+                "{}:{}: {}",
+                Integer.valueOf(lexical.getLine()),
+                Integer.valueOf(lexical.getColumn()),
+                error.message());
+            });
+          }
+        }
       }
 
       return unit();
@@ -238,10 +352,11 @@ public final class Main implements Runnable
     {
       super.call();
 
-      final CaDefinitionParserFormatProviderType provider = this.findProvider();
-      if (provider != null) {
+      final CaDefinitionParserFormatProviderType provider =
+        findParserProvider(this.format, this.file);
 
-        final CaDefinitionParserType parser = provider.create();
+      if (provider != null) {
+        final CaDefinitionParserType parser = provider.parserCreate();
 
         final Path path = Paths.get(this.file);
         try (final InputStream is = Files.newInputStream(path)) {
@@ -271,48 +386,6 @@ public final class Main implements Runnable
       return unit();
     }
 
-    private CaDefinitionParserFormatProviderType findProvider()
-    {
-      final ServiceLoader<CaDefinitionParserFormatProviderType> loader =
-        ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
-
-      if (this.format == null) {
-        LOG.debug("attempting to infer format from file suffix");
-        final int index = this.file.lastIndexOf('.');
-        if (index != -1) {
-          final String suffix = this.file.substring(index + 1);
-          final Iterator<CaDefinitionParserFormatProviderType> providers =
-            loader.iterator();
-          while (providers.hasNext()) {
-            final CaDefinitionParserFormatProviderType current_provider =
-              providers.next();
-            if (current_provider.format().suffix().equals(suffix)) {
-              LOG.debug("using provider: {}", current_provider);
-              return current_provider;
-            }
-          }
-        }
-
-        LOG.error("File does not have a recognized suffix");
-      } else {
-        LOG.debug("attempting to find provider for {}", this.format);
-        final Iterator<CaDefinitionParserFormatProviderType> providers =
-          loader.iterator();
-        while (providers.hasNext()) {
-          final CaDefinitionParserFormatProviderType current_provider =
-            providers.next();
-          if (current_provider.format().name().equals(this.format)) {
-            LOG.debug("using provider: {}", current_provider);
-            return current_provider;
-          }
-        }
-
-        LOG.error("Could not find a provider for the format '{}'", this.format);
-      }
-
-      return null;
-    }
-
     private void validate(
       final CaDefinitionSkeletonType sk)
     {
@@ -322,5 +395,93 @@ public final class Main implements Runnable
         Integer.valueOf(sk.bones().size()),
         Integer.valueOf(sk.actions().size()));
     }
+  }
+
+  private static CaDefinitionParserFormatProviderType findParserProvider(
+    final String format,
+    final String file)
+  {
+    final ServiceLoader<CaDefinitionParserFormatProviderType> loader =
+      ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
+
+    if (format == null) {
+      LOG.debug("attempting to infer format from file suffix");
+      final int index = file.lastIndexOf('.');
+      if (index != -1) {
+        final String suffix = file.substring(index + 1);
+        final Iterator<CaDefinitionParserFormatProviderType> providers =
+          loader.iterator();
+        while (providers.hasNext()) {
+          final CaDefinitionParserFormatProviderType current_provider =
+            providers.next();
+          if (current_provider.parserFormat().suffix().equals(suffix)) {
+            LOG.debug("using provider: {}", current_provider);
+            return current_provider;
+          }
+        }
+      }
+
+      LOG.error("File {} does not have a recognized suffix", file);
+    } else {
+      LOG.debug("attempting to find provider for {}", format);
+      final Iterator<CaDefinitionParserFormatProviderType> providers =
+        loader.iterator();
+      while (providers.hasNext()) {
+        final CaDefinitionParserFormatProviderType current_provider =
+          providers.next();
+        if (current_provider.parserFormat().name().equals(format)) {
+          LOG.debug("using provider: {}", current_provider);
+          return current_provider;
+        }
+      }
+
+      LOG.error("Could not find a provider for the format '{}'", format);
+    }
+
+    return null;
+  }
+
+  private static CaDefinitionSerializerFormatProviderType findSerializerProvider(
+    final String format,
+    final String file)
+  {
+    final ServiceLoader<CaDefinitionSerializerFormatProviderType> loader =
+      ServiceLoader.load(CaDefinitionSerializerFormatProviderType.class);
+
+    if (format == null) {
+      LOG.debug("attempting to infer format from file suffix");
+      final int index = file.lastIndexOf('.');
+      if (index != -1) {
+        final String suffix = file.substring(index + 1);
+        final Iterator<CaDefinitionSerializerFormatProviderType> providers =
+          loader.iterator();
+        while (providers.hasNext()) {
+          final CaDefinitionSerializerFormatProviderType current_provider =
+            providers.next();
+          if (current_provider.serializerFormat().suffix().equals(suffix)) {
+            LOG.debug("using provider: {}", current_provider);
+            return current_provider;
+          }
+        }
+      }
+
+      LOG.error("File {} does not have a recognized suffix", file);
+    } else {
+      LOG.debug("attempting to find provider for {}", format);
+      final Iterator<CaDefinitionSerializerFormatProviderType> providers =
+        loader.iterator();
+      while (providers.hasNext()) {
+        final CaDefinitionSerializerFormatProviderType current_provider =
+          providers.next();
+        if (current_provider.serializerFormat().name().equals(format)) {
+          LOG.debug("using provider: {}", current_provider);
+          return current_provider;
+        }
+      }
+
+      LOG.error("Could not find a provider for the format '{}'", format);
+    }
+
+    return null;
   }
 }

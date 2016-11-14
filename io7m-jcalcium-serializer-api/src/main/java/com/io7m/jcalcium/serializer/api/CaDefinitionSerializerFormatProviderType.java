@@ -14,33 +14,43 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.parser.api;
+package com.io7m.jcalcium.serializer.api;
 
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import javaslang.collection.SortedSet;
 
 /**
- * A provider of parsers for a given format.
+ * A provider of serializers for a given format.
  */
 
-public interface CaDefinitionParserFormatProviderType
+public interface CaDefinitionSerializerFormatProviderType
 {
   /**
    * @return The format that this provider supports
    */
 
-  CaFormatDescriptionType parserFormat();
+  CaFormatDescriptionType serializerFormat();
 
   /**
    * @return The supported versions of the format
    */
 
-  SortedSet<CaFormatVersionType> parserSupportedVersions();
+  SortedSet<CaFormatVersionType> serializerSupportedVersions();
 
   /**
-   * @return A new parser for the format
+   * Create a new serializer for the given format version.
+   *
+   * @param v The version
+   *
+   * @return A new serializer for the format
+   *
+   * @throws UnsupportedOperationException If the given version is not one of
+   *                                       the versions returned by {@link
+   *                                       #serializerSupportedVersions()}
    */
 
-  CaDefinitionParserType parserCreate();
+  CaDefinitionSerializerType serializerCreate(
+    CaFormatVersionType v)
+    throws UnsupportedOperationException;
 }

@@ -28,7 +28,10 @@ import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
+import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientationType;
@@ -47,8 +50,7 @@ import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.parser.api.CaParseErrorType;
-import com.io7m.jcalcium.parser.api.CaParserVersion;
-import com.io7m.jcalcium.parser.api.CaParserVersionType;
+import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jlexing.core.ImmutableLexicalPosition;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.QuaternionI4D;
@@ -60,17 +62,21 @@ import javaslang.Tuple2;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Seq;
+import javaslang.collection.SortedSet;
 import javaslang.collection.Traversable;
+import javaslang.collection.TreeSet;
 import javaslang.control.Validation;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.io7m.jfunctional.Unit.unit;
 import static javaslang.control.Validation.invalid;
 import static javaslang.control.Validation.valid;
 
@@ -78,13 +84,14 @@ import static javaslang.control.Validation.valid;
  * An implementation of a protobuf3 parser for version 1 types.
  */
 
-public final class CaV1Protobuf3Parsing implements CaDefinitionParserType
+public final class CaV1Protobuf3Format implements CaDefinitionParserType,
+  CaDefinitionSerializerType
 {
   /**
    * Construct a parser
    */
 
-  public CaV1Protobuf3Parsing()
+  public CaV1Protobuf3Format()
   {
 
   }
@@ -93,6 +100,211 @@ public final class CaV1Protobuf3Parsing implements CaDefinitionParserType
     final Validation<List<List<E>>, T> v)
   {
     return v.leftMap(xs -> xs.fold(List.empty(), List::appendAll));
+  }
+
+  /**
+   * @return The parserSupportedVersions supported by this parser
+   */
+
+  public static SortedSet<CaFormatVersionType> supported()
+  {
+    return TreeSet.of(CaFormatVersion.of(1, 0));
+  }
+
+  private static Skeleton.V1Skeleton fromCoreSkeleton(
+    final CaDefinitionSkeletonType skeleton)
+  {
+    final Skeleton.V1Skeleton.Builder b = Skeleton.V1Skeleton.newBuilder();
+    b.setName(skeleton.name().value());
+    skeleton.actions().forEach(p -> {
+      b.addActions(fromCoreAction(p._2));
+    });
+    skeleton.bones().forEach(p -> {
+      b.addBones(fromCoreBone(p._2));
+    });
+    return b.build();
+  }
+
+  private static Skeleton.V1Bone fromCoreBone(final CaDefinitionBoneType bone)
+  {
+    final Skeleton.V1Bone.Builder b = Skeleton.V1Bone.newBuilder();
+    b.setName(bone.name().value());
+    bone.parent().ifPresent(p -> {
+      b.setParent(p.value());
+    });
+    b.setOrientation(fromCoreQuaternion(bone.orientation()));
+    b.setScale(fromCoreScale(bone.scale()));
+    b.setTranslation(fromCoreTranslation(bone.translation()));
+    return b.build();
+  }
+
+  private static Skeleton.V1Action fromCoreAction(
+    final CaDefinitionActionType action)
+  {
+    return action.matchAction(unit(), (bone_name, curve) -> {
+      final Skeleton.V1Action.Builder b = Skeleton.V1Action.newBuilder();
+      b.setCurves(fromCoreActionCurves(curve));
+      return b.build();
+    });
+  }
+
+  private static Skeleton.V1ActionCurves fromCoreActionCurves(
+    final CaDefinitionActionCurvesType ac)
+  {
+    final Skeleton.V1ActionCurves.Builder b = Skeleton.V1ActionCurves.newBuilder();
+    b.setName(ac.name().value());
+    ac.curves().forEach(p -> {
+      p._2.forEach(curve -> {
+        b.addCurves(fromCoreCurve(curve));
+      });
+    });
+    return b.build();
+  }
+
+  private static Skeleton.V1Curve fromCoreCurve(
+    final CaDefinitionCurveType curve)
+  {
+    final Skeleton.V1Curve.Builder b = Skeleton.V1Curve.newBuilder();
+    return curve.matchCurve(
+      unit(),
+      (name, c) -> {
+        b.setTranslation(fromCoreCurveTranslation(c));
+        return b.build();
+      },
+      (name, c) -> {
+        b.setOrientation(fromCoreCurveOrientation(c));
+        return b.build();
+      },
+      (name, c) -> {
+        b.setScale(fromCoreCurveScale(c));
+        return b.build();
+      });
+  }
+
+  private static Skeleton.V1CurveScale fromCoreCurveScale(
+    final CaDefinitionCurveScaleType c)
+  {
+    final Skeleton.V1CurveScale.Builder b = Skeleton.V1CurveScale.newBuilder();
+    b.setBone(c.bone().value());
+    c.keyframes().forEach(k -> b.addKeyframes(fromCoreCurveKeyframeScale(k)));
+    return b.build();
+  }
+
+  private static Skeleton.V1CurveKeyframeScale fromCoreCurveKeyframeScale(
+    final CaDefinitionCurveKeyframeScaleType k)
+  {
+    final Skeleton.V1CurveKeyframeScale.Builder b =
+      Skeleton.V1CurveKeyframeScale.newBuilder();
+    b.setEasing(fromCoreEasing(k.easing()));
+    b.setInterpolation(fromCoreInterpolation(k.interpolation()));
+    b.setIndex(k.index());
+    b.setScale(fromCoreScale(k.scale()));
+    return b.build();
+  }
+
+  private static Skeleton.V1CurveKeyframeTranslation fromCoreCurveKeyframeTranslation(
+    final CaDefinitionCurveKeyframeTranslationType k)
+  {
+    final Skeleton.V1CurveKeyframeTranslation.Builder b =
+      Skeleton.V1CurveKeyframeTranslation.newBuilder();
+    b.setEasing(fromCoreEasing(k.easing()));
+    b.setInterpolation(fromCoreInterpolation(k.interpolation()));
+    b.setIndex(k.index());
+    b.setTranslation(fromCoreTranslation(k.translation()));
+    return b.build();
+  }
+
+  private static Skeleton.V1CurveKeyframeOrientation fromCoreCurveKeyframeOrientation(
+    final CaDefinitionCurveKeyframeOrientationType k)
+  {
+    final Skeleton.V1CurveKeyframeOrientation.Builder b =
+      Skeleton.V1CurveKeyframeOrientation.newBuilder();
+    b.setEasing(fromCoreEasing(k.easing()));
+    b.setInterpolation(fromCoreInterpolation(k.interpolation()));
+    b.setIndex(k.index());
+    b.setOrientation(fromCoreQuaternion(k.orientation()));
+    return b.build();
+  }
+
+  private static Skeleton.V1Scale fromCoreScale(
+    final VectorI3D scale)
+  {
+    final Skeleton.V1Scale.Builder b = Skeleton.V1Scale.newBuilder();
+    b.setX(scale.getXD());
+    b.setY(scale.getYD());
+    b.setZ(scale.getZD());
+    return b.build();
+  }
+
+  private static Skeleton.V1Translation fromCoreTranslation(
+    final PVectorI3D<CaSpaceBoneParentRelativeType> translation)
+  {
+    final Skeleton.V1Translation.Builder b = Skeleton.V1Translation.newBuilder();
+    b.setX(translation.getXD());
+    b.setY(translation.getYD());
+    b.setZ(translation.getZD());
+    return b.build();
+  }
+
+  private static Skeleton.V1Quaternion fromCoreQuaternion(
+    final QuaternionI4D orientation)
+  {
+    final Skeleton.V1Quaternion.Builder b = Skeleton.V1Quaternion.newBuilder();
+    b.setX(orientation.getXD());
+    b.setY(orientation.getYD());
+    b.setZ(orientation.getZD());
+    b.setW(orientation.getWD());
+    return b.build();
+  }
+
+  private static Skeleton.V1Interpolation fromCoreInterpolation(
+    final CaCurveInterpolation interpolation)
+  {
+    switch (interpolation) {
+      case CURVE_INTERPOLATION_CONSTANT:
+        return Skeleton.V1Interpolation.V1_INTERPOLATION_CONSTANT;
+      case CURVE_INTERPOLATION_LINEAR:
+        return Skeleton.V1Interpolation.V1_INTERPOLATION_LINEAR;
+      case CURVE_INTERPOLATION_EXPONENTIAL:
+        return Skeleton.V1Interpolation.V1_INTERPOLATION_EXPONENTIAL;
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  private static Skeleton.V1Easing fromCoreEasing(
+    final CaCurveEasing easing)
+  {
+    switch (easing) {
+      case CURVE_EASING_IN:
+        return Skeleton.V1Easing.V1_EASING_IN;
+      case CURVE_EASING_OUT:
+        return Skeleton.V1Easing.V1_EASING_OUT;
+      case CURVE_EASING_IN_OUT:
+        return Skeleton.V1Easing.V1_EASING_IN_OUT;
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  private static Skeleton.V1CurveTranslation fromCoreCurveTranslation(
+    final CaDefinitionCurveTranslationType c)
+  {
+    final Skeleton.V1CurveTranslation.Builder b =
+      Skeleton.V1CurveTranslation.newBuilder();
+    b.setBone(c.bone().value());
+    c.keyframes().forEach(k -> b.addKeyframes(fromCoreCurveKeyframeTranslation(k)));
+    return b.build();
+  }
+
+  private static Skeleton.V1CurveOrientation fromCoreCurveOrientation(
+    final CaDefinitionCurveOrientationType c)
+  {
+    final Skeleton.V1CurveOrientation.Builder b =
+      Skeleton.V1CurveOrientation.newBuilder();
+    b.setBone(c.bone().value());
+    c.keyframes().forEach(k -> b.addKeyframes(fromCoreCurveKeyframeOrientation(k)));
+    return b.build();
   }
 
   @Override
@@ -104,13 +316,13 @@ public final class CaV1Protobuf3Parsing implements CaDefinitionParserType
     return new Parsed(uri, is).run();
   }
 
-  /**
-   * @return The versions supported by this parser
-   */
-
-  public static List<CaParserVersionType> supported()
+  @Override
+  public void serializeSkeletonToStream(
+    final CaDefinitionSkeletonType skeleton,
+    final OutputStream out)
+    throws IOException
   {
-    return List.of(CaParserVersion.of(1, 0));
+    fromCoreSkeleton(skeleton).writeTo(out);
   }
 
   private static final class Parsed

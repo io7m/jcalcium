@@ -17,6 +17,7 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaActionNameType;
+import com.io7m.jfunctional.PartialBiFunctionType;
 
 /**
  * A definition of an action.
@@ -24,6 +25,26 @@ import com.io7m.jcalcium.core.CaActionNameType;
 
 public interface CaDefinitionActionType
 {
+  /**
+   * Match on an action definition.
+   *
+   * @param context        A contextual value
+   * @param on_curves Evaluated for curve actions
+   * @param <A>            The type of contextual values
+   * @param <B>            The type of returned values
+   * @param <E>            The type of raised exceptions
+   *
+   * @return The value returned by the evaluated function
+   *
+   * @throws E If any of the given functions raise {@code E}
+   */
+
+  <A, B, E extends Exception>
+  B matchAction(
+    A context,
+    PartialBiFunctionType<A, CaDefinitionActionCurvesType, B, E> on_curves)
+    throws E;
+
   /**
    * @return The name of the action
    */
