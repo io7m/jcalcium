@@ -15,9 +15,9 @@
  */
 
 /**
- * Core types and functions.
+ * Command line parsing and formatting utility.
  */
 
 @com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.cmdline;
 

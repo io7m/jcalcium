@@ -14,10 +14,32 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.parser.api;
+
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+import javaslang.collection.List;
+import javaslang.control.Validation;
+
+import java.io.InputStream;
+import java.net.URI;
+
 /**
- * Core types and functions.
+ * The type of parsers.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public interface CaDefinitionParserType
+{
+  /**
+   * Attempt to parse a skeleton from the given stream.
+   *
+   * @param is  An input stream
+   * @param uri A URI for identifying the source of the stream, primarily used
+   *            for error messages
+   *
+   * @return A validation value indicating the result of parsing
+   */
 
+  Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+    InputStream is,
+    URI uri);
+}

@@ -14,10 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.CaCurveEasing;
+import com.io7m.jcalcium.core.CaCurveInterpolation;
+
 /**
- * Core types and functions.
+ * The base type of keyframes.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public interface CaDefinitionCurveKeyframeType
+{
+  /**
+   * @return The index of the keyframe (in the range {@code [0,
+   * Integer.MAX_VALUE]}
+   */
 
+  int index();
+
+  /**
+   * @return The interpolation type for the keyframe
+   */
+
+  CaCurveInterpolation interpolation();
+
+  /**
+   * @return The easing type for the keyframe
+   */
+
+  CaCurveEasing easing();
+}

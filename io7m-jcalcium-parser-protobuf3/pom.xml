@@ -10,11 +10,11 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-core</artifactId>
+  <artifactId>io7m-jcalcium-parser-protobuf3</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-core</name>
-  <description>Skeletal animation (Core)</description>
+  <name>io7m-jcalcium-json</name>
+  <description>Skeletal animation (Protobuf3 format parser)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
@@ -25,6 +25,17 @@
 
   <dependencies>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-parser-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.io7m.jnull</groupId>
       <artifactId>io7m-jnull-core</artifactId>
     </dependency>
@@ -34,13 +45,12 @@
     </dependency>
 
     <dependency>
-      <groupId>io.javaslang</groupId>
-      <artifactId>javaslang</artifactId>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.immutables</groupId>
-      <artifactId>value</artifactId>
-      <scope>provided</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
@@ -52,6 +62,19 @@
 
   <build>
     <plugins>
+      <!-- Generate protobuf sources -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Check style -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -66,10 +89,8 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.io7m.jcalcium.core,
-              com.io7m.jcalcium.core.definitions,
-              com.io7m.jcalcium.core.definitions.actions,
-              com.io7m.jcalcium.core.spaces
+              com.io7m.jcalcium.parser.protobuf3,
+              com.io7m.jcalcium.parser.protobuf3.v1
             </Export-Package>
           </instructions>
         </configuration>

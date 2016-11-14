@@ -14,10 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.spaces;
+
 /**
- * Core types and functions.
+ * The skeleton coordinate space for bones.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
-
+public interface CaSpaceSkeletonType extends CaSpaceType
+{
+  // No extra methods
+}

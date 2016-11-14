@@ -14,10 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jtensors.QuaternionI4D;
+import org.immutables.value.Value;
+
 /**
- * Core types and functions.
+ * A keyframe for a curve that affects the orientation of a bone.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@ImmutableStyleType
+@Value.Immutable
+public interface CaDefinitionCurveKeyframeOrientationType extends
+  CaDefinitionCurveKeyframeType
+{
+  /**
+   * @return The orientation at this keyframe
+   */
 
+  QuaternionI4D orientation();
+}

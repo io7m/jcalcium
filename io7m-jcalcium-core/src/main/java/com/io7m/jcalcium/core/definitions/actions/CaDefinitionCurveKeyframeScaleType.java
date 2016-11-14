@@ -14,10 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jtensors.VectorI3D;
+import org.immutables.value.Value;
+
 /**
- * Core types and functions.
+ * A keyframe for a curve that affects the scale of a bone.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@ImmutableStyleType
+@Value.Immutable
+public interface CaDefinitionCurveKeyframeScaleType extends
+  CaDefinitionCurveKeyframeType
+{
+  /**
+   * @return The scale of the bone at this keyframe
+   */
 
+  VectorI3D scale();
+}

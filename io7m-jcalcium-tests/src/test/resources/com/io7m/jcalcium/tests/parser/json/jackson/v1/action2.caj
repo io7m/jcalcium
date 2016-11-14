@@ -1,0 +1,27 @@
+{
+  "name": "bone0",
+  "bones": [
+
+  ],
+  "actions": [
+    {
+      "type": "curves",
+      "name": "action0",
+      "frames-per-second": 60,
+      "curves": [
+        {
+          "bone": "bone.000",
+          "type": "scale",
+          "keyframes": [
+            {
+              "index": 0,
+              "interpolation": "linear",
+              "easing": "in-out",
+              "scale": [0.000000, 1.000000, 2.000000]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -14,10 +14,32 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.parser.api;
+
+import com.io7m.jlexing.core.ImmutableLexicalPositionType;
+import org.immutables.value.Value;
+
+import java.nio.file.Path;
+
 /**
- * Core types and functions.
+ * The type of parse errors.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@Value.Immutable
+@com.io7m.jcalcium.core.ImmutableStyleType
+public interface CaParseErrorType
+{
+  /**
+   * @return The lexical information for the error
+   */
 
+  @Value.Parameter
+  ImmutableLexicalPositionType<Path> lexical();
+
+  /**
+   * @return The error message
+   */
+
+  @Value.Parameter
+  String message();
+}

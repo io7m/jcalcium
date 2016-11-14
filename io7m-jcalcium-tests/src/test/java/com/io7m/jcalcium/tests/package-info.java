@@ -15,9 +15,9 @@
  */
 
 /**
- * Core types and functions.
+ * Unit tests.
  */
 
 @com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.tests;
 

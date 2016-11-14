@@ -15,9 +15,9 @@
  */
 
 /**
- * Core types and functions.
+ * Protobuf3 parser for 1.* skeleton definitions.
  */
 
 @com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.parser.protobuf3.v1;
 

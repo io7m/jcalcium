@@ -14,10 +14,17 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.tests;
+
 /**
- * Core types and functions.
+ * This class exists to prevent a bug in Maven's jar plugin. The bug is
+ * triggered at deploy time when a project does not contain any sources.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public final class Bug
+{
+  private Bug()
+  {
 
+  }
+}

@@ -14,10 +14,32 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.parser.api;
+
+import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
+import javaslang.collection.List;
+
 /**
- * Core types and functions.
+ * A provider of parsers for a given format.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public interface CaDefinitionParserFormatProviderType
+{
+  /**
+   * @return The format that this provider supports
+   */
 
+  CaFormatDescriptionType format();
+
+  /**
+   * @return The supported versions of the format
+   */
+
+  List<CaParserVersionType> versions();
+
+  /**
+   * @return A new parser for the format
+   */
+
+  CaDefinitionParserType create();
+}

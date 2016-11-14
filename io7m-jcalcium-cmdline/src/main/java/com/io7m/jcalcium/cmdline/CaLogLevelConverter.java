@@ -14,10 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.cmdline;
+
+import com.beust.jcommander.IStringConverter;
+
 /**
- * Core types and functions.
+ * A converter for {@link CaLogLevel} values.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public final class CaLogLevelConverter implements
+  IStringConverter<CaLogLevel>
+{
+  /**
+   * Construct a new converter.
+   */
 
+  public CaLogLevelConverter()
+  {
+
+  }
+
+  @Override
+  public CaLogLevel convert(final String value)
+  {
+    for (final CaLogLevel v : CaLogLevel.values()) {
+      if (value.equals(v.getName())) {
+        return v;
+      }
+    }
+
+    throw new CaLogLevelUnrecognized(
+      "Unrecognized verbosity level: " + value);
+  }
+}

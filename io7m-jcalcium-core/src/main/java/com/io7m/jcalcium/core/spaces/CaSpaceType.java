@@ -14,10 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.spaces;
+
 /**
- * Core types and functions.
+ * The type of coordinate spaces.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
-
+public interface CaSpaceType
+{
+  // No value-level representation
+}

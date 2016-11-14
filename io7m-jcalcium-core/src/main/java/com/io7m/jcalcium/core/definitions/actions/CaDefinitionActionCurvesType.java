@@ -14,10 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.CaBoneNameType;
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import javaslang.collection.List;
+import javaslang.collection.Map;
+import org.immutables.value.Value;
+
 /**
- * Core types and functions.
+ * An action that is constructed from a set of keyframe curves.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@ImmutableStyleType
+@Value.Immutable
+public interface CaDefinitionActionCurvesType extends CaDefinitionActionType
+{
+  /**
+   * @return The curves for the action
+   */
 
+  Map<CaBoneNameType, List<CaDefinitionCurveType>> curves();
+}

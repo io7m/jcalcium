@@ -1,0 +1,20 @@
+{
+  "name": "bone0",
+  "bones": [
+
+  ],
+  "actions": [
+    {
+      "type": "curves",
+      "name": "action0",
+      "frames-per-second": 60,
+      "curves": []
+    },
+    {
+      "type": "curves",
+      "name": "action0",
+      "frames-per-second": 60,
+      "curves": []
+    }
+  ]
+}

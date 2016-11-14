@@ -14,10 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/**
- * Core types and functions.
- */
-
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.jcalcium.core;
 
+import org.immutables.value.Value;
+
+/**
+ * The type of action names.
+ */
+
+@ImmutableStyleType
+@Value.Immutable
+public interface CaActionNameType
+{
+  /**
+   * @return The name value
+   */
+
+  @Value.Parameter
+  String value();
+}

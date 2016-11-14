@@ -14,10 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jtensors.parameterized.PVectorI3D;
+import org.immutables.value.Value;
+
 /**
- * Core types and functions.
+ * A keyframe for a curve that affects the translation of a bone.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@ImmutableStyleType
+@Value.Immutable
+public interface CaDefinitionCurveKeyframeTranslationType extends
+  CaDefinitionCurveKeyframeType
+{
+  /**
+   * @return The translation of the bone at this keyframe
+   */
 
+  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
+}

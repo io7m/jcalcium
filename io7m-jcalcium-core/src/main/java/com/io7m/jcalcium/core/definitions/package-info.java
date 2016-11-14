@@ -15,9 +15,9 @@
  */
 
 /**
- * Core types and functions.
+ * Types related to definitions.
  */
 
 @com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.core.definitions;
 

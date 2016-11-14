@@ -15,9 +15,9 @@
  */
 
 /**
- * Core types and functions.
+ * JSON parser for 1.* skeleton definitions.
  */
 
 @com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.parser.json.jackson.v1;
 

@@ -14,10 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions.actions;
+
+import com.io7m.jcalcium.core.CaActionNameType;
+
 /**
- * Core types and functions.
+ * A definition of an action.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+public interface CaDefinitionActionType
+{
+  /**
+   * @return The name of the action
+   */
 
+  CaActionNameType name();
+
+  /**
+   * @return The number of frames per second the action uses
+   */
+
+  int framesPerSecond();
+}

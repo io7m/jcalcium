@@ -14,10 +14,40 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core.definitions;
+
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import org.immutables.value.Value;
+
 /**
- * Core types and functions.
+ * A description of a definition format.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.core;
+@Value.Immutable
+@ImmutableStyleType
+public interface CaFormatDescriptionType
+{
+  /**
+   * @return A human-readable description of the format
+   */
 
+  String description();
+
+  /**
+   * @return The filename suffix used for the format
+   */
+
+  String suffix();
+
+  /**
+   * @return The mime type for the format
+   */
+
+  String mimeType();
+
+  /**
+   * @return The unique name for the format
+   */
+
+  String name();
+}

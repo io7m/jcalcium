@@ -14,10 +14,45 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/**
- * Core types and functions.
- */
-
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.jcalcium.core;
 
+import com.io7m.jnull.NullCheck;
+
+/**
+ * The kind of supported actions.
+ */
+
+public enum CaActionKind
+{
+  /**
+   * An action constructed from curves that drive components of bones.
+   */
+
+  ACTION_CURVES("curves");
+
+  private final String name;
+
+  CaActionKind(
+    final String in_name)
+  {
+    this.name = NullCheck.notNull(in_name, "Name");
+  }
+
+  /**
+   * @param name A kind name
+   *
+   * @return The kind for the given name
+   */
+
+  public static CaActionKind of(
+    final String name)
+  {
+    switch (NullCheck.notNull(name, "Name")) {
+      case "curves":
+        return ACTION_CURVES;
+    }
+
+    throw new IllegalArgumentException(
+      "Unrecognized action kind: " + name);
+  }
+}

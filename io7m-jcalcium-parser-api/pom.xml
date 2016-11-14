@@ -10,11 +10,11 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-core</artifactId>
+  <artifactId>io7m-jcalcium-parser-api</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-core</name>
-  <description>Skeletal animation (Core)</description>
+  <name>io7m-jcalcium-parser-api</name>
+  <description>Skeletal animation (Parser API)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
@@ -25,12 +25,22 @@
 
   <dependencies>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.io7m.jnull</groupId>
       <artifactId>io7m-jnull-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.jtensors</groupId>
       <artifactId>io7m-jtensors-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jlexing</groupId>
+      <artifactId>io7m-jlexing-core</artifactId>
     </dependency>
 
     <dependency>
@@ -66,10 +76,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.io7m.jcalcium.core,
-              com.io7m.jcalcium.core.definitions,
-              com.io7m.jcalcium.core.definitions.actions,
-              com.io7m.jcalcium.core.spaces
+              com.io7m.jcalcium.parser.api
             </Export-Package>
           </instructions>
         </configuration>
