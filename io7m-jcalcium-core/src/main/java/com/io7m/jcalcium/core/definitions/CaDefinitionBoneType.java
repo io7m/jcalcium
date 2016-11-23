@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.core.definitions;
 
-import com.io7m.jcalcium.core.CaBoneNameType;
+import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.QuaternionI4D;
@@ -39,14 +39,14 @@ public interface CaDefinitionBoneType
    */
 
   @Value.Parameter
-  CaBoneNameType name();
+  CaBoneName name();
 
   /**
    * @return The name of the bone's parent
    */
 
   @Value.Parameter
-  Optional<CaBoneNameType> parent();
+  Optional<CaBoneName> parent();
 
   /**
    * @return The parent-relative offset for the bone

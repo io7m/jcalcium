@@ -16,8 +16,8 @@
 
 package com.io7m.jcalcium.core.definitions.actions;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 

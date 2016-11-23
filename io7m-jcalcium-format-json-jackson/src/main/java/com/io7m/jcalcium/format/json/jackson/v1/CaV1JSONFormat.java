@@ -45,7 +45,6 @@ import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
@@ -65,9 +64,8 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
-import com.io7m.jlexing.core.ImmutableLexicalPosition;
+import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
@@ -116,14 +114,14 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
    * @return The parserSupportedVersions supported by this parser
    */
 
-  public static SortedSet<CaFormatVersionType> supported()
+  public static SortedSet<CaFormatVersion> supported()
   {
     return TreeSet.of(CaFormatVersion.of(1, 0));
   }
 
   @Override
   public Validation<
-    javaslang.collection.List<CaParseErrorType>,
+    javaslang.collection.List<CaParseError>,
     CaDefinitionSkeletonType>
   parseSkeletonFromStream(
     final InputStream is,
@@ -138,24 +136,24 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     } catch (final JsonParseException e) {
       final JsonParser proc = e.getProcessor();
       final JsonLocation loc = proc.getCurrentLocation();
-      final javaslang.collection.List<CaParseErrorType> xs =
+      final javaslang.collection.List<CaParseError> xs =
         javaslang.collection.List.of(
           CaParseError.of(
-            ImmutableLexicalPosition.newPositionWithFile(
+            LexicalPosition.of(
               loc.getLineNr(),
               loc.getColumnNr(),
-              Paths.get(uri)),
+              Optional.of(Paths.get(uri))),
             e.getMessage()
           ));
       return Validation.invalid(xs);
     } catch (final IOException e) {
-      final javaslang.collection.List<CaParseErrorType> xs =
+      final javaslang.collection.List<CaParseError> xs =
         javaslang.collection.List.of(
           CaParseError.of(
-            ImmutableLexicalPosition.newPositionWithFile(
+            LexicalPosition.of(
               -1,
               -1,
-              Paths.get(uri)),
+              Optional.of(Paths.get(uri))),
             e.getMessage()
           ));
       return Validation.invalid(xs);

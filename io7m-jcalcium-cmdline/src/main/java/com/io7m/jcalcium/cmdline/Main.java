@@ -22,14 +22,14 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
+import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
-import com.io7m.jlexing.core.ImmutableLexicalPositionType;
+import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.SortedSet;
@@ -184,7 +184,6 @@ public final class Main implements Runnable
       super.call();
 
 
-
       System.out.printf(
         "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
         "# Name",
@@ -202,7 +201,7 @@ public final class Main implements Runnable
       while (parser_providers.hasNext()) {
         final CaDefinitionParserFormatProviderType provider = parser_providers.next();
         final CaFormatDescriptionType format = provider.parserFormat();
-        final SortedSet<CaFormatVersionType> versions = provider.parserSupportedVersions();
+        final SortedSet<CaFormatVersion> versions = provider.parserSupportedVersions();
         versions.forEach(version -> {
           System.out.printf(
             "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
@@ -226,7 +225,7 @@ public final class Main implements Runnable
       while (serializer_providers.hasNext()) {
         final CaDefinitionSerializerFormatProviderType provider = serializer_providers.next();
         final CaFormatDescriptionType format = provider.serializerFormat();
-        final SortedSet<CaFormatVersionType> versions = provider.serializerSupportedVersions();
+        final SortedSet<CaFormatVersion> versions = provider.serializerSupportedVersions();
         versions.forEach(version -> {
           System.out.printf(
             "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
@@ -300,7 +299,7 @@ public final class Main implements Runnable
           Paths.get(this.file_out);
 
         try (final InputStream is = Files.newInputStream(path_in)) {
-          final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> result =
+          final Validation<List<CaParseError>, CaDefinitionSkeletonType> result =
             parser.parseSkeletonFromStream(is, URI.create(this.file_in));
           if (result.isValid()) {
             LOG.debug("parsed successfully");
@@ -312,11 +311,11 @@ public final class Main implements Runnable
           } else {
             LOG.error("parsing failed");
             result.getError().forEach(error -> {
-              final ImmutableLexicalPositionType<Path> lexical = error.lexical();
+              final LexicalPosition<Path> lexical = error.lexical();
               LOG.error(
                 "{}:{}: {}",
-                Integer.valueOf(lexical.getLine()),
-                Integer.valueOf(lexical.getColumn()),
+                Integer.valueOf(lexical.line()),
+                Integer.valueOf(lexical.column()),
                 error.message());
             });
           }
@@ -360,7 +359,7 @@ public final class Main implements Runnable
 
         final Path path = Paths.get(this.file);
         try (final InputStream is = Files.newInputStream(path)) {
-          final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> result =
+          final Validation<List<CaParseError>, CaDefinitionSkeletonType> result =
             parser.parseSkeletonFromStream(is, URI.create(this.file));
           if (result.isValid()) {
             LOG.debug("parsed successfully");
@@ -368,11 +367,11 @@ public final class Main implements Runnable
           } else {
             LOG.error("parsing failed");
             result.getError().forEach(error -> {
-              final ImmutableLexicalPositionType<Path> lexical = error.lexical();
+              final LexicalPosition<Path> lexical = error.lexical();
               LOG.error(
                 "{}:{}: {}",
-                Integer.valueOf(lexical.getLine()),
-                Integer.valueOf(lexical.getColumn()),
+                Integer.valueOf(lexical.line()),
+                Integer.valueOf(lexical.column()),
                 error.message());
             });
           }

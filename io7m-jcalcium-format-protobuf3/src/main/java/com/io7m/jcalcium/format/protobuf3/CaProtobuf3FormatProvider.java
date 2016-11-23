@@ -20,17 +20,15 @@ import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.format.protobuf3.v1.CaV1Protobuf3Format;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
+import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
-import com.io7m.jlexing.core.ImmutableLexicalPosition;
-import com.io7m.jlexing.core.ImmutableLexicalPositionType;
+import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.SortedSet;
@@ -46,6 +44,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import static javaslang.control.Validation.invalid;
 import static javaslang.control.Validation.valid;
@@ -59,7 +58,7 @@ public final class CaProtobuf3FormatProvider implements
   CaDefinitionSerializerFormatProviderType
 {
   private static final Logger LOG;
-  private static final CaFormatDescriptionType FORMAT;
+  private static final CaFormatDescription FORMAT;
 
   static {
     LOG = LoggerFactory.getLogger(CaProtobuf3FormatProvider.class);
@@ -84,13 +83,13 @@ public final class CaProtobuf3FormatProvider implements
   }
 
   @Override
-  public CaFormatDescriptionType parserFormat()
+  public CaFormatDescription parserFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public SortedSet<CaFormatVersionType> parserSupportedVersions()
+  public SortedSet<CaFormatVersion> parserSupportedVersions()
   {
     return CaV1Protobuf3Format.supported();
   }
@@ -102,23 +101,23 @@ public final class CaProtobuf3FormatProvider implements
   }
 
   @Override
-  public CaFormatDescriptionType serializerFormat()
+  public CaFormatDescription serializerFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public SortedSet<CaFormatVersionType> serializerSupportedVersions()
+  public SortedSet<CaFormatVersion> serializerSupportedVersions()
   {
     return CaV1Protobuf3Format.supported();
   }
 
   @Override
   public CaDefinitionSerializerType serializerCreate(
-    final CaFormatVersionType v)
+    final CaFormatVersion v)
     throws UnsupportedOperationException
   {
-    for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
+    for (final CaFormatVersion supported : CaV1Protobuf3Format.supported()) {
       if (supported.major() == v.major() && supported.minor() == v.minor()) {
         return new PrefixingSerializer(v);
       }
@@ -131,10 +130,10 @@ public final class CaProtobuf3FormatProvider implements
   private static final class PrefixingSerializer implements
     CaDefinitionSerializerType
   {
-    private final CaFormatVersionType version;
+    private final CaFormatVersion version;
 
     PrefixingSerializer(
-      final CaFormatVersionType v)
+      final CaFormatVersion v)
     {
       this.version = NullCheck.notNull(v, "Version");
     }
@@ -169,7 +168,7 @@ public final class CaProtobuf3FormatProvider implements
 
     }
 
-    private static Validation<List<CaParseErrorType>, CaFormatVersionType> parseVersion(
+    private static Validation<List<CaParseError>, CaFormatVersion> parseVersion(
       final InputStream is,
       final URI uri)
     {
@@ -239,12 +238,12 @@ public final class CaProtobuf3FormatProvider implements
       }
     }
 
-    private static ImmutableLexicalPositionType<Path> position(final URI uri)
+    private static LexicalPosition<Path> position(final URI uri)
     {
-      return ImmutableLexicalPosition.newPositionWithFile(0, 0, Paths.get(uri));
+      return LexicalPosition.of(0, 0, Optional.of(Paths.get(uri)));
     }
 
-    private static Validation<List<CaParseErrorType>, Unit> parseMagicNumber(
+    private static Validation<List<CaParseError>, Unit> parseMagicNumber(
       final InputStream is,
       final URI uri)
     {
@@ -304,7 +303,7 @@ public final class CaProtobuf3FormatProvider implements
     }
 
     @Override
-    public Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+    public Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
       final InputStream is,
       final URI uri)
     {
@@ -314,11 +313,11 @@ public final class CaProtobuf3FormatProvider implements
             .flatMap(p -> p.parseSkeletonFromStream(is, uri))));
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionParserType> parserForVersion(
-      final CaFormatVersionType version,
+    private Validation<List<CaParseError>, CaDefinitionParserType> parserForVersion(
+      final CaFormatVersion version,
       final URI uri)
     {
-      for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
+      for (final CaFormatVersion supported : CaV1Protobuf3Format.supported()) {
         if (supported.equals(version)) {
           return valid(new CaV1Protobuf3Format());
         }
@@ -335,7 +334,7 @@ public final class CaProtobuf3FormatProvider implements
       sb.append("  Supported: ");
       sb.append(System.lineSeparator());
 
-      for (final CaFormatVersionType supported : CaV1Protobuf3Format.supported()) {
+      for (final CaFormatVersion supported : CaV1Protobuf3Format.supported()) {
         sb.append("    ");
         sb.append(supported.major());
         sb.append("");

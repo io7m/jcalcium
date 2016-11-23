@@ -19,7 +19,7 @@ package com.io7m.jcalcium.tests.format.json.jackson;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
+import com.io7m.jcalcium.parser.api.CaParseError;
 import javaslang.collection.List;
 import javaslang.control.Validation;
 import org.junit.Assert;
@@ -43,7 +43,7 @@ public final class CaJSONFormatProviderTest
   public void testEmpty()
   {
     final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("empty.caj"), uri("empty.caj"));
 
     dump(r);
@@ -55,7 +55,7 @@ public final class CaJSONFormatProviderTest
   public void testNoVersion()
   {
     final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("no_version.caj"), uri("no_version.caj"));
 
     dump(r);
@@ -66,7 +66,7 @@ public final class CaJSONFormatProviderTest
   public void testBadVersion()
   {
     final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("bad_version.caj"), uri("bad_version.caj"));
 
     dump(r);
@@ -77,7 +77,7 @@ public final class CaJSONFormatProviderTest
   public void testAll()
   {
     final CaDefinitionParserType p = new CaJSONFormatProvider().parserCreate();
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
       p.parseSkeletonFromStream(resource("all-1.0.caj"), uri("all-1.0.caj"));
 
     dump(r);
@@ -85,7 +85,7 @@ public final class CaJSONFormatProviderTest
   }
 
   private static void dump(
-    final Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> r)
+    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r)
   {
     if (r.isValid()) {
       LOG.debug("valid: {}", r.get());

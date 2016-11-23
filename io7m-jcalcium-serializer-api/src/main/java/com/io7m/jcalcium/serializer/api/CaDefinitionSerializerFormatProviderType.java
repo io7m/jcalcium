@@ -16,8 +16,8 @@
 
 package com.io7m.jcalcium.serializer.api;
 
-import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
+import com.io7m.jcalcium.core.definitions.CaFormatDescription;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import javaslang.collection.SortedSet;
 
 /**
@@ -30,13 +30,13 @@ public interface CaDefinitionSerializerFormatProviderType
    * @return The format that this provider supports
    */
 
-  CaFormatDescriptionType serializerFormat();
+  CaFormatDescription serializerFormat();
 
   /**
    * @return The supported versions of the format
    */
 
-  SortedSet<CaFormatVersionType> serializerSupportedVersions();
+  SortedSet<CaFormatVersion> serializerSupportedVersions();
 
   /**
    * Create a new serializer for the given format version.
@@ -51,6 +51,6 @@ public interface CaDefinitionSerializerFormatProviderType
    */
 
   CaDefinitionSerializerType serializerCreate(
-    CaFormatVersionType v)
+    CaFormatVersion v)
     throws UnsupportedOperationException;
 }

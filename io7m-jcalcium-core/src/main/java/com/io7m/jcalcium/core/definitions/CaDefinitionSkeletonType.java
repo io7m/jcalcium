@@ -16,9 +16,9 @@
 
 package com.io7m.jcalcium.core.definitions;
 
-import com.io7m.jcalcium.core.CaActionNameType;
-import com.io7m.jcalcium.core.CaBoneNameType;
-import com.io7m.jcalcium.core.CaSkeletonNameType;
+import com.io7m.jcalcium.core.CaActionName;
+import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
 import javaslang.collection.Map;
@@ -37,19 +37,19 @@ public interface CaDefinitionSkeletonType
    */
 
   @Value.Parameter
-  CaSkeletonNameType name();
+  CaSkeletonName name();
 
   /**
    * @return The skeleton's bones, by name
    */
 
   @Value.Parameter
-  Map<CaBoneNameType, CaDefinitionBoneType> bones();
+  Map<CaBoneName, CaDefinitionBoneType> bones();
 
   /**
    * @return The skeleton's actions, by name
    */
 
   @Value.Parameter
-  Map<CaActionNameType, CaDefinitionActionType> actions();
+  Map<CaActionName, CaDefinitionActionType> actions();
 }

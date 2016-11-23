@@ -39,7 +39,7 @@ public interface CaDefinitionParserType
    * @return A validation value indicating the result of parsing
    */
 
-  Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+  Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
     InputStream is,
     URI uri);
 }

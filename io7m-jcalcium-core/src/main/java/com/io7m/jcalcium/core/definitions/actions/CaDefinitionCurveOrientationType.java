@@ -38,7 +38,9 @@ public interface CaDefinitionCurveOrientationType extends CaDefinitionCurveType
     final PartialBiFunctionType<A, CaDefinitionCurveScaleType, B, E> on_scale)
     throws E
   {
-    return NullCheck.notNull(on_orientation, "on_orientation").call(context, this);
+    return NullCheck.notNull(on_orientation, "on_orientation").call(
+      context,
+      this);
   }
 
   /**

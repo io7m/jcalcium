@@ -17,19 +17,18 @@
 package com.io7m.jcalcium.format.protobuf3.v1;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaActionNameType;
+import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.CaBoneNameType;
+import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.CaSkeletonNameType;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
-import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
@@ -49,9 +48,8 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
-import com.io7m.jlexing.core.ImmutableLexicalPosition;
+import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
@@ -71,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
@@ -106,7 +105,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
    * @return The parserSupportedVersions supported by this parser
    */
 
-  public static SortedSet<CaFormatVersionType> supported()
+  public static SortedSet<CaFormatVersion> supported()
   {
     return TreeSet.of(CaFormatVersion.of(1, 0));
   }
@@ -148,7 +147,8 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
     final Skeleton.V1ActionCurves.Builder b = Skeleton.V1ActionCurves.newBuilder();
     b.setName(ac.name().value());
     b.setFramesPerSecond(ac.framesPerSecond());
-    ac.curves().forEach(p -> p._2.forEach(curve -> b.addCurves(fromCoreCurve(curve))));
+    ac.curves().forEach(p -> p._2.forEach(curve -> b.addCurves(fromCoreCurve(
+      curve))));
     return b.build();
   }
 
@@ -299,7 +299,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
   }
 
   @Override
-  public Validation<List<CaParseErrorType>, CaDefinitionSkeletonType>
+  public Validation<List<CaParseError>, CaDefinitionSkeletonType>
   parseSkeletonFromStream(
     final InputStream is,
     final URI uri)
@@ -329,17 +329,17 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       this.stream = NullCheck.notNull(in_stream, "Stream");
     }
 
-    private static <T, U> List<Validation<List<CaParseErrorType>, U>> list(
+    private static <T, U> List<Validation<List<CaParseError>, U>> list(
       final Collection<T> v,
-      final Function<T, Validation<List<CaParseErrorType>, U>> f)
+      final Function<T, Validation<List<CaParseError>, U>> f)
     {
       return v.stream().map(f).collect(List.collector());
     }
 
-    private static <T> Validation<List<CaParseErrorType>, List<T>> errorList(
-      final List<Validation<List<CaParseErrorType>, T>> results)
+    private static <T> Validation<List<CaParseError>, List<T>> errorList(
+      final List<Validation<List<CaParseError>, T>> results)
     {
-      final List<Validation<List<CaParseErrorType>, T>> invalids =
+      final List<Validation<List<CaParseError>, T>> invalids =
         results.filter(Validation::isInvalid);
 
       if (!invalids.isEmpty()) {
@@ -349,21 +349,21 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       return valid(results.map(Validation::get));
     }
 
-    private Validation<List<CaParseErrorType>, VectorI3D> scale(
+    private Validation<List<CaParseError>, VectorI3D> scale(
       final Skeleton.V1ScaleOrBuilder v)
     {
       return this.notNull(v, "Scale").flatMap(
         vnn -> valid(new VectorI3D(vnn.getX(), vnn.getY(), vnn.getZ())));
     }
 
-    private Validation<List<CaParseErrorType>, PVectorI3D<CaSpaceBoneParentRelativeType>> translation(
+    private Validation<List<CaParseError>, PVectorI3D<CaSpaceBoneParentRelativeType>> translation(
       final Skeleton.V1TranslationOrBuilder v)
     {
       return this.notNull(v, "Translation").flatMap(
         vnn -> valid(new PVectorI3D<>(vnn.getX(), vnn.getY(), vnn.getZ())));
     }
 
-    private Validation<List<CaParseErrorType>, QuaternionI4D> quaternion(
+    private Validation<List<CaParseError>, QuaternionI4D> quaternion(
       final Skeleton.V1QuaternionOrBuilder v)
     {
       return this.notNull(v, "Quaternion").flatMap(
@@ -371,13 +371,13 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
           qnn.getX(), qnn.getY(), qnn.getZ(), qnn.getW())));
     }
 
-    private <T> Validation<List<CaParseErrorType>, T> invalidList(
+    private <T> Validation<List<CaParseError>, T> invalidList(
       final String message)
     {
       return Validation.invalid(List.of(this.errorFor(message)));
     }
 
-    private <T> Validation<List<CaParseErrorType>, T> notNull(
+    private <T> Validation<List<CaParseError>, T> notNull(
       final T x,
       final String name)
     {
@@ -387,15 +387,16 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       return valid(x);
     }
 
-    private CaParseErrorType errorFor(
+    private CaParseError errorFor(
       final String message)
     {
+      final Path path = Paths.get(this.uri);
       return CaParseError.of(
-        ImmutableLexicalPosition.newPositionWithFile(0, 0, Paths.get(this.uri)),
+        LexicalPosition.of(0, 0, Optional.of(path)),
         message);
     }
 
-    private Validation<List<CaParseErrorType>, String> nonEmptyString(
+    private Validation<List<CaParseError>, String> nonEmptyString(
       final String value,
       final String name)
     {
@@ -407,7 +408,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, Optional<String>> maybeEmptyString(
+    private Validation<List<CaParseError>, Optional<String>> maybeEmptyString(
       final String value,
       final String name)
     {
@@ -419,23 +420,32 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionBoneType> bone(
+    private Validation<List<CaParseError>, CaDefinitionBoneType> bone(
       final Skeleton.V1BoneOrBuilder v_bone)
     {
       return this.notNull(v_bone, "Bone").flatMap(bone -> {
-        final Validation<List<CaParseErrorType>, CaBoneName> v_name =
-          this.nonEmptyString(v_bone.getName(), "Bone name").map(CaBoneName::of);
-        final Validation<List<CaParseErrorType>, Optional<CaBoneNameType>> v_parent =
-          this.maybeEmptyString(v_bone.getParent(), "Parent bone").map(t -> t.map(CaBoneName::of));
-        final Validation<List<CaParseErrorType>, PVectorI3D<CaSpaceBoneParentRelativeType>> v_translation =
+        final Validation<List<CaParseError>, CaBoneName> v_name =
+          this.nonEmptyString(
+            v_bone.getName(),
+            "Bone name").map(CaBoneName::of);
+        final Validation<List<CaParseError>, Optional<CaBoneName>> v_parent =
+          this.maybeEmptyString(
+            v_bone.getParent(),
+            "Parent bone").map(t -> t.map(CaBoneName::of));
+        final Validation<List<CaParseError>, PVectorI3D<CaSpaceBoneParentRelativeType>> v_translation =
           this.translation(v_bone.getTranslation());
-        final Validation<List<CaParseErrorType>, QuaternionI4D> v_orientation =
+        final Validation<List<CaParseError>, QuaternionI4D> v_orientation =
           this.quaternion(v_bone.getOrientation());
-        final Validation<List<CaParseErrorType>, VectorI3D> v_scale =
+        final Validation<List<CaParseError>, VectorI3D> v_scale =
           this.scale(v_bone.getScale());
 
         return flatten(
-          Validation.combine(v_name, v_parent, v_translation, v_orientation, v_scale)
+          Validation.combine(
+            v_name,
+            v_parent,
+            v_translation,
+            v_orientation,
+            v_scale)
             .ap((b_name, b_parent, b_trans, b_quat, b_scale) -> {
               final CaDefinitionBone.Builder bb = CaDefinitionBone.builder();
               bb.setName(b_name);
@@ -448,7 +458,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionActionType> action(
+    private Validation<List<CaParseError>, CaDefinitionActionType> action(
       final Skeleton.V1ActionOrBuilder v_action)
     {
       return this.notNull(v_action.getActionCase(), "Action case")
@@ -463,13 +473,15 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
         });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionActionType> actionCurves(
+    private Validation<List<CaParseError>, CaDefinitionActionType> actionCurves(
       final Skeleton.V1ActionCurvesOrBuilder action_curves)
     {
       return this.notNull(action_curves, "Action").flatMap(ac -> {
-        final Validation<List<CaParseErrorType>, CaActionName> v_name =
-          this.nonEmptyString(ac.getName(), "Action name").map(CaActionName::of);
-        final Validation<List<CaParseErrorType>, Map<CaBoneNameType, List<CaDefinitionCurveType>>> v_curves =
+        final Validation<List<CaParseError>, CaActionName> v_name =
+          this.nonEmptyString(
+            ac.getName(),
+            "Action name").map(CaActionName::of);
+        final Validation<List<CaParseError>, Map<CaBoneName, List<CaDefinitionCurveType>>> v_curves =
           this.notNull(ac.getCurvesList(), "Curves")
             .flatMap(curves -> errorList(list(curves, this::curve)))
             .map(curves -> curves.groupBy(CaDefinitionCurveType::bone));
@@ -487,7 +499,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveType> curve(
+    private Validation<List<CaParseError>, CaDefinitionCurveType> curve(
       final Skeleton.V1Curve curve)
     {
       return this.notNull(curve.getCurveCase(), "Curve case")
@@ -506,7 +518,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
         });
     }
 
-    private Validation<List<CaParseErrorType>, CaCurveInterpolation>
+    private Validation<List<CaParseError>, CaCurveInterpolation>
     interpolation(final Skeleton.V1Interpolation interpolation)
     {
       return this.notNull(interpolation, "Interpolation").flatMap(i -> {
@@ -524,7 +536,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaCurveEasing>
+    private Validation<List<CaParseError>, CaCurveEasing>
     easing(final Skeleton.V1Easing easing)
     {
       return this.notNull(easing, "Easing").flatMap(i -> {
@@ -542,16 +554,16 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveKeyframeTranslationType>
+    private Validation<List<CaParseError>, CaDefinitionCurveKeyframeTranslationType>
     curveKeyframeTranslation(
       final Skeleton.V1CurveKeyframeTranslation translation)
     {
       return this.notNull(translation, "Translation").flatMap(kf -> {
-        final Validation<List<CaParseErrorType>, PVectorI3D<CaSpaceBoneParentRelativeType>> v_trans =
+        final Validation<List<CaParseError>, PVectorI3D<CaSpaceBoneParentRelativeType>> v_trans =
           this.translation(translation.getTranslation());
-        final Validation<List<CaParseErrorType>, CaCurveEasing> v_ease =
+        final Validation<List<CaParseError>, CaCurveEasing> v_ease =
           this.easing(translation.getEasing());
-        final Validation<List<CaParseErrorType>, CaCurveInterpolation> v_inter =
+        final Validation<List<CaParseError>, CaCurveInterpolation> v_inter =
           this.interpolation(translation.getInterpolation());
         return flatten(
           Validation.combine(v_trans, v_ease, v_inter)
@@ -567,14 +579,14 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveTranslationType>
+    private Validation<List<CaParseError>, CaDefinitionCurveTranslationType>
     curveTranslation(
       final Skeleton.V1CurveTranslation translation)
     {
       return this.notNull(translation, "Translation").flatMap(tr -> {
-        final Validation<List<CaParseErrorType>, CaBoneName> v_name =
+        final Validation<List<CaParseError>, CaBoneName> v_name =
           this.nonEmptyString(tr.getBone(), "Bone name").map(CaBoneName::of);
-        final Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeTranslationType>> v_frames =
+        final Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeTranslationType>> v_frames =
           this.curveTranslationKeyframes(tr.getKeyframesList());
 
         return flatten(
@@ -589,7 +601,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeTranslationType>>
+    private Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeTranslationType>>
     curveTranslationKeyframes(
       final java.util.List<Skeleton.V1CurveKeyframeTranslation> tr)
     {
@@ -599,16 +611,16 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
                           .collect(List.collector())));
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveKeyframeScaleType>
+    private Validation<List<CaParseError>, CaDefinitionCurveKeyframeScaleType>
     curveKeyframeScale(
       final Skeleton.V1CurveKeyframeScale scale)
     {
       return this.notNull(scale, "Scale").flatMap(kf -> {
-        final Validation<List<CaParseErrorType>, VectorI3D> v_scale =
+        final Validation<List<CaParseError>, VectorI3D> v_scale =
           this.scale(scale.getScale());
-        final Validation<List<CaParseErrorType>, CaCurveEasing> v_ease =
+        final Validation<List<CaParseError>, CaCurveEasing> v_ease =
           this.easing(scale.getEasing());
-        final Validation<List<CaParseErrorType>, CaCurveInterpolation> v_inter =
+        final Validation<List<CaParseError>, CaCurveInterpolation> v_inter =
           this.interpolation(scale.getInterpolation());
         return flatten(
           Validation.combine(v_scale, v_ease, v_inter)
@@ -624,7 +636,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeScaleType>>
+    private Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeScaleType>>
     curveScaleKeyframes(
       final java.util.List<Skeleton.V1CurveKeyframeScale> tr)
     {
@@ -634,14 +646,14 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
                           .collect(List.collector())));
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveScaleType>
+    private Validation<List<CaParseError>, CaDefinitionCurveScaleType>
     curveScale(
       final Skeleton.V1CurveScale scale)
     {
       return this.notNull(scale, "Scale").flatMap(tr -> {
-        final Validation<List<CaParseErrorType>, CaBoneName> v_name =
+        final Validation<List<CaParseError>, CaBoneName> v_name =
           this.nonEmptyString(tr.getBone(), "Bone name").map(CaBoneName::of);
-        final Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeScaleType>> v_frames =
+        final Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeScaleType>> v_frames =
           this.curveScaleKeyframes(tr.getKeyframesList());
 
         return flatten(
@@ -656,16 +668,16 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveKeyframeOrientationType>
+    private Validation<List<CaParseError>, CaDefinitionCurveKeyframeOrientationType>
     curveKeyframeOrientation(
       final Skeleton.V1CurveKeyframeOrientation orientation)
     {
       return this.notNull(orientation, "Orientation").flatMap(kf -> {
-        final Validation<List<CaParseErrorType>, QuaternionI4D> v_orientation =
+        final Validation<List<CaParseError>, QuaternionI4D> v_orientation =
           this.quaternion(orientation.getOrientation());
-        final Validation<List<CaParseErrorType>, CaCurveEasing> v_ease =
+        final Validation<List<CaParseError>, CaCurveEasing> v_ease =
           this.easing(orientation.getEasing());
-        final Validation<List<CaParseErrorType>, CaCurveInterpolation> v_inter =
+        final Validation<List<CaParseError>, CaCurveInterpolation> v_inter =
           this.interpolation(orientation.getInterpolation());
         return flatten(
           Validation.combine(v_orientation, v_ease, v_inter)
@@ -681,7 +693,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeOrientationType>>
+    private Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeOrientationType>>
     curveOrientationKeyframes(
       final java.util.List<Skeleton.V1CurveKeyframeOrientation> tr)
     {
@@ -691,14 +703,14 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
                           .collect(List.collector())));
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionCurveOrientationType>
+    private Validation<List<CaParseError>, CaDefinitionCurveOrientationType>
     curveOrientation(
       final Skeleton.V1CurveOrientation orientation)
     {
       return this.notNull(orientation, "Orientation").flatMap(tr -> {
-        final Validation<List<CaParseErrorType>, CaBoneName> v_name =
+        final Validation<List<CaParseError>, CaBoneName> v_name =
           this.nonEmptyString(tr.getBone(), "Bone name").map(CaBoneName::of);
-        final Validation<List<CaParseErrorType>, List<CaDefinitionCurveKeyframeOrientationType>> v_frames =
+        final Validation<List<CaParseError>, List<CaDefinitionCurveKeyframeOrientationType>> v_frames =
           this.curveOrientationKeyframes(tr.getKeyframesList());
 
         return flatten(
@@ -713,22 +725,24 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> run()
+    private Validation<List<CaParseError>, CaDefinitionSkeletonType> run()
     {
       try {
         final Skeleton.V1Skeleton sk =
           Skeleton.V1Skeleton.parseFrom(this.stream);
 
-        final Validation<List<CaParseErrorType>, CaSkeletonNameType> v_name =
-          this.nonEmptyString(sk.getName(), "Skeleton name").map(CaSkeletonName::of);
+        final Validation<List<CaParseError>, CaSkeletonName> v_name =
+          this.nonEmptyString(
+            sk.getName(),
+            "Skeleton name").map(CaSkeletonName::of);
 
-        final Validation<List<CaParseErrorType>, Map<CaBoneNameType, CaDefinitionBoneType>> v_bones =
+        final Validation<List<CaParseError>, Map<CaBoneName, CaDefinitionBoneType>> v_bones =
           this.notNull(sk.getBonesList(), "Bones")
             .flatMap(bones -> errorList(list(bones, this::bone)))
             .flatMap(bones -> this.toMap(
               bones, "bone", CaDefinitionBoneType::name));
 
-        final Validation<List<CaParseErrorType>, Map<CaActionNameType, CaDefinitionActionType>> v_actions =
+        final Validation<List<CaParseError>, Map<CaActionName, CaDefinitionActionType>> v_actions =
           this.notNull(sk.getActionsList(), "Actions")
             .flatMap(actions -> errorList(list(actions, this::action)))
             .flatMap(actions -> this.toMap(
@@ -749,7 +763,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       }
     }
 
-    private <K, V> Validation<List<CaParseErrorType>, Map<K, V>> toMap(
+    private <K, V> Validation<List<CaParseError>, Map<K, V>> toMap(
       final Traversable<V> results,
       final String name,
       final Function<V, K> classify)

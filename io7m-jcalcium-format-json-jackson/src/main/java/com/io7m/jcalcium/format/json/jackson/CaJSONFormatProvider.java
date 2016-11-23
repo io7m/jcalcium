@@ -30,16 +30,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
-import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import com.io7m.jcalcium.format.json.jackson.v1.CaV1JSONFormat;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
-import com.io7m.jcalcium.parser.api.CaParseErrorType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
-import com.io7m.jlexing.core.ImmutableLexicalPosition;
+import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.SortedSet;
@@ -52,6 +51,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * A format provider for the JSON format.
@@ -87,13 +87,13 @@ public final class CaJSONFormatProvider implements
   }
 
   @Override
-  public CaFormatDescriptionType parserFormat()
+  public CaFormatDescription parserFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public SortedSet<CaFormatVersionType> parserSupportedVersions()
+  public SortedSet<CaFormatVersion> parserSupportedVersions()
   {
     return CaV1JSONFormat.supported();
   }
@@ -105,20 +105,20 @@ public final class CaJSONFormatProvider implements
   }
 
   @Override
-  public CaFormatDescriptionType serializerFormat()
+  public CaFormatDescription serializerFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public SortedSet<CaFormatVersionType> serializerSupportedVersions()
+  public SortedSet<CaFormatVersion> serializerSupportedVersions()
   {
     return CaV1JSONFormat.supported();
   }
 
   @Override
   public CaDefinitionSerializerType serializerCreate(
-    final CaFormatVersionType v)
+    final CaFormatVersion v)
     throws UnsupportedOperationException
   {
     return new Serializer(v);
@@ -222,7 +222,7 @@ public final class CaJSONFormatProvider implements
     }
 
     @Override
-    public Validation<List<CaParseErrorType>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+    public Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
       final InputStream is,
       final URI uri)
     {
@@ -234,36 +234,36 @@ public final class CaJSONFormatProvider implements
           this.mapper.readValue(is, CaDefinitionSkeletonType.class));
       } catch (final JsonMappingException e) {
         final JsonLocation loc = e.getLocation();
-        final javaslang.collection.List<CaParseErrorType> xs =
+        final javaslang.collection.List<CaParseError> xs =
           javaslang.collection.List.of(
             CaParseError.of(
-              ImmutableLexicalPosition.newPositionWithFile(
+              LexicalPosition.of(
                 loc.getLineNr(),
                 loc.getColumnNr(),
-                Paths.get(uri)),
+                Optional.of(Paths.get(uri))),
               e.getMessage()
             ));
         return Validation.invalid(xs);
       } catch (final JsonParseException e) {
         final JsonLocation loc = e.getLocation();
-        final javaslang.collection.List<CaParseErrorType> xs =
+        final javaslang.collection.List<CaParseError> xs =
           javaslang.collection.List.of(
             CaParseError.of(
-              ImmutableLexicalPosition.newPositionWithFile(
+              LexicalPosition.of(
                 loc.getLineNr(),
                 loc.getColumnNr(),
-                Paths.get(uri)),
+                Optional.of(Paths.get(uri))),
               e.getMessage()
             ));
         return Validation.invalid(xs);
       } catch (final IOException e) {
-        final javaslang.collection.List<CaParseErrorType> xs =
+        final javaslang.collection.List<CaParseError> xs =
           javaslang.collection.List.of(
             CaParseError.of(
-              ImmutableLexicalPosition.newPositionWithFile(
+              LexicalPosition.of(
                 -1,
                 -1,
-                Paths.get(uri)),
+                Optional.of(Paths.get(uri))),
               e.getMessage()
             ));
         return Validation.invalid(xs);

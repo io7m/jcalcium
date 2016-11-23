@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.core.definitions.actions;
 
+import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaBoneNameType;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
@@ -45,5 +46,5 @@ public interface CaDefinitionActionCurvesType extends CaDefinitionActionType
    * @return The curves for the action
    */
 
-  Map<CaBoneNameType, List<CaDefinitionCurveType>> curves();
+  Map<CaBoneName, List<CaDefinitionCurveType>> curves();
 }

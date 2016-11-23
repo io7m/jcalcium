@@ -38,7 +38,9 @@ public interface CaDefinitionCurveTranslationType extends CaDefinitionCurveType
     final PartialBiFunctionType<A, CaDefinitionCurveScaleType, B, E> on_scale)
     throws E
   {
-    return NullCheck.notNull(on_translation, "on_translation").call(context, this);
+    return NullCheck.notNull(on_translation, "on_translation").call(
+      context,
+      this);
   }
 
   /**

@@ -16,7 +16,9 @@
 
 package com.io7m.jcalcium.parser.api;
 
+import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
+import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
 import javaslang.collection.SortedSet;
 
@@ -30,13 +32,13 @@ public interface CaDefinitionParserFormatProviderType
    * @return The format that this provider supports
    */
 
-  CaFormatDescriptionType parserFormat();
+  CaFormatDescription parserFormat();
 
   /**
    * @return The supported versions of the format
    */
 
-  SortedSet<CaFormatVersionType> parserSupportedVersions();
+  SortedSet<CaFormatVersion> parserSupportedVersions();
 
   /**
    * @return A new parser for the format

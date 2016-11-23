@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.core.definitions.actions;
 
+import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaActionNameType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 
@@ -28,11 +29,11 @@ public interface CaDefinitionActionType
   /**
    * Match on an action definition.
    *
-   * @param context        A contextual value
+   * @param context   A contextual value
    * @param on_curves Evaluated for curve actions
-   * @param <A>            The type of contextual values
-   * @param <B>            The type of returned values
-   * @param <E>            The type of raised exceptions
+   * @param <A>       The type of contextual values
+   * @param <B>       The type of returned values
+   * @param <E>       The type of raised exceptions
    *
    * @return The value returned by the evaluated function
    *
@@ -49,7 +50,7 @@ public interface CaDefinitionActionType
    * @return The name of the action
    */
 
-  CaActionNameType name();
+  CaActionName name();
 
   /**
    * @return The number of frames per second the action uses

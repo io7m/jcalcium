@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.parser.api;
 
-import com.io7m.jlexing.core.ImmutableLexicalPositionType;
+import com.io7m.jlexing.core.LexicalPosition;
 import org.immutables.value.Value;
 
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ public interface CaParseErrorType
    */
 
   @Value.Parameter
-  ImmutableLexicalPositionType<Path> lexical();
+  LexicalPosition<Path> lexical();
 
   /**
    * @return The error message
