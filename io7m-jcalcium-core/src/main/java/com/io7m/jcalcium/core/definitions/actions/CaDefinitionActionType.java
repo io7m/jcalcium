@@ -17,7 +17,6 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaActionNameType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 
 /**

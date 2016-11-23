@@ -17,7 +17,6 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.CaBoneNameType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 
 /**
