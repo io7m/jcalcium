@@ -17,12 +17,9 @@
 package com.io7m.jcalcium.format.protobuf3.v1;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;

@@ -18,12 +18,10 @@ package com.io7m.jcalcium.format.protobuf3;
 
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
-import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.protobuf3.v1.CaV1Protobuf3Format;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
-import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
