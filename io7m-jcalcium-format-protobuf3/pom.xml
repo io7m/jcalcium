@@ -13,7 +13,7 @@
   <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-json</name>
+  <name>io7m-jcalcium-format-protobuf3</name>
   <description>Skeletal animation (Protobuf3 format)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
