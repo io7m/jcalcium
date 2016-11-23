@@ -1,3 +1,6 @@
+*.blend.caj
+*.blend.caj.log
+*.blend.caj.tmp
 *.iml
 *.ipr
 *.iws
