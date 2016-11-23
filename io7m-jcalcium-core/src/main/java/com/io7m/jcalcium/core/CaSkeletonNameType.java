@@ -40,8 +40,9 @@ public interface CaSkeletonNameType
   @Value.Check
   default void checkPreconditions()
   {
-    if (this.value().isEmpty()) {
-      throw new IllegalArgumentException("Skeleton name must not be empty");
+    if (!CaSkeletonNames.isValid(this.value())) {
+      throw new IllegalArgumentException(
+        "Skeleton name must match the pattern: " + CaSkeletonNames.PATTERN.pattern());
     }
   }
 }

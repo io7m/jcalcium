@@ -16,33 +16,45 @@
 
 package com.io7m.jcalcium.core;
 
-import org.immutables.value.Value;
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.regex.Pattern;
 
 /**
- * The type of bone names.
+ * Validity checks for skeleton names.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaBoneNameType
+public final class CaSkeletonNames
 {
   /**
-   * @return The name value
+   * The pattern that defines a valid skeleton name.
    */
 
-  @Value.Parameter
-  String value();
+  public static final Pattern PATTERN;
+
+  private static final String PATTERN_TEXT;
+
+  static {
+    PATTERN_TEXT = "[\\p{IsAlphabetic}\\p{IsDigit}_\\-\\.:]+";
+    PATTERN = NullCheck.notNull(
+      Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
+  }
 
   /**
-   * Check preconditions for the type.
+   * @param text The text
+   *
+   * @return {@code true} iff the given text is a valid skeleton name
    */
 
-  @Value.Check
-  default void checkPreconditions()
+  public static boolean isValid(
+    final CharSequence text)
   {
-    if (!CaBoneNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Bone name must match the pattern: " + CaBoneNames.PATTERN.pattern());
-    }
+    return PATTERN.matcher(text).matches();
+  }
+
+  private CaSkeletonNames()
+  {
+    throw new UnreachableCodeException();
   }
 }

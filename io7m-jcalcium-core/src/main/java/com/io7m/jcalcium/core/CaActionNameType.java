@@ -40,8 +40,9 @@ public interface CaActionNameType
   @Value.Check
   default void checkPreconditions()
   {
-    if (this.value().isEmpty()) {
-      throw new IllegalArgumentException("Action name must not be empty");
+    if (!CaActionNames.isValid(this.value())) {
+      throw new IllegalArgumentException(
+        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
     }
   }
 }
