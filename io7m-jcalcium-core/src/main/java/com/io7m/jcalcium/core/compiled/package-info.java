@@ -14,42 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
-
-import com.io7m.jnull.NullCheck;
-import org.immutables.value.Value;
-
 /**
- * The type of action names.
+ * Compiled skeleton types.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionNameType extends Comparable<CaActionNameType>
-{
-  @Override
-  default int compareTo(final CaActionNameType o)
-  {
-    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
-  }
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.jcalcium.core.compiled;
 
-  /**
-   * @return The name value
-   */
-
-  @Value.Parameter
-  String value();
-
-  /**
-   * Check preconditions for the type.
-   */
-
-  @Value.Check
-  default void checkPreconditions()
-  {
-    if (!CaActionNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
-    }
-  }
-}

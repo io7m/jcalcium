@@ -14,42 +14,29 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
-
-import com.io7m.jnull.NullCheck;
-import org.immutables.value.Value;
+package com.io7m.jcalcium.compiler.api;
 
 /**
- * The type of action names.
+ * Compilation error codes.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionNameType extends Comparable<CaActionNameType>
+public enum CaCompileErrorCode
 {
-  @Override
-  default int compareTo(final CaActionNameType o)
-  {
-    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
-  }
-
   /**
-   * @return The name value
+   * A bone specifies a nonexistent parent.
    */
 
-  @Value.Parameter
-  String value();
+  ERROR_NONEXISTENT_PARENT,
 
   /**
-   * Check preconditions for the type.
+   * The skeleton does not have a root bone.
    */
 
-  @Value.Check
-  default void checkPreconditions()
-  {
-    if (!CaActionNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
-    }
-  }
+  ERROR_NO_ROOT_BONE,
+
+  ERROR_CYCLE, /**
+   * The skeleton has multiple root bones.
+   */
+
+  ERROR_MULTIPLE_ROOT_BONES
 }

@@ -20,6 +20,12 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.io7m.jcalcium.compiler.api.CaCompileError;
+import com.io7m.jcalcium.compiler.api.CaCompilerType;
+import com.io7m.jcalcium.compiler.main.CaCompiler;
+import com.io7m.jcalcium.core.compiled.CaCompiledBone;
+import com.io7m.jcalcium.core.compiled.CaCompiledSkeletonType;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -31,6 +37,7 @@ import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jlexing.core.LexicalPosition;
 import com.io7m.jnull.NullCheck;
+import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import javaslang.collection.List;
 import javaslang.collection.SortedSet;
 import javaslang.control.Validation;
@@ -46,6 +53,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 
@@ -73,20 +81,23 @@ public final class Main implements Runnable
     this.args = NullCheck.notNull(in_args);
 
     final CommandRoot r = new CommandRoot();
-    final CommandValidate validate = new CommandValidate();
+    final CommandCompile compile = new CommandCompile();
     final CommandFormats formats = new CommandFormats();
     final CommandTranscode transcode = new CommandTranscode();
+    final CommandValidate validate = new CommandValidate();
 
     this.commands = new HashMap<>(8);
+    this.commands.put("compile", compile);
     this.commands.put("formats", formats);
     this.commands.put("validate", validate);
     this.commands.put("transcode", transcode);
 
     this.commander = new JCommander(r);
     this.commander.setProgramName("calcium");
-    this.commander.addCommand("validate", validate);
+    this.commander.addCommand("compile", compile);
     this.commander.addCommand("formats", formats);
     this.commander.addCommand("transcode", transcode);
+    this.commander.addCommand("validate", validate);
   }
 
   /**
@@ -299,7 +310,7 @@ public final class Main implements Runnable
           Paths.get(this.file_out);
 
         try (final InputStream is = Files.newInputStream(path_in)) {
-          final Validation<List<CaParseError>, CaDefinitionSkeletonType> result =
+          final Validation<List<CaParseError>, CaDefinitionSkeleton> result =
             parser.parseSkeletonFromStream(is, URI.create(this.file_in));
           if (result.isValid()) {
             LOG.debug("parsed successfully");
@@ -359,7 +370,7 @@ public final class Main implements Runnable
 
         final Path path = Paths.get(this.file);
         try (final InputStream is = Files.newInputStream(path)) {
-          final Validation<List<CaParseError>, CaDefinitionSkeletonType> result =
+          final Validation<List<CaParseError>, CaDefinitionSkeleton> result =
             parser.parseSkeletonFromStream(is, URI.create(this.file));
           if (result.isValid()) {
             LOG.debug("parsed successfully");
@@ -386,13 +397,108 @@ public final class Main implements Runnable
     }
 
     private void validate(
-      final CaDefinitionSkeletonType sk)
+      final CaDefinitionSkeleton sk)
     {
       LOG.debug(
         "parsed skeleton: {}, {} bones, {} actions",
         sk.name().value(),
         Integer.valueOf(sk.bones().size()),
         Integer.valueOf(sk.actions().size()));
+    }
+  }
+
+  @Parameters(commandDescription = "Compile a skeleton file")
+  private final class CommandCompile extends CommandRoot
+  {
+    @Parameter(
+      names = "-file",
+      required = true,
+      description = "The input file")
+    private String file;
+
+    @Parameter(
+      names = "-format",
+      description = "The input file format")
+    private String format;
+
+    CommandCompile()
+    {
+
+    }
+
+    @Override
+    public Unit call()
+      throws Exception
+    {
+      super.call();
+
+      final CaCompilerType compiler = CaCompiler.create();
+      final CaDefinitionParserFormatProviderType provider =
+        findParserProvider(this.format, this.file);
+
+      if (provider != null) {
+        final CaDefinitionParserType parser = provider.parserCreate();
+
+        final Path path = Paths.get(this.file);
+        try (final InputStream is = Files.newInputStream(path)) {
+          final Validation<List<CaParseError>, CaDefinitionSkeleton> parse_result =
+            parser.parseSkeletonFromStream(is, URI.create(this.file));
+
+          if (!parse_result.isValid()) {
+            LOG.error("parsing failed");
+            parse_result.getError().forEach(error -> {
+              final LexicalPosition<Path> lexical = error.lexical();
+              LOG.error(
+                "{}:{}: {}",
+                Integer.valueOf(lexical.line()),
+                Integer.valueOf(lexical.column()),
+                error.message());
+            });
+            return unit();
+          }
+
+          LOG.debug("compiling");
+          final Validation<List<CaCompileError>, CaCompiledSkeletonType> compile_result =
+            compiler.compile(parse_result.get());
+
+          if (!compile_result.isValid()) {
+            LOG.error("compilation failed");
+            compile_result.getError().forEach(
+              error -> LOG.error("{}: {}", error.code(), error.message()));
+            return unit();
+          }
+
+          final CaCompiledSkeletonType compiled = compile_result.get();
+          compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
+            final CaCompiledBone bone = node.value();
+
+            final Optional<JOTreeNodeReadableType<CaCompiledBone>> parent_opt =
+              node.parentReadable();
+            if (parent_opt.isPresent()) {
+              final JOTreeNodeReadableType<CaCompiledBone> parent = parent_opt.get();
+              LOG.debug(
+                "{}:{}:{}:{}",
+                Integer.valueOf(depth),
+                Integer.valueOf(parent.value().id()),
+                Integer.valueOf(bone.id()),
+                bone.name().value());
+            } else {
+              LOG.debug(
+                "{}:{}:{}:{}",
+                Integer.valueOf(depth),
+                "-",
+                Integer.valueOf(bone.id()),
+                bone.name().value());
+            }
+          });
+        }
+
+      } else {
+        LOG.error("Could not find a suitable format provider");
+        Main.this.exit_code = 1;
+      }
+
+      return unit();
     }
   }
 

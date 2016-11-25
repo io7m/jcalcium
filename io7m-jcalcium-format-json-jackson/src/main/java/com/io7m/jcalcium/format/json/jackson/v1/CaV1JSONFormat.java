@@ -41,7 +41,6 @@ import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -120,9 +119,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
   }
 
   @Override
-  public Validation<
-    javaslang.collection.List<CaParseError>,
-    CaDefinitionSkeletonType>
+  public Validation<javaslang.collection.List<CaParseError>, CaDefinitionSkeleton>
   parseSkeletonFromStream(
     final InputStream is,
     final URI uri)
@@ -334,7 +331,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
      */
 
     public static CaV1Bone fromCore(
-      final CaDefinitionBoneType b)
+      final CaDefinitionBone b)
     {
       return new CaV1Bone(
         b.name().value(),
@@ -348,7 +345,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
      * @return A bone
      */
 
-    public CaDefinitionBoneType toBone()
+    public CaDefinitionBone toBone()
     {
       final CaDefinitionBone.Builder bb = CaDefinitionBone.builder();
       bb.setParent(this.parent.map(CaBoneName::of));
@@ -827,7 +824,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
      * @return A skeleton
      */
 
-    public CaDefinitionSkeletonType toSkeleton()
+    public CaDefinitionSkeleton toSkeleton()
     {
       final CaDefinitionSkeleton.Builder sk_b = CaDefinitionSkeleton.builder();
       sk_b.setName(CaSkeletonName.of(this.name));

@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.format.protobuf3;
 
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -301,7 +302,7 @@ public final class CaProtobuf3FormatProvider implements
     }
 
     @Override
-    public Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+    public Validation<List<CaParseError>, CaDefinitionSkeleton> parseSkeletonFromStream(
       final InputStream is,
       final URI uri)
     {

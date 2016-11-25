@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.parser.api;
 
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import javaslang.collection.List;
 import javaslang.control.Validation;
@@ -39,7 +40,7 @@ public interface CaDefinitionParserType
    * @return A validation value indicating the result of parsing
    */
 
-  Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+  Validation<List<CaParseError>, CaDefinitionSkeleton> parseSkeletonFromStream(
     InputStream is,
     URI uri);
 }

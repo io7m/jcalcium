@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.tests.format.protobuf3;
 
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
 import com.io7m.jcalcium.format.protobuf3.CaProtobuf3FormatProvider;
@@ -57,9 +57,11 @@ public final class CaProtobuf3FormatProviderTest
     final CaDefinitionParserType pp =
       new CaProtobuf3FormatProvider().parserCreate();
     final CaDefinitionSerializerType sp =
-      new CaProtobuf3FormatProvider().serializerCreate(CaFormatVersion.of(1, 0));
+      new CaProtobuf3FormatProvider().serializerCreate(CaFormatVersion.of(
+        1,
+        0));
 
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> rj =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> rj =
       pj.parseSkeletonFromStream(resource("all-1.0.caj"), uri("all-1.0.caj"));
     dump(rj);
     Assert.assertTrue(rj.isValid());
@@ -67,9 +69,10 @@ public final class CaProtobuf3FormatProviderTest
     final ByteArrayOutputStream bao = new ByteArrayOutputStream();
     sp.serializeSkeletonToStream(rj.get(), bao);
 
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> rp =
-      pp.parseSkeletonFromStream(new ByteArrayInputStream(bao.toByteArray()),
-      uri("all-1.0.caj"));
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> rp =
+      pp.parseSkeletonFromStream(
+        new ByteArrayInputStream(bao.toByteArray()),
+        uri("all-1.0.caj"));
 
     dump(rp);
     Assert.assertTrue(rp.isValid());
@@ -77,7 +80,7 @@ public final class CaProtobuf3FormatProviderTest
   }
 
   private static void dump(
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r)
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
   {
     if (r.isValid()) {
       LOG.debug("valid: {}", r.get());

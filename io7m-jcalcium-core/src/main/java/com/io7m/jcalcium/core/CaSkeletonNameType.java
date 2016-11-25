@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.core;
 
+import com.io7m.jnull.NullCheck;
 import org.immutables.value.Value;
 
 /**
@@ -24,8 +25,14 @@ import org.immutables.value.Value;
 
 @ImmutableStyleType
 @Value.Immutable
-public interface CaSkeletonNameType
+public interface CaSkeletonNameType extends Comparable<CaSkeletonNameType>
 {
+  @Override
+  default int compareTo(final CaSkeletonNameType o)
+  {
+    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
+  }
+
   /**
    * @return The name value
    */

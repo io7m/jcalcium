@@ -14,42 +14,28 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.tests;
 
-import com.io7m.jnull.NullCheck;
-import org.immutables.value.Value;
+import com.io7m.jcalcium.core.CaBoneName;
+import net.java.quickcheck.Generator;
+import net.java.quickcheck.generator.support.CharacterGenerator;
+import net.java.quickcheck.generator.support.IntegerGenerator;
+import net.java.quickcheck.generator.support.StringGenerator;
 
-/**
- * The type of action names.
- */
-
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionNameType extends Comparable<CaActionNameType>
+public final class CaBoneNameGenerator implements Generator<CaBoneName>
 {
-  @Override
-  default int compareTo(final CaActionNameType o)
+  private final StringGenerator gen;
+
+  public CaBoneNameGenerator()
   {
-    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
+    this.gen = new StringGenerator(
+      new IntegerGenerator(1, 32),
+      new CharacterGenerator('a', 'z'));
   }
 
-  /**
-   * @return The name value
-   */
-
-  @Value.Parameter
-  String value();
-
-  /**
-   * Check preconditions for the type.
-   */
-
-  @Value.Check
-  default void checkPreconditions()
+  @Override
+  public CaBoneName next()
   {
-    if (!CaActionNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
-    }
+    return CaBoneName.of(this.gen.next());
   }
 }

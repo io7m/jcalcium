@@ -14,42 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jnull.NullCheck;
-import org.immutables.value.Value;
+import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jorchard.core.JOTreeNodeReadableType;
+import javaslang.collection.SortedMap;
 
 /**
- * The type of action names.
+ * The type of compiled skeletons.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionNameType extends Comparable<CaActionNameType>
+public interface CaCompiledSkeletonType
 {
-  @Override
-  default int compareTo(final CaActionNameType o)
-  {
-    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
-  }
-
   /**
-   * @return The name value
+   * @return The tree of bones for the skeleton
    */
 
-  @Value.Parameter
-  String value();
+  JOTreeNodeReadableType<CaCompiledBone> bones();
 
   /**
-   * Check preconditions for the type.
+   * @return A map of bone nodes by name
    */
 
-  @Value.Check
-  default void checkPreconditions()
-  {
-    if (!CaActionNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
-    }
-  }
+  SortedMap<CaBoneName, JOTreeNodeReadableType<CaCompiledBone>> bonesByName();
+
+  /**
+   * @return A map of bone nodes by ID
+   */
+
+  SortedMap<Integer, JOTreeNodeReadableType<CaCompiledBone>> bonesByID();
 }

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -125,7 +126,7 @@ public final class CaJSONFormatProvider implements
   }
 
   private static final class SkeletonDeserializer
-    extends StdDeserializer<CaDefinitionSkeletonType>
+    extends StdDeserializer<CaDefinitionSkeleton>
   {
     private static final Logger LOG;
 
@@ -135,11 +136,11 @@ public final class CaJSONFormatProvider implements
 
     SkeletonDeserializer()
     {
-      super(CaDefinitionSkeletonType.class);
+      super(CaDefinitionSkeleton.class);
     }
 
     @Override
-    public CaDefinitionSkeletonType deserialize(
+    public CaDefinitionSkeleton deserialize(
       final JsonParser p,
       final DeserializationContext ctxt)
       throws IOException, JsonProcessingException
@@ -214,7 +215,7 @@ public final class CaJSONFormatProvider implements
     {
       final SimpleModule m = new SimpleModule();
       m.addDeserializer(
-        CaDefinitionSkeletonType.class, new SkeletonDeserializer());
+        CaDefinitionSkeleton.class, new SkeletonDeserializer());
 
       this.mapper = CaJSON.createMapper();
       this.mapper.registerModule(m);
@@ -222,7 +223,7 @@ public final class CaJSONFormatProvider implements
     }
 
     @Override
-    public Validation<List<CaParseError>, CaDefinitionSkeletonType> parseSkeletonFromStream(
+    public Validation<List<CaParseError>, CaDefinitionSkeleton> parseSkeletonFromStream(
       final InputStream is,
       final URI uri)
     {
@@ -231,7 +232,7 @@ public final class CaJSONFormatProvider implements
 
       try {
         return Validation.valid(
-          this.mapper.readValue(is, CaDefinitionSkeletonType.class));
+          this.mapper.readValue(is, CaDefinitionSkeleton.class));
       } catch (final JsonMappingException e) {
         final JsonLocation loc = e.getLocation();
         final javaslang.collection.List<CaParseError> xs =

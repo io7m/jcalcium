@@ -1002,11 +1002,12 @@ class CalciumExporter:
     assert type(out_file) == io.TextIOWrapper
     assert type(skeleton) == CalciumSkeleton
 
-    json_data = {}
-    json_data['version'] = "calcium skeleton 1.0"
-    json_data['skeleton'] = skeleton.toJSON()
-
-    out_file.write(json.dumps(json_data, sort_keys=True, indent=2))
+    out_file.write("{\n")
+    out_file.write("  \"version\": \"calcium skeleton 1.0\",\n")
+    out_file.write("  \"skeleton\": ")
+    out_file.write(json.dumps(skeleton.toJSON(), sort_keys=False, indent=2))
+    out_file.write("\n")
+    out_file.write("}\n")
   #end
 
   def __writeFile(self, out_file, armature):

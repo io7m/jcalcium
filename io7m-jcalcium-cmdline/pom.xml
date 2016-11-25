@@ -31,6 +31,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-compiler-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>io7m-jcalcium-format-json-jackson</artifactId>
       <version>${project.version}</version>
     </dependency>

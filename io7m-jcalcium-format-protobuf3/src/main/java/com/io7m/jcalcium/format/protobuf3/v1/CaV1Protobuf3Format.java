@@ -22,7 +22,6 @@ import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -117,7 +116,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
     return b.build();
   }
 
-  private static Skeleton.V1Bone fromCoreBone(final CaDefinitionBoneType bone)
+  private static Skeleton.V1Bone fromCoreBone(final CaDefinitionBone bone)
   {
     final Skeleton.V1Bone.Builder b = Skeleton.V1Bone.newBuilder();
     b.setName(bone.name().value());
@@ -296,7 +295,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
   }
 
   @Override
-  public Validation<List<CaParseError>, CaDefinitionSkeletonType>
+  public Validation<List<CaParseError>, CaDefinitionSkeleton>
   parseSkeletonFromStream(
     final InputStream is,
     final URI uri)
@@ -417,7 +416,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseError>, CaDefinitionBoneType> bone(
+    private Validation<List<CaParseError>, CaDefinitionBone> bone(
       final Skeleton.V1BoneOrBuilder v_bone)
     {
       return this.notNull(v_bone, "Bone").flatMap(bone -> {
@@ -722,7 +721,7 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
       });
     }
 
-    private Validation<List<CaParseError>, CaDefinitionSkeletonType> run()
+    private Validation<List<CaParseError>, CaDefinitionSkeleton> run()
     {
       try {
         final Skeleton.V1Skeleton sk =
@@ -733,11 +732,10 @@ public final class CaV1Protobuf3Format implements CaDefinitionParserType,
             sk.getName(),
             "Skeleton name").map(CaSkeletonName::of);
 
-        final Validation<List<CaParseError>, Map<CaBoneName, CaDefinitionBoneType>> v_bones =
+        final Validation<List<CaParseError>, Map<CaBoneName, CaDefinitionBone>> v_bones =
           this.notNull(sk.getBonesList(), "Bones")
             .flatMap(bones -> errorList(list(bones, this::bone)))
-            .flatMap(bones -> this.toMap(
-              bones, "bone", CaDefinitionBoneType::name));
+            .flatMap(bones -> this.toMap(bones, "bone", CaDefinitionBone::name));
 
         final Validation<List<CaParseError>, Map<CaActionName, CaDefinitionActionType>> v_actions =
           this.notNull(sk.getActionsList(), "Actions")

@@ -14,42 +14,27 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.compiler.api;
 
-import com.io7m.jnull.NullCheck;
-import org.immutables.value.Value;
+import com.io7m.jcalcium.core.compiled.CaCompiledSkeletonType;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
+import javaslang.collection.List;
+import javaslang.control.Validation;
 
 /**
- * The type of action names.
+ * The type of compilers.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionNameType extends Comparable<CaActionNameType>
+public interface CaCompilerType
 {
-  @Override
-  default int compareTo(final CaActionNameType o)
-  {
-    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
-  }
-
   /**
-   * @return The name value
+   * Compile the given skeleton definition.
+   *
+   * @param skeleton The skeleton definition
+   *
+   * @return A compiled skeleton, or a list of errors
    */
 
-  @Value.Parameter
-  String value();
-
-  /**
-   * Check preconditions for the type.
-   */
-
-  @Value.Check
-  default void checkPreconditions()
-  {
-    if (!CaActionNames.isValid(this.value())) {
-      throw new IllegalArgumentException(
-        "Action name must match the pattern: " + CaActionNames.PATTERN.pattern());
-    }
-  }
+  Validation<List<CaCompileError>, CaCompiledSkeletonType> compile(
+    CaDefinitionSkeleton skeleton);
 }

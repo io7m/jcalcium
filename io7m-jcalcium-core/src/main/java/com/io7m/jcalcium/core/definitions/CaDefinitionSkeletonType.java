@@ -44,7 +44,7 @@ public interface CaDefinitionSkeletonType
    */
 
   @Value.Parameter
-  Map<CaBoneName, CaDefinitionBoneType> bones();
+  Map<CaBoneName, CaDefinitionBone> bones();
 
   /**
    * @return The skeleton's actions, by name

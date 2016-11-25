@@ -21,6 +21,7 @@ import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
+import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientationType;
@@ -59,7 +60,7 @@ public final class CaV1JSONParserTest
   public void testEmpty()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("empty.caj"), uri("empty.caj"));
 
     dump(r);
@@ -71,7 +72,7 @@ public final class CaV1JSONParserTest
   public void testBone0()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("bone0.caj"), uri("bone0.caj"));
 
     dump(r);
@@ -101,12 +102,12 @@ public final class CaV1JSONParserTest
   public void testBone1()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("bone1.caj"), uri("bone1.caj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
-    final CaDefinitionSkeletonType s = r.get();
+    final CaDefinitionSkeleton s = r.get();
     Assert.assertEquals("bone1", s.name().value());
     Assert.assertEquals(1L, (long) s.bones().size());
 
@@ -132,12 +133,12 @@ public final class CaV1JSONParserTest
   public void testAction0()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("action0.caj"), uri("action0.caj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
-    final CaDefinitionSkeletonType s = r.get();
+    final CaDefinitionSkeleton s = r.get();
     Assert.assertEquals(0L, (long) s.actions().size());
   }
 
@@ -145,12 +146,12 @@ public final class CaV1JSONParserTest
   public void testAction1()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("action1.caj"), uri("action1.caj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
-    final CaDefinitionSkeletonType s = r.get();
+    final CaDefinitionSkeleton s = r.get();
     Assert.assertEquals(1L, (long) s.actions().size());
 
     final CaDefinitionActionCurvesType act = (CaDefinitionActionCurvesType)
@@ -169,7 +170,9 @@ public final class CaV1JSONParserTest
 
     final CaDefinitionCurveKeyframeTranslationType kf = c.keyframes().get(0);
     Assert.assertEquals(new PVectorI3D<>(0.0, 1.0, 2.0), kf.translation());
-    Assert.assertEquals(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR, kf.interpolation());
+    Assert.assertEquals(
+      CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+      kf.interpolation());
     Assert.assertEquals(CaCurveEasing.CURVE_EASING_IN_OUT, kf.easing());
   }
 
@@ -177,12 +180,12 @@ public final class CaV1JSONParserTest
   public void testAction2()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("action2.caj"), uri("action2.caj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
-    final CaDefinitionSkeletonType s = r.get();
+    final CaDefinitionSkeleton s = r.get();
     Assert.assertEquals(1L, (long) s.actions().size());
 
     final CaDefinitionActionCurvesType act = (CaDefinitionActionCurvesType)
@@ -201,7 +204,9 @@ public final class CaV1JSONParserTest
 
     final CaDefinitionCurveKeyframeScaleType kf = c.keyframes().get(0);
     Assert.assertEquals(new VectorI3D(0.0, 1.0, 2.0), kf.scale());
-    Assert.assertEquals(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR, kf.interpolation());
+    Assert.assertEquals(
+      CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+      kf.interpolation());
     Assert.assertEquals(CaCurveEasing.CURVE_EASING_IN_OUT, kf.easing());
   }
 
@@ -209,12 +214,12 @@ public final class CaV1JSONParserTest
   public void testAction3()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("action3.caj"), uri("action3.caj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
-    final CaDefinitionSkeletonType s = r.get();
+    final CaDefinitionSkeleton s = r.get();
     Assert.assertEquals(1L, (long) s.actions().size());
 
     final CaDefinitionActionCurvesType act = (CaDefinitionActionCurvesType)
@@ -232,8 +237,12 @@ public final class CaV1JSONParserTest
     Assert.assertEquals(1L, (long) c.keyframes().size());
 
     final CaDefinitionCurveKeyframeOrientationType kf = c.keyframes().get(0);
-    Assert.assertEquals(new QuaternionI4D(0.0, 1.0, 2.0, 3.0), kf.orientation());
-    Assert.assertEquals(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR, kf.interpolation());
+    Assert.assertEquals(
+      new QuaternionI4D(0.0, 1.0, 2.0, 3.0),
+      kf.orientation());
+    Assert.assertEquals(
+      CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+      kf.interpolation());
     Assert.assertEquals(CaCurveEasing.CURVE_EASING_IN_OUT, kf.easing());
   }
 
@@ -241,8 +250,10 @@ public final class CaV1JSONParserTest
   public void testDuplicateAction()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
-      p.parseSkeletonFromStream(resource("dup_action.caj"), uri("dup_action.caj"));
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
+      p.parseSkeletonFromStream(
+        resource("dup_action.caj"),
+        uri("dup_action.caj"));
 
     dump(r);
     Assert.assertFalse(r.isValid());
@@ -252,7 +263,7 @@ public final class CaV1JSONParserTest
   public void testDuplicateBone()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r =
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(resource("dup_bone.caj"), uri("dup_bone.caj"));
 
     dump(r);
@@ -260,7 +271,7 @@ public final class CaV1JSONParserTest
   }
 
   private static void dump(
-    final Validation<List<CaParseError>, CaDefinitionSkeletonType> r)
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
   {
     if (r.isValid()) {
       LOG.debug("valid: {}", r.get());
