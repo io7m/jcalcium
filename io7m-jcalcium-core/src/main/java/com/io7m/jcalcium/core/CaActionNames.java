@@ -41,6 +41,11 @@ public final class CaActionNames
       Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
   }
 
+  private CaActionNames()
+  {
+    throw new UnreachableCodeException();
+  }
+
   /**
    * @param text The text
    *
@@ -51,10 +56,5 @@ public final class CaActionNames
     final CharSequence text)
   {
     return PATTERN.matcher(text).matches();
-  }
-
-  private CaActionNames()
-  {
-    throw new UnreachableCodeException();
   }
 }

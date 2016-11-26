@@ -42,6 +42,12 @@ public final class CaCompiler implements CaCompilerType
 
   }
 
+  /**
+   * Create a new compiler.
+   *
+   * @return A compiler
+   */
+
   public static CaCompilerType create()
   {
     return new CaCompiler();

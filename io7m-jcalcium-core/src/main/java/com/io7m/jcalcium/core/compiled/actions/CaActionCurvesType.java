@@ -16,13 +16,11 @@
 
 package com.io7m.jcalcium.core.compiled.actions;
 
-import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
-import javaslang.collection.Map;
 import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 

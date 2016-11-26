@@ -22,10 +22,8 @@ import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientationType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveOrientation;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.generators.QuaternionI4DGenerator;
-import com.io7m.jtensors.generators.parameterized.PVectorI3DGenerator;
 import javaslang.collection.List;
 import net.java.quickcheck.Generator;
 

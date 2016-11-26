@@ -27,7 +27,6 @@ import com.io7m.jtensors.generators.VectorI3DGenerator;
 import javaslang.collection.List;
 import net.java.quickcheck.Generator;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 /**

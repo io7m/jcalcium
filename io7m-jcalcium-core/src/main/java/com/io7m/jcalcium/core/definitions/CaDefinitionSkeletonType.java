@@ -22,7 +22,6 @@ import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
 import javaslang.collection.Map;
-import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 
 /**

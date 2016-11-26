@@ -41,6 +41,11 @@ public final class CaBoneNames
       Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
   }
 
+  private CaBoneNames()
+  {
+    throw new UnreachableCodeException();
+  }
+
   /**
    * @param text The text
    *
@@ -51,10 +56,5 @@ public final class CaBoneNames
     final CharSequence text)
   {
     return PATTERN.matcher(text).matches();
-  }
-
-  private CaBoneNames()
-  {
-    throw new UnreachableCodeException();
   }
 }

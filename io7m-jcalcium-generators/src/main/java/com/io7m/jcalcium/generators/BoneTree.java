@@ -36,24 +36,6 @@ public final class BoneTree
   private final Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> nodes;
 
   /**
-   * @return The node tree
-   */
-
-  public JOTreeNodeType<CaDefinitionBone> tree()
-  {
-    return this.tree;
-  }
-
-  /**
-   * @return The nodes by name
-   */
-
-  public Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> nodes()
-  {
-    return this.nodes;
-  }
-
-  /**
    * Construct a bone tree.
    *
    * @param in_tree  The tree
@@ -77,5 +59,23 @@ public final class BoneTree
         "Tree size %d must match node map size %d",
         Integer.valueOf(count.get()),
         Integer.valueOf(in_nodes.size())));
+  }
+
+  /**
+   * @return The node tree
+   */
+
+  public JOTreeNodeType<CaDefinitionBone> tree()
+  {
+    return this.tree;
+  }
+
+  /**
+   * @return The nodes by name
+   */
+
+  public Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> nodes()
+  {
+    return this.nodes;
   }
 }

@@ -41,6 +41,11 @@ public final class CaSkeletonNames
       Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
   }
 
+  private CaSkeletonNames()
+  {
+    throw new UnreachableCodeException();
+  }
+
   /**
    * @param text The text
    *
@@ -51,10 +56,5 @@ public final class CaSkeletonNames
     final CharSequence text)
   {
     return PATTERN.matcher(text).matches();
-  }
-
-  private CaSkeletonNames()
-  {
-    throw new UnreachableCodeException();
   }
 }

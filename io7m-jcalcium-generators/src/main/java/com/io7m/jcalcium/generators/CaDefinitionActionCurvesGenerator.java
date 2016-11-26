@@ -69,7 +69,9 @@ public final class CaDefinitionActionCurvesGenerator
       final CaBoneName bone_name = curve.bone();
       if (m.containsKey(bone_name)) {
         final List<CaDefinitionCurveType> xs = m.get(bone_name).get();
-        if (xs.filter(c -> Objects.equals(c.getClass(), curve.getClass())).isEmpty()) {
+        if (xs.filter(c -> Objects.equals(
+          c.getClass(),
+          curve.getClass())).isEmpty()) {
           m = m.put(bone_name, xs.append(curve));
         }
       } else {
