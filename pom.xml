@@ -22,6 +22,8 @@
     <module>io7m-jcalcium-compiler-main</module>
     <module>io7m-jcalcium-core</module>
     <module>io7m-jcalcium-documentation</module>
+    <module>io7m-jcalcium-evaluator-api</module>
+    <module>io7m-jcalcium-evaluator-main</module>
     <module>io7m-jcalcium-format-json-jackson</module>
     <module>io7m-jcalcium-format-protobuf3</module>
     <module>io7m-jcalcium-generators</module>

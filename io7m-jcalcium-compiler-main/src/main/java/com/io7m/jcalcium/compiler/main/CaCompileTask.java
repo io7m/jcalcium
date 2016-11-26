@@ -23,6 +23,7 @@ import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -363,91 +364,6 @@ final class CaCompileTask
     final CaDefinitionActionType action)
   {
     return action.matchAction(bone_index, CaCompileTask::compileActionCurves);
-  }
-
-  private static final class CurveTypeCounter
-  {
-    private final BitSet bone_type_received;
-    private final CaBoneName bone_name;
-    private final CaActionName action_name;
-
-    CurveTypeCounter(
-      final CaBoneName in_bone_name,
-      final CaActionName in_action_name)
-    {
-      this.bone_type_received = new BitSet(3);
-      this.bone_name = NullCheck.notNull(in_bone_name, "Bone name");
-      this.action_name = NullCheck.notNull(in_action_name, "Action name");
-    }
-
-    public Validation<List<CaCompileError>, Unit> onCurveTranslation(
-      final CaDefinitionCurveTranslationType translation)
-    {
-      if (this.bone_type_received.get(0)) {
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append("Multiple curves of the same type for an action.");
-        sb.append(System.lineSeparator());
-        sb.append("  Action: ");
-        sb.append(this.action_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Type:   translation");
-        sb.append(System.lineSeparator());
-        return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
-          sb.toString()));
-      }
-      this.bone_type_received.set(0, true);
-      return valid(Unit.unit());
-    }
-
-    public Validation<List<CaCompileError>, Unit> onCurveOrientation(
-      final CaDefinitionCurveOrientationType orientation)
-    {
-      if (this.bone_type_received.get(1)) {
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append("Multiple curves of the same type for an action.");
-        sb.append(System.lineSeparator());
-        sb.append("  Action: ");
-        sb.append(this.action_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Type:   orientation");
-        sb.append(System.lineSeparator());
-        return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
-          sb.toString()));
-      }
-      this.bone_type_received.set(1, true);
-      return valid(Unit.unit());
-    }
-
-    public Validation<List<CaCompileError>, Unit> onCurveScale(
-      final CaDefinitionCurveScaleType orientation)
-    {
-      if (this.bone_type_received.get(2)) {
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append("Multiple curves of the same type for an action.");
-        sb.append(System.lineSeparator());
-        sb.append("  Action: ");
-        sb.append(this.action_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
-        sb.append(System.lineSeparator());
-        sb.append("  Type:   scale");
-        sb.append(System.lineSeparator());
-        return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
-          sb.toString()));
-      }
-      this.bone_type_received.set(2, true);
-      return valid(Unit.unit());
-    }
   }
 
   private static Validation<List<CaCompileError>, CaActionType>
@@ -818,7 +734,19 @@ final class CaCompileTask
     return valid(Integer.valueOf(fps));
   }
 
-  Validation<List<CaCompileError>, CaSkeletonType> run()
+  private static CaSkeleton make(
+    final BoneIndex index,
+    final SortedMap<CaActionName, CaActionType> actions)
+  {
+    final CaSkeleton.Builder b = CaSkeleton.builder();
+    b.setActionsByName(actions);
+    b.setBonesByID(index.bones_by_id.mapValues(x -> x));
+    b.setBonesByName(index.bones_by_name.mapValues(x -> x));
+    b.setBones(index.bones);
+    return b.build();
+  }
+
+  Validation<List<CaCompileError>, CaSkeleton> run()
   {
     final Map<CaBoneName, CaDefinitionBone> in_bones = this.input.bones();
     final Map<CaActionName, CaDefinitionActionType> in_actions = this.input.actions();
@@ -828,7 +756,92 @@ final class CaCompileTask
       .flatMap(CaCompileTask::compileBonesAssignIdentifiers)
       .flatMap(CaCompileTask::compileBonesCreateIndex)
       .flatMap(index -> compileActions(index, in_actions).flatMap(
-        actions -> valid(new Skeleton(index, actions))));
+        actions -> valid(make(index, actions))));
+  }
+
+  private static final class CurveTypeCounter
+  {
+    private final BitSet bone_type_received;
+    private final CaBoneName bone_name;
+    private final CaActionName action_name;
+
+    CurveTypeCounter(
+      final CaBoneName in_bone_name,
+      final CaActionName in_action_name)
+    {
+      this.bone_type_received = new BitSet(3);
+      this.bone_name = NullCheck.notNull(in_bone_name, "Bone name");
+      this.action_name = NullCheck.notNull(in_action_name, "Action name");
+    }
+
+    public Validation<List<CaCompileError>, Unit> onCurveTranslation(
+      final CaDefinitionCurveTranslationType translation)
+    {
+      if (this.bone_type_received.get(0)) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("Multiple curves of the same type for an action.");
+        sb.append(System.lineSeparator());
+        sb.append("  Action: ");
+        sb.append(this.action_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Bone:   ");
+        sb.append(this.bone_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Type:   translation");
+        sb.append(System.lineSeparator());
+        return invalid(errorsFor(
+          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          sb.toString()));
+      }
+      this.bone_type_received.set(0, true);
+      return valid(Unit.unit());
+    }
+
+    public Validation<List<CaCompileError>, Unit> onCurveOrientation(
+      final CaDefinitionCurveOrientationType orientation)
+    {
+      if (this.bone_type_received.get(1)) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("Multiple curves of the same type for an action.");
+        sb.append(System.lineSeparator());
+        sb.append("  Action: ");
+        sb.append(this.action_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Bone:   ");
+        sb.append(this.bone_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Type:   orientation");
+        sb.append(System.lineSeparator());
+        return invalid(errorsFor(
+          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          sb.toString()));
+      }
+      this.bone_type_received.set(1, true);
+      return valid(Unit.unit());
+    }
+
+    public Validation<List<CaCompileError>, Unit> onCurveScale(
+      final CaDefinitionCurveScaleType orientation)
+    {
+      if (this.bone_type_received.get(2)) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("Multiple curves of the same type for an action.");
+        sb.append(System.lineSeparator());
+        sb.append("  Action: ");
+        sb.append(this.action_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Bone:   ");
+        sb.append(this.bone_name.value());
+        sb.append(System.lineSeparator());
+        sb.append("  Type:   scale");
+        sb.append(System.lineSeparator());
+        return invalid(errorsFor(
+          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          sb.toString()));
+      }
+      this.bone_type_received.set(2, true);
+      return valid(Unit.unit());
+    }
   }
 
   private static final class NodeByDepth
@@ -856,59 +869,13 @@ final class CaCompileTask
       final SortedMap<CaBoneName, JOTreeNodeType<CaBone>> in_bones_by_name,
       final SortedMap<Integer, JOTreeNodeType<CaBone>> in_bones_by_id)
     {
-      this.bones = NullCheck.notNull(in_bones, "Bones");
-      this.bones_by_name = NullCheck.notNull(
-        in_bones_by_name,
-        "Bones by name");
-      this.bones_by_id = NullCheck.notNull(in_bones_by_id, "Bones by id");
-    }
-  }
-
-  private static final class Skeleton implements CaSkeletonType
-  {
-    private final JOTreeNodeType<CaBone> bones;
-    private final SortedMap<CaBoneName, JOTreeNodeType<CaBone>> bones_by_name;
-    private final SortedMap<Integer, JOTreeNodeType<CaBone>> bones_by_id;
-    private final SortedMap<CaActionName, CaActionType> actions;
-
-    Skeleton(
-      final BoneIndex in_index,
-      final SortedMap<CaActionName, CaActionType> in_actions)
-    {
       this.bones =
-        NullCheck.notNull(in_index, "Bones").bones;
+        NullCheck.notNull(in_bones, "Bones");
       this.bones_by_name =
-        NullCheck.notNull(in_index, "Bones by name").bones_by_name;
+        NullCheck.notNull(in_bones_by_name, "Bones by name");
       this.bones_by_id =
-        NullCheck.notNull(in_index, "Bones by ID").bones_by_id;
-      this.actions =
-        NullCheck.notNull(in_actions, "Actions");
-    }
-
-    @Override
-    public JOTreeNodeReadableType<CaBone> bones()
-    {
-      return this.bones;
-    }
-
-    @Override
-    public SortedMap<CaActionName, CaActionType> actionsByName()
-    {
-      return this.actions;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName()
-    {
-      return (SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>>) (Object) this.bones_by_name;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID()
-    {
-      return (SortedMap<Integer, JOTreeNodeReadableType<CaBone>>) (Object) this.bones_by_id;
+        NullCheck.notNull(in_bones_by_id, "Bones by id");
     }
   }
+
 }

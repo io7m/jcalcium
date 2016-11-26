@@ -26,7 +26,7 @@ import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaBone;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScaleType;
@@ -91,7 +91,7 @@ public abstract class CaCompilerContract
   }
 
   private static void dump(
-    final Validation<List<CaCompileError>, CaSkeletonType> r)
+    final Validation<List<CaCompileError>, CaSkeleton> r)
   {
     if (r.isValid()) {
       LOG.debug("valid: {}", r.get());
@@ -113,7 +113,7 @@ public abstract class CaCompilerContract
     b.setBones(HashMap.empty());
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -151,7 +151,7 @@ public abstract class CaCompilerContract
       Tuple.of(bone_1_name, bone_1)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -190,7 +190,7 @@ public abstract class CaCompilerContract
       Tuple.of(bone_1_name, bone_1)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -237,7 +237,7 @@ public abstract class CaCompilerContract
       Tuple.of(bone_2_name, bone_2)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -280,7 +280,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -323,7 +323,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -385,7 +385,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -447,7 +447,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -509,7 +509,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -590,7 +590,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -671,7 +671,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -752,7 +752,7 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
@@ -804,13 +804,13 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeleton> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertTrue(r.isValid());
 
-    final CaSkeletonType compiled = r.get();
+    final CaSkeleton compiled = r.get();
 
     final Map<CaBoneName, JOTreeNodeReadableType<CaBone>> by_name =
       compiled.bonesByName();
@@ -881,12 +881,12 @@ public abstract class CaCompilerContract
         protected void doSpecify(final CaDefinitionSkeleton original)
           throws Throwable
         {
-          final Validation<List<CaCompileError>, CaSkeletonType> r =
+          final Validation<List<CaCompileError>, CaSkeleton> r =
             cc.compile(original);
           dump(r);
           Assert.assertTrue(r.isValid());
 
-          final CaSkeletonType compiled = r.get();
+          final CaSkeleton compiled = r.get();
           Assert.assertEquals(
             (long) original.bones().size(),
             (long) compiled.bonesByName().size());

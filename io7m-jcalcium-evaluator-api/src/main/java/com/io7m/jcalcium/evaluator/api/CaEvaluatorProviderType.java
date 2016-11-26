@@ -14,43 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.main;
+package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.compiler.api.CaCompileError;
-import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
 
 /**
- * Main implementation of the {@link CaCompilerType} interface.
+ * The type of evaluator providers.
  */
 
-public final class CaCompiler implements CaCompilerType
+public interface CaEvaluatorProviderType
 {
-  private CaCompiler()
-  {
-
-  }
-
   /**
-   * Create a new compiler.
+   * Create a new evaluator for the given skeleton.
    *
-   * @return A compiler
+   * @param skeleton A compiled skeleton
+   *
+   * @return A new evaluator
    */
 
-  public static CaCompilerType create()
-  {
-    return new CaCompiler();
-  }
-
-  @Override
-  public Validation<List<CaCompileError>, CaSkeleton> compile(
-    final CaDefinitionSkeleton skeleton)
-  {
-    return new CaCompileTask(skeleton).run();
-  }
-
+  CaEvaluatorType create(
+    CaSkeleton skeleton);
 }

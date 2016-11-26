@@ -16,39 +16,119 @@
 
 package com.io7m.jcalcium.core.compiled;
 
+import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import javaslang.collection.SortedMap;
+import org.immutables.value.Value;
+
+import java.util.Objects;
+
+import static com.io7m.jfunctional.Unit.unit;
 
 /**
  * The type of compiled skeletons.
  */
 
+@Value.Immutable
+@ImmutableStyleType
 public interface CaSkeletonType
 {
   /**
    * @return The tree of bones for the skeleton
    */
 
+  @Value.Parameter
   JOTreeNodeReadableType<CaBone> bones();
 
   /**
    * @return The actions by name
    */
 
+  @Value.Parameter
   SortedMap<CaActionName, CaActionType> actionsByName();
 
   /**
    * @return A map of bone nodes by name
    */
 
+  @Value.Parameter
   SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName();
 
   /**
    * @return A map of bone nodes by ID
    */
 
+  @Value.Parameter
   SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID();
+
+  @Value.Check
+  default void checkPreconditions()
+  {
+    Preconditions.checkPrecondition(
+      this.bonesByID().size() == this.bonesByName().size(),
+      "Bone maps must be the same size");
+
+    this.bones().forEachBreadthFirst(this, (t, depth, node) -> {
+      final CaBone bone = node.value();
+      final Integer bone_id = Integer.valueOf(bone.id());
+
+      Preconditions.checkPrecondition(
+        bone_id,
+        t.bonesByID().containsKey(bone_id),
+        id -> "Bone " + id + " must exist in ID map");
+      Preconditions.checkPrecondition(
+        bone.name(),
+        t.bonesByName().containsKey(bone.name()),
+        name -> "Bone " + name + " must exist in name map");
+
+      final JOTreeNodeReadableType<CaBone> bone_by_name =
+        t.bonesByName().get(bone.name()).get();
+      final JOTreeNodeReadableType<CaBone> bone_by_id =
+        t.bonesByID().get(bone_id).get();
+
+      Preconditions.checkPrecondition(
+        bone.name(),
+        Objects.equals(bone_by_name.value().name(), bone.name()),
+        name -> "Bone name " + name + " must match name in map");
+      Preconditions.checkPrecondition(
+        bone_id,
+        bone_by_id.value().id() == bone.id(),
+        id -> "Bone ID " + id + " must match id in map");
+    });
+
+    this.actionsByName().forEach(pair -> {
+      final CaActionName act_name = pair._1;
+      final CaActionType act = pair._2;
+
+      Preconditions.checkPrecondition(
+        act_name,
+        Objects.equals(act_name, act.name()),
+        name -> "Action name " + name + " must match name in map");
+
+      act.matchAction(this, (t, act_curves) -> {
+        act_curves.curves().forEach(curve_pair -> {
+          final CaBoneName act_bone = curve_pair._1;
+
+          Preconditions.checkPrecondition(
+            act_bone,
+            t.bonesByName().containsKey(act_bone),
+            name -> "Action must not refer to nonexistent bone " + name);
+
+          curve_pair._2.forEach(curve -> {
+            Preconditions.checkPrecondition(
+              Objects.equals(curve.bone(), act_bone),
+              "Curve must refer to correct bone");
+            Preconditions.checkPrecondition(
+              Objects.equals(curve.action(), act_name),
+              "Curve must refer to correct action");
+          });
+        });
+        return unit();
+      });
+    });
+  }
 }

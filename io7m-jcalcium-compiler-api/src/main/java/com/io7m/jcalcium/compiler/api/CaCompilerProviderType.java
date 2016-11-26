@@ -16,25 +16,15 @@
 
 package com.io7m.jcalcium.compiler.api;
 
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
-
 /**
- * The type of compilers.
+ * A provider for {@link CaCompilerType} values.
  */
 
-public interface CaCompilerType
+public interface CaCompilerProviderType
 {
   /**
-   * Compile the given skeleton definition.
-   *
-   * @param skeleton The skeleton definition
-   *
-   * @return A compiled skeleton, or a list of errors
+   * @return A new compiler
    */
 
-  Validation<List<CaCompileError>, CaSkeleton> compile(
-    CaDefinitionSkeleton skeleton);
+  CaCompilerType create();
 }

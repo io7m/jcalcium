@@ -16,41 +16,27 @@
 
 package com.io7m.jcalcium.compiler.main;
 
-import com.io7m.jcalcium.compiler.api.CaCompileError;
+import com.io7m.jcalcium.compiler.api.CaCompilerProviderType;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
 
 /**
- * Main implementation of the {@link CaCompilerType} interface.
+ * The default implementation of the {@link CaCompilerProviderType}.
  */
 
-public final class CaCompiler implements CaCompilerType
+public final class CaCompilerProvider implements CaCompilerProviderType
 {
-  private CaCompiler()
-  {
-
-  }
-
   /**
-   * Create a new compiler.
-   *
-   * @return A compiler
+   * Construct a new provider.
    */
 
-  public static CaCompilerType create()
+  public CaCompilerProvider()
   {
-    return new CaCompiler();
+
   }
 
   @Override
-  public Validation<List<CaCompileError>, CaSkeleton> compile(
-    final CaDefinitionSkeleton skeleton)
+  public CaCompilerType create()
   {
-    return new CaCompileTask(skeleton).run();
+    return CaCompiler.create();
   }
-
 }

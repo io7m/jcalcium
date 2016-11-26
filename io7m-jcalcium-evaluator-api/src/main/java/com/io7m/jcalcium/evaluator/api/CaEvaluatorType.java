@@ -14,27 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.api;
-
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
+package com.io7m.jcalcium.evaluator.api;
 
 /**
- * The type of compilers.
+ * The type of evaluators.
  */
 
-public interface CaCompilerType
+public interface CaEvaluatorType
 {
-  /**
-   * Compile the given skeleton definition.
-   *
-   * @param skeleton The skeleton definition
-   *
-   * @return A compiled skeleton, or a list of errors
-   */
 
-  Validation<List<CaCompileError>, CaSkeleton> compile(
-    CaDefinitionSkeleton skeleton);
 }

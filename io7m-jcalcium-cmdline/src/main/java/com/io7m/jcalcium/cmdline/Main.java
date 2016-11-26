@@ -24,6 +24,7 @@ import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.compiler.main.CaCompiler;
 import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
@@ -457,7 +458,7 @@ public final class Main implements Runnable
           }
 
           LOG.debug("compiling");
-          final Validation<List<CaCompileError>, CaSkeletonType> compile_result =
+          final Validation<List<CaCompileError>, CaSkeleton> compile_result =
             compiler.compile(parse_result.get());
 
           if (!compile_result.isValid()) {
@@ -467,7 +468,7 @@ public final class Main implements Runnable
             return unit();
           }
 
-          final CaSkeletonType compiled = compile_result.get();
+          final CaSkeleton compiled = compile_result.get();
           compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
             final CaBone bone = node.value();
 
