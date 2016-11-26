@@ -14,27 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.api;
+package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
+import com.io7m.jcalcium.core.CaActionName;
+import net.java.quickcheck.Generator;
+import net.java.quickcheck.generator.support.CharacterGenerator;
+import net.java.quickcheck.generator.support.IntegerGenerator;
+import net.java.quickcheck.generator.support.StringGenerator;
 
 /**
- * The type of compilers.
+ * A generator for {@link CaActionName}.
  */
 
-public interface CaCompilerType
+public final class CaActionNameGenerator implements Generator<CaActionName>
 {
+  private final StringGenerator gen;
+
   /**
-   * Compile the given skeleton definition.
-   *
-   * @param skeleton The skeleton definition
-   *
-   * @return A compiled skeleton, or a list of errors
+   * Construct a generator.
    */
 
-  Validation<List<CaCompileError>, CaSkeletonType> compile(
-    CaDefinitionSkeleton skeleton);
+  public CaActionNameGenerator()
+  {
+    this.gen = new StringGenerator(
+      new IntegerGenerator(1, 32),
+      new CharacterGenerator('a', 'z'));
+  }
+
+  @Override
+  public CaActionName next()
+  {
+    return CaActionName.of(this.gen.next());
+  }
 }

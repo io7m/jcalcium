@@ -22,6 +22,7 @@ import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.Map;
+import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 
 /**

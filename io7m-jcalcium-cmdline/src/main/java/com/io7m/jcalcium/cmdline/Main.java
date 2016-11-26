@@ -23,10 +23,9 @@ import com.beust.jcommander.Parameters;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.compiler.main.CaCompiler;
-import com.io7m.jcalcium.core.compiled.CaCompiledBone;
-import com.io7m.jcalcium.core.compiled.CaCompiledSkeletonType;
+import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
@@ -458,7 +457,7 @@ public final class Main implements Runnable
           }
 
           LOG.debug("compiling");
-          final Validation<List<CaCompileError>, CaCompiledSkeletonType> compile_result =
+          final Validation<List<CaCompileError>, CaSkeletonType> compile_result =
             compiler.compile(parse_result.get());
 
           if (!compile_result.isValid()) {
@@ -468,14 +467,14 @@ public final class Main implements Runnable
             return unit();
           }
 
-          final CaCompiledSkeletonType compiled = compile_result.get();
+          final CaSkeletonType compiled = compile_result.get();
           compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
-            final CaCompiledBone bone = node.value();
+            final CaBone bone = node.value();
 
-            final Optional<JOTreeNodeReadableType<CaCompiledBone>> parent_opt =
+            final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
               node.parentReadable();
             if (parent_opt.isPresent()) {
-              final JOTreeNodeReadableType<CaCompiledBone> parent = parent_opt.get();
+              final JOTreeNodeReadableType<CaBone> parent = parent_opt.get();
               LOG.debug(
                 "{}:{}:{}:{}",
                 Integer.valueOf(depth),

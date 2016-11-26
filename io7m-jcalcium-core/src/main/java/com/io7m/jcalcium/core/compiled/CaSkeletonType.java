@@ -14,59 +14,41 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.api;
+package com.io7m.jcalcium.core.compiled;
+
+import com.io7m.jcalcium.core.CaActionName;
+import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.compiled.actions.CaActionType;
+import com.io7m.jorchard.core.JOTreeNodeReadableType;
+import javaslang.collection.SortedMap;
 
 /**
- * Compilation error codes.
+ * The type of compiled skeletons.
  */
 
-public enum CaCompileErrorCode
+public interface CaSkeletonType
 {
   /**
-   * A bone specifies a nonexistent parent.
+   * @return The tree of bones for the skeleton
    */
 
-  ERROR_BONE_NONEXISTENT_PARENT,
+  JOTreeNodeReadableType<CaBone> bones();
 
   /**
-   * The skeleton does not have a root bone.
+   * @return The actions by name
    */
 
-  ERROR_BONE_NO_ROOT,
+  SortedMap<CaActionName, CaActionType> actionsByName();
 
   /**
-   * A cycle was detected in the bones of a skeleton.
+   * @return A map of bone nodes by name
    */
 
-  ERROR_BONE_CYCLE,
+  SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName();
 
   /**
-   * The skeleton has multiple root bones.
+   * @return A map of bone nodes by ID
    */
 
-  ERROR_BONE_MULTIPLE_ROOTS,
-
-  /**
-   * An action supplies a nonexistent bone.
-   */
-
-  ERROR_ACTION_INVALID_BONE,
-
-  /**
-   * Two keyframes on a curve have the same index.
-   */
-
-  ERROR_ACTION_DUPLICATE_KEYFRAME,
-
-  /**
-   * An action has multiple curves of the same type for a bone.
-   */
-
-  ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
-
-  /**
-   * An action has an invalid frames per second count.
-   */
-
-  ERROR_ACTION_INVALID_FPS
+  SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID();
 }

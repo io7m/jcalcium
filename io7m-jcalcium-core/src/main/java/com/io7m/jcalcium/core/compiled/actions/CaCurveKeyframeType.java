@@ -14,59 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.api;
+package com.io7m.jcalcium.core.compiled.actions;
+
+import com.io7m.jcalcium.core.CaCurveEasing;
+import com.io7m.jcalcium.core.CaCurveInterpolation;
 
 /**
- * Compilation error codes.
+ * The base type of keyframes.
  */
 
-public enum CaCompileErrorCode
+public interface CaCurveKeyframeType
 {
   /**
-   * A bone specifies a nonexistent parent.
+   * @return The index of the keyframe (in the range {@code [0,
+   * Integer.MAX_VALUE]}
    */
 
-  ERROR_BONE_NONEXISTENT_PARENT,
+  int index();
 
   /**
-   * The skeleton does not have a root bone.
+   * @return The interpolation type for the keyframe
    */
 
-  ERROR_BONE_NO_ROOT,
+  CaCurveInterpolation interpolation();
 
   /**
-   * A cycle was detected in the bones of a skeleton.
+   * @return The easing type for the keyframe
    */
 
-  ERROR_BONE_CYCLE,
-
-  /**
-   * The skeleton has multiple root bones.
-   */
-
-  ERROR_BONE_MULTIPLE_ROOTS,
-
-  /**
-   * An action supplies a nonexistent bone.
-   */
-
-  ERROR_ACTION_INVALID_BONE,
-
-  /**
-   * Two keyframes on a curve have the same index.
-   */
-
-  ERROR_ACTION_DUPLICATE_KEYFRAME,
-
-  /**
-   * An action has multiple curves of the same type for a bone.
-   */
-
-  ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
-
-  /**
-   * An action has an invalid frames per second count.
-   */
-
-  ERROR_ACTION_INVALID_FPS
+  CaCurveEasing easing();
 }

@@ -14,27 +14,23 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.compiler.api;
+package com.io7m.jcalcium.core.compiled.actions;
 
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import javaslang.collection.List;
-import javaslang.control.Validation;
+import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jtensors.QuaternionI4D;
+import org.immutables.value.Value;
 
 /**
- * The type of compilers.
+ * A keyframe for a curve that affects the orientation of a bone.
  */
 
-public interface CaCompilerType
+@ImmutableStyleType
+@Value.Immutable
+public interface CaCurveKeyframeOrientationType extends CaCurveKeyframeType
 {
   /**
-   * Compile the given skeleton definition.
-   *
-   * @param skeleton The skeleton definition
-   *
-   * @return A compiled skeleton, or a list of errors
+   * @return The orientation at this keyframe
    */
 
-  Validation<List<CaCompileError>, CaSkeletonType> compile(
-    CaDefinitionSkeleton skeleton);
+  QuaternionI4D orientation();
 }

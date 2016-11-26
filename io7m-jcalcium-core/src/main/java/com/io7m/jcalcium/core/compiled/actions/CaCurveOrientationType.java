@@ -14,43 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.definitions;
+package com.io7m.jcalcium.core.compiled.actions;
 
-import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
-import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
-import javaslang.collection.Map;
+import com.io7m.jfunctional.PartialBiFunctionType;
+import com.io7m.jnull.NullCheck;
+import javaslang.collection.List;
 import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 
 /**
- * A skeleton definition.
+ * A curve that affects the orientation of a bone.
  */
 
 @ImmutableStyleType
 @Value.Immutable
-public interface CaDefinitionSkeletonType
+public interface CaCurveOrientationType extends CaCurveType
 {
-  /**
-   * @return The name of the skeleton
-   */
-
-  @Value.Parameter
-  CaSkeletonName name();
-
-  /**
-   * @return The skeleton's bones, by name
-   */
-
-  @Value.Parameter
-  Map<CaBoneName, CaDefinitionBone> bones();
+  @Override
+  default <A, B, E extends Exception> B matchCurve(
+    final A context,
+    final PartialBiFunctionType<A, CaCurveTranslationType, B, E> on_translation,
+    final PartialBiFunctionType<A, CaCurveOrientationType, B, E> on_orientation,
+    final PartialBiFunctionType<A, CaCurveScaleType, B, E> on_scale)
+    throws E
+  {
+    return NullCheck.notNull(on_orientation, "on_orientation")
+      .call(context, this);
+  }
 
   /**
-   * @return The skeleton's actions, by name
+   * @return The list of keyframes for the bone
    */
 
-  @Value.Parameter
-  Map<CaActionName, CaDefinitionActionType> actions();
+  SortedMap<Integer, CaCurveKeyframeOrientationType> keyframes();
 }

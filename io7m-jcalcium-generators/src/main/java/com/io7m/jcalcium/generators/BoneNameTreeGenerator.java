@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.tests;
+package com.io7m.jcalcium.generators;
 
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
@@ -22,27 +22,27 @@ import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jorchard.generators.JOTreeNodeGenerator;
 import net.java.quickcheck.Generator;
 import net.java.quickcheck.generator.support.IntegerGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+/**
+ * A generator for bone trees.
+ */
+
 public final class BoneNameTreeGenerator implements Generator<BoneNameTree>
 {
-  private static final Logger LOG;
-
-  static {
-    LOG = LoggerFactory.getLogger(BoneNameTreeGenerator.class);
-  }
-
   private final CaBoneNameGenerator names;
   private final IntegerGenerator sizes;
   private final Generator<JOTreeNodeType<CaBoneName>> tree_gen;
 
+  /**
+   * Construct a bone tree generator.
+   */
+
   public BoneNameTreeGenerator()
   {
     this.names = new CaBoneNameGenerator();
-    this.sizes = new IntegerGenerator(1, 100);
+    this.sizes = new IntegerGenerator(1, 32);
     this.tree_gen = JOTreeNodeGenerator.create(this.sizes, this.names, 0.2);
   }
 

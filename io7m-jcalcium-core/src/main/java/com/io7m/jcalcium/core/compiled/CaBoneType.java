@@ -14,43 +14,56 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.definitions;
+package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
-import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
-import javaslang.collection.Map;
-import javaslang.collection.SortedMap;
+import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.VectorI3D;
+import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 
 /**
- * A skeleton definition.
+ * The type of compiled bones.
  */
 
-@ImmutableStyleType
 @Value.Immutable
-public interface CaDefinitionSkeletonType
+@ImmutableStyleType
+public interface CaBoneType
 {
   /**
-   * @return The name of the skeleton
+   * @return The bone name
    */
 
   @Value.Parameter
-  CaSkeletonName name();
+  CaBoneName name();
 
   /**
-   * @return The skeleton's bones, by name
+   * @return The bone ID
    */
 
   @Value.Parameter
-  Map<CaBoneName, CaDefinitionBone> bones();
+  int id();
 
   /**
-   * @return The skeleton's actions, by name
+   * @return The parent-relative offset for the bone
    */
 
   @Value.Parameter
-  Map<CaActionName, CaDefinitionActionType> actions();
+  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
+
+  /**
+   * @return The parent-relative orientation of the bone
+   */
+
+  @Value.Parameter
+  QuaternionI4D orientation();
+
+  /**
+   * @return The parent-relative scale of the bone
+   */
+
+  @Value.Parameter
+  VectorI3D scale();
 }

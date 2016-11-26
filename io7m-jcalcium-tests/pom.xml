@@ -44,6 +44,11 @@
       <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-generators</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.jnull</groupId>
@@ -52,10 +57,6 @@
     <dependency>
       <groupId>com.io7m.jtensors</groupId>
       <artifactId>io7m-jtensors-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.jtensors</groupId>
-      <artifactId>io7m-jtensors-generators</artifactId>
     </dependency>
 
     <dependency>

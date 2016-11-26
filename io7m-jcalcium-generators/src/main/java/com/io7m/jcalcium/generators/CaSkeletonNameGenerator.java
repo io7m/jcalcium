@@ -14,19 +14,27 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.tests;
+package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import net.java.quickcheck.Generator;
 import net.java.quickcheck.generator.support.CharacterGenerator;
 import net.java.quickcheck.generator.support.IntegerGenerator;
 import net.java.quickcheck.generator.support.StringGenerator;
 
-public final class CaBoneNameGenerator implements Generator<CaBoneName>
+/**
+ * A generator for {@link CaSkeletonName}.
+ */
+
+public final class CaSkeletonNameGenerator implements Generator<CaSkeletonName>
 {
   private final StringGenerator gen;
 
-  public CaBoneNameGenerator()
+  /**
+   * Construct a generator.
+   */
+
+  public CaSkeletonNameGenerator()
   {
     this.gen = new StringGenerator(
       new IntegerGenerator(1, 32),
@@ -34,8 +42,8 @@ public final class CaBoneNameGenerator implements Generator<CaBoneName>
   }
 
   @Override
-  public CaBoneName next()
+  public CaSkeletonName next()
   {
-    return CaBoneName.of(this.gen.next());
+    return CaSkeletonName.of(this.gen.next());
   }
 }

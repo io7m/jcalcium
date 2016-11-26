@@ -14,56 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.compiled;
+package com.io7m.jcalcium.core.compiled.actions;
 
+import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jtensors.QuaternionI4D;
-import com.io7m.jtensors.VectorI3D;
-import com.io7m.jtensors.parameterized.PVectorI3D;
+import com.io7m.jfunctional.PartialBiFunctionType;
+import com.io7m.jnull.NullCheck;
+import javaslang.collection.List;
+import javaslang.collection.Map;
+import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 
 /**
- * The type of compiled bones.
+ * An action that is constructed from a set of keyframe curves.
  */
 
-@Value.Immutable
 @ImmutableStyleType
-public interface CaCompiledBoneType
+@Value.Immutable
+public interface CaActionCurvesType extends CaActionType
 {
-  /**
-   * @return The bone name
-   */
-
-  @Value.Parameter
-  CaBoneName name();
-
-  /**
-   * @return The bone ID
-   */
-
-  @Value.Parameter
-  int id();
+  @Override
+  default <A, B, E extends Exception> B matchAction(
+    final A context,
+    final PartialBiFunctionType<A, CaActionCurvesType, B, E> on_curves)
+    throws E
+  {
+    return NullCheck.notNull(on_curves, "on_curves").call(context, this);
+  }
 
   /**
-   * @return The parent-relative offset for the bone
+   * @return The curves for the action
    */
 
-  @Value.Parameter
-  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
-
-  /**
-   * @return The parent-relative orientation of the bone
-   */
-
-  @Value.Parameter
-  QuaternionI4D orientation();
-
-  /**
-   * @return The parent-relative scale of the bone
-   */
-
-  @Value.Parameter
-  VectorI3D scale();
+  SortedMap<CaBoneName, List<CaCurveType>> curves();
 }

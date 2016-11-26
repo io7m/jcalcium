@@ -16,18 +16,45 @@
 
 package com.io7m.jcalcium.tests.compiler.api;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
+import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaCurveEasing;
+import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaCompiledBone;
-import com.io7m.jcalcium.core.compiled.CaCompiledSkeletonType;
+import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaSkeletonType;
+import com.io7m.jcalcium.core.compiled.actions.CaActionType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientationType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScaleType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslationType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientationType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveScaleType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslationType;
+import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientation;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeOrientationType;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeScale;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeScaleType;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslation;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslationType;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveOrientation;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveScale;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
+import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jcalcium.tests.BoneNameTree;
-import com.io7m.jcalcium.tests.BoneNameTreeGenerator;
+import com.io7m.jcalcium.generators.BoneNameTree;
+import com.io7m.jcalcium.generators.BoneNameTreeGenerator;
+import com.io7m.jcalcium.generators.BoneTree;
+import com.io7m.jcalcium.generators.BoneTreeGenerator;
+import com.io7m.jcalcium.generators.CaDefinitionSkeletonGenerator;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.QuaternionI4D;
@@ -40,7 +67,10 @@ import javaslang.Tuple;
 import javaslang.collection.HashMap;
 import javaslang.collection.List;
 import javaslang.collection.Map;
+import javaslang.collection.SortedMap;
 import javaslang.control.Validation;
+import net.java.quickcheck.QuickCheck;
+import net.java.quickcheck.characteristic.AbstractCharacteristic;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -49,7 +79,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
+
+import static com.io7m.jfunctional.Unit.unit;
 
 public abstract class CaCompilerContract
 {
@@ -60,7 +91,7 @@ public abstract class CaCompilerContract
   }
 
   private static void dump(
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r)
+    final Validation<List<CaCompileError>, CaSkeletonType> r)
   {
     if (r.isValid()) {
       LOG.debug("valid: {}", r.get());
@@ -82,13 +113,13 @@ public abstract class CaCompilerContract
     b.setBones(HashMap.empty());
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_NO_ROOT_BONE,
+      CaCompileErrorCode.ERROR_BONE_NO_ROOT,
       r.getError().get(0).code());
   }
 
@@ -120,13 +151,13 @@ public abstract class CaCompilerContract
       Tuple.of(bone_1_name, bone_1)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_MULTIPLE_ROOT_BONES,
+      CaCompileErrorCode.ERROR_BONE_MULTIPLE_ROOTS,
       r.getError().get(0).code());
   }
 
@@ -159,13 +190,13 @@ public abstract class CaCompilerContract
       Tuple.of(bone_1_name, bone_1)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_NONEXISTENT_PARENT,
+      CaCompileErrorCode.ERROR_BONE_NONEXISTENT_PARENT,
       r.getError().get(0).code());
   }
 
@@ -206,13 +237,528 @@ public abstract class CaCompilerContract
       Tuple.of(bone_2_name, bone_2)));
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_CYCLE,
+      CaCompileErrorCode.ERROR_BONE_CYCLE,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionNonexistentBone()
+  {
+    final CaCompilerType cc = this.create();
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("nonexistent"), List.empty());
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_INVALID_BONE,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionInvalidFPS()
+  {
+    final CaCompilerType cc = this.create();
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), List.empty());
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(-1);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_INVALID_FPS,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionDuplicateKeyframesTranslation()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionCurveKeyframeTranslation.Builder kf_b =
+      CaDefinitionCurveKeyframeTranslation.builder();
+    kf_b.setIndex(0);
+    kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+    kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+    kf_b.setTranslation(new PVectorI3D<>());
+
+    List<CaDefinitionCurveKeyframeTranslationType> curve_keyframes = List.empty();
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+
+    final CaDefinitionCurveTranslation.Builder curve_b =
+      CaDefinitionCurveTranslation.builder();
+    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setKeyframes(curve_keyframes);
+
+    List<CaDefinitionCurveType> curves = List.empty();
+    curves = curves.append(curve_b.build());
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionDuplicateKeyframesOrientation()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionCurveKeyframeOrientation.Builder kf_b =
+      CaDefinitionCurveKeyframeOrientation.builder();
+    kf_b.setIndex(0);
+    kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+    kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+    kf_b.setOrientation(new QuaternionI4D());
+
+    List<CaDefinitionCurveKeyframeOrientationType> curve_keyframes = List.empty();
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+
+    final CaDefinitionCurveOrientation.Builder curve_b =
+      CaDefinitionCurveOrientation.builder();
+    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setKeyframes(curve_keyframes);
+
+    List<CaDefinitionCurveType> curves = List.empty();
+    curves = curves.append(curve_b.build());
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionDuplicateKeyframesScale()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionCurveKeyframeScale.Builder kf_b =
+      CaDefinitionCurveKeyframeScale.builder();
+    kf_b.setIndex(0);
+    kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+    kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+    kf_b.setScale(new VectorI3D());
+
+    List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+    curve_keyframes = curve_keyframes.append(kf_b.build());
+
+    final CaDefinitionCurveScale.Builder curve_b =
+      CaDefinitionCurveScale.builder();
+    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setKeyframes(curve_keyframes);
+
+    List<CaDefinitionCurveType> curves = List.empty();
+    curves = curves.append(curve_b.build());
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionMultipleCurvesSameTypeTranslation()
+  {
+    final CaCompilerType cc = this.create();
+
+    List<CaDefinitionCurveType> curves = List.empty();
+
+    {
+      final CaDefinitionCurveKeyframeTranslation.Builder kf_b =
+        CaDefinitionCurveKeyframeTranslation.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setTranslation(new PVectorI3D<>());
+
+      List<CaDefinitionCurveKeyframeTranslationType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveTranslation.Builder curve_b =
+        CaDefinitionCurveTranslation.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    {
+      final CaDefinitionCurveKeyframeTranslation.Builder kf_b =
+        CaDefinitionCurveKeyframeTranslation.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setTranslation(new PVectorI3D<>());
+
+      List<CaDefinitionCurveKeyframeTranslationType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveTranslation.Builder curve_b =
+        CaDefinitionCurveTranslation.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionMultipleCurvesSameTypeOrientation()
+  {
+    final CaCompilerType cc = this.create();
+
+    List<CaDefinitionCurveType> curves = List.empty();
+
+    {
+      final CaDefinitionCurveKeyframeOrientation.Builder kf_b =
+        CaDefinitionCurveKeyframeOrientation.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setOrientation(new QuaternionI4D());
+
+      List<CaDefinitionCurveKeyframeOrientationType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveOrientation.Builder curve_b =
+        CaDefinitionCurveOrientation.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    {
+      final CaDefinitionCurveKeyframeOrientation.Builder kf_b =
+        CaDefinitionCurveKeyframeOrientation.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setOrientation(new QuaternionI4D());
+
+      List<CaDefinitionCurveKeyframeOrientationType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveOrientation.Builder curve_b =
+        CaDefinitionCurveOrientation.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileActionMultipleCurvesSameTypeScale()
+  {
+    final CaCompilerType cc = this.create();
+
+    List<CaDefinitionCurveType> curves = List.empty();
+
+    {
+      final CaDefinitionCurveKeyframeScale.Builder kf_b =
+        CaDefinitionCurveKeyframeScale.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setScale(new VectorI3D());
+
+      List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveScale.Builder curve_b =
+        CaDefinitionCurveScale.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    {
+      final CaDefinitionCurveKeyframeScale.Builder kf_b =
+        CaDefinitionCurveKeyframeScale.builder();
+      kf_b.setIndex(0);
+      kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
+      kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
+      kf_b.setScale(new VectorI3D());
+
+      List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
+      curve_keyframes = curve_keyframes.append(kf_b.build());
+
+      final CaDefinitionCurveScale.Builder curve_b =
+        CaDefinitionCurveScale.builder();
+      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setKeyframes(curve_keyframes);
+      curves = curves.append(curve_b.build());
+    }
+
+    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(act_curves);
+
+    Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
+    actions = actions.put(CaActionName.of("act0"), act_b.build());
+
+    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    bones = bones.put(
+      CaBoneName.of("bone0"),
+      CaDefinitionBone.of(
+        CaBoneName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D()));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(actions);
+    b.setBones(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
       r.getError().get(0).code());
   }
 
@@ -232,7 +778,7 @@ public abstract class CaCompilerContract
     final BoneNameTree tree = gen.next();
 
     final StringBuilder sb = new StringBuilder(100);
-    tree.tree.forEachDepthFirst(Unit.unit(), (input, depth, node) -> {
+    tree.tree().forEachDepthFirst(unit(), (input, depth, node) -> {
       sb.setLength(0);
       for (int index = 0; index < depth; ++index) {
         sb.append("  ");
@@ -242,7 +788,7 @@ public abstract class CaCompilerContract
     });
 
     final Map<CaBoneName, CaDefinitionBone> bones =
-      tree.nodes.map((CaBoneName bone_name, JOTreeNodeReadableType<CaBoneName> node) -> {
+      tree.nodes().map((CaBoneName bone_name, JOTreeNodeReadableType<CaBoneName> node) -> {
         final CaDefinitionBone.Builder cb = CaDefinitionBone.builder();
         cb.setName(node.value());
         cb.setScale(vgen.next());
@@ -258,17 +804,17 @@ public abstract class CaCompilerContract
     b.setBones(bones);
 
     final CaDefinitionSkeleton s = b.build();
-    final Validation<List<CaCompileError>, CaCompiledSkeletonType> r =
+    final Validation<List<CaCompileError>, CaSkeletonType> r =
       cc.compile(s);
 
     dump(r);
     Assert.assertTrue(r.isValid());
 
-    final CaCompiledSkeletonType compiled = r.get();
+    final CaSkeletonType compiled = r.get();
 
-    final Map<CaBoneName, JOTreeNodeReadableType<CaCompiledBone>> by_name =
+    final Map<CaBoneName, JOTreeNodeReadableType<CaBone>> by_name =
       compiled.bonesByName();
-    final Map<Integer, JOTreeNodeReadableType<CaCompiledBone>> by_id =
+    final Map<Integer, JOTreeNodeReadableType<CaBone>> by_id =
       compiled.bonesByID();
 
     Assert.assertEquals((long) by_id.size(), (long) by_name.size());
@@ -278,9 +824,9 @@ public abstract class CaCompilerContract
     for (final CaBoneName bone_name : bones.keySet()) {
       Assert.assertTrue(by_name.containsKey(bone_name));
 
-      final JOTreeNodeReadableType<CaCompiledBone> compiled_node =
+      final JOTreeNodeReadableType<CaBone> compiled_node =
         by_name.get(bone_name).get();
-      final CaCompiledBone compiled_bone =
+      final CaBone compiled_bone =
         compiled_node.value();
 
       final Integer id = Integer.valueOf(compiled_bone.id());
@@ -288,7 +834,7 @@ public abstract class CaCompilerContract
       ids_unique.add(id);
 
       final JOTreeNodeReadableType<CaBoneName> original_node =
-        tree.nodes.get(bone_name).get();
+        tree.nodes().get(bone_name).get();
       final CaDefinitionBone original_bone =
         bones.get(bone_name).get();
 
@@ -297,7 +843,7 @@ public abstract class CaCompilerContract
         Boolean.valueOf(original_bone.parent().isPresent()));
 
       if (compiled_node.parentReadable().isPresent()) {
-        final JOTreeNodeReadableType<CaCompiledBone> c_parent =
+        final JOTreeNodeReadableType<CaBone> c_parent =
           compiled_node.parentReadable().get();
         final CaBoneName b_parent =
           original_bone.parent().get();
@@ -317,5 +863,201 @@ public abstract class CaCompilerContract
       Assert.assertEquals(
         original_bone.orientation(), compiled_bone.orientation());
     }
+  }
+
+  @Test
+  public void testCompileCorrectAll()
+  {
+    final CaCompilerType cc = this.create();
+    final BoneTreeGenerator gen = new BoneTreeGenerator();
+    final BoneTree tree = gen.next();
+
+    QuickCheck.forAll(
+      100,
+      new CaDefinitionSkeletonGenerator(tree),
+      new AbstractCharacteristic<CaDefinitionSkeleton>()
+      {
+        @Override
+        protected void doSpecify(final CaDefinitionSkeleton original)
+          throws Throwable
+        {
+          final Validation<List<CaCompileError>, CaSkeletonType> r =
+            cc.compile(original);
+          dump(r);
+          Assert.assertTrue(r.isValid());
+
+          final CaSkeletonType compiled = r.get();
+          Assert.assertEquals(
+            (long) original.bones().size(),
+            (long) compiled.bonesByName().size());
+          Assert.assertEquals(
+            (long) original.bones().size(),
+            (long) compiled.bonesByID().size());
+
+          for (final CaBoneName bone_name : original.bones().keySet()) {
+            Assert.assertTrue(compiled.bonesByName().containsKey(bone_name));
+
+            final CaDefinitionBone bone_orig =
+              original.bones().get(bone_name).get();
+            final CaBone bone_comp =
+              compiled.bonesByName().get(bone_name).get().value();
+
+            Assert.assertEquals(
+              bone_orig.name(), bone_comp.name());
+            Assert.assertEquals(
+              bone_orig.orientation(), bone_comp.orientation());
+            Assert.assertEquals(
+              bone_orig.scale(), bone_comp.scale());
+            Assert.assertEquals(
+              bone_orig.translation(), bone_comp.translation());
+          }
+
+          Assert.assertEquals(
+            (long) original.actions().size(),
+            (long) compiled.actionsByName().size());
+
+          for (final CaActionName action_name : original.actions().keySet()) {
+            Assert.assertTrue(
+              compiled.actionsByName().containsKey(action_name));
+
+            final CaDefinitionActionType act_orig =
+              original.actions().get(action_name).get();
+            final CaActionType act_comp =
+              compiled.actionsByName().get(action_name).get();
+
+            Assert.assertEquals(act_orig.name(), act_comp.name());
+            Assert.assertEquals(
+              (long) act_orig.framesPerSecond(),
+              (long) act_comp.framesPerSecond());
+
+            act_comp.matchAction(unit(), (ignored, act_comp_c) -> {
+              Assert.assertEquals(
+                CaDefinitionActionCurves.class, act_orig.getClass());
+              final CaDefinitionActionCurves act_orig_c =
+                (CaDefinitionActionCurves) act_orig;
+
+              final SortedMap<CaBoneName, List<CaCurveType>> curves_by_bone_comp =
+                act_comp_c.curves();
+              final Map<CaBoneName, List<CaDefinitionCurveType>> curves_by_bone_orig =
+                act_orig_c.curves();
+
+              Assert.assertEquals(
+                (long) curves_by_bone_orig.size(),
+                (long) curves_by_bone_comp.size());
+
+              for (final CaBoneName curve_bone : curves_by_bone_comp.keySet()) {
+                final List<CaDefinitionCurveType> curves_orig =
+                  curves_by_bone_orig.get(curve_bone).get();
+                final List<CaCurveType> curves_comp =
+                  curves_by_bone_comp.get(curve_bone).get();
+
+                for (int index = 0; index < curves_comp.size(); ++index) {
+                  final CaCurveType curve_comp =
+                    curves_comp.get(index);
+                  final CaDefinitionCurveType curve_orig =
+                    curves_orig.get(index);
+
+                  Assert.assertEquals(curve_orig.bone(), curve_bone);
+                  Assert.assertEquals(curve_orig.bone(), curve_comp.bone());
+
+                  curve_orig.matchCurve(
+                    unit(),
+                    (ignored1, orig_translation) -> {
+                      final CaCurveTranslationType comp_translation =
+                        (CaCurveTranslationType) curve_comp;
+
+                      Assert.assertEquals(
+                        (long) orig_translation.keyframes().size(),
+                        (long) comp_translation.keyframes().size());
+
+                      for (final CaDefinitionCurveKeyframeTranslationType kf :
+                        orig_translation.keyframes()) {
+
+                        final Integer kf_index = Integer.valueOf(kf.index());
+                        Assert.assertTrue(comp_translation.keyframes().containsKey(kf_index));
+
+                        final CaCurveKeyframeTranslationType comp_kf =
+                          comp_translation.keyframes().get(kf_index).get();
+
+                        Assert.assertEquals(
+                          kf.translation(), comp_kf.translation());
+                        Assert.assertEquals(
+                          kf.easing(), comp_kf.easing());
+                        Assert.assertEquals(
+                          kf.interpolation(), comp_kf.interpolation());
+                        Assert.assertEquals(
+                          (long) kf.index(), (long) comp_kf.index());
+                      }
+
+                      return unit();
+                    },
+
+                    (ignored1, orig_orientation) -> {
+                      final CaCurveOrientationType comp_orientation =
+                        (CaCurveOrientationType) curve_comp;
+
+                      Assert.assertEquals(
+                        (long) orig_orientation.keyframes().size(),
+                        (long) comp_orientation.keyframes().size());
+
+                      for (final CaDefinitionCurveKeyframeOrientationType kf :
+                        orig_orientation.keyframes()) {
+
+                        final Integer kf_index = Integer.valueOf(kf.index());
+                        Assert.assertTrue(comp_orientation.keyframes().containsKey(kf_index));
+
+                        final CaCurveKeyframeOrientationType comp_kf =
+                          comp_orientation.keyframes().get(kf_index).get();
+
+                        Assert.assertEquals(
+                          kf.orientation(), comp_kf.orientation());
+                        Assert.assertEquals(
+                          kf.easing(), comp_kf.easing());
+                        Assert.assertEquals(
+                          kf.interpolation(), comp_kf.interpolation());
+                        Assert.assertEquals(
+                          (long) kf.index(), (long) comp_kf.index());
+                      }
+
+                      return unit();
+                    },
+
+                    (ignored1, orig_scale) -> {
+                      final CaCurveScaleType comp_scale =
+                        (CaCurveScaleType) curve_comp;
+
+                      Assert.assertEquals(
+                        (long) orig_scale.keyframes().size(),
+                        (long) comp_scale.keyframes().size());
+
+                      for (final CaDefinitionCurveKeyframeScaleType kf :
+                        orig_scale.keyframes()) {
+
+                        final Integer kf_index = Integer.valueOf(kf.index());
+                        Assert.assertTrue(comp_scale.keyframes().containsKey(kf_index));
+
+                        final CaCurveKeyframeScaleType comp_kf =
+                          comp_scale.keyframes().get(kf_index).get();
+
+                        Assert.assertEquals(
+                          kf.scale(), comp_kf.scale());
+                        Assert.assertEquals(
+                          kf.easing(), comp_kf.easing());
+                        Assert.assertEquals(
+                          kf.interpolation(), comp_kf.interpolation());
+                        Assert.assertEquals(
+                          (long) kf.index(), (long) comp_kf.index());
+                      }
+
+                      return unit();
+                    });
+                }
+              }
+
+              return unit();
+            });
+          }
+        }
+      });
   }
 }

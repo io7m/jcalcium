@@ -14,10 +14,11 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.tests;
+package com.io7m.jcalcium.generators;
 
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
@@ -25,14 +26,43 @@ import javaslang.collection.Map;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class BoneNameTree
-{
-  public final JOTreeNodeType<CaBoneName> tree;
-  public final Map<CaBoneName, JOTreeNodeReadableType<CaBoneName>> nodes;
+/**
+ * A generated bone tree.
+ */
 
-  public BoneNameTree(
-    final JOTreeNodeType<CaBoneName> in_tree,
-    final Map<CaBoneName, JOTreeNodeReadableType<CaBoneName>> in_nodes)
+public final class BoneTree
+{
+  private final JOTreeNodeType<CaDefinitionBone> tree;
+  private final Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> nodes;
+
+  /**
+   * @return The node tree
+   */
+
+  public JOTreeNodeType<CaDefinitionBone> tree()
+  {
+    return this.tree;
+  }
+
+  /**
+   * @return The nodes by name
+   */
+
+  public Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> nodes()
+  {
+    return this.nodes;
+  }
+
+  /**
+   * Construct a bone tree.
+   *
+   * @param in_tree  The tree
+   * @param in_nodes The nodes
+   */
+
+  public BoneTree(
+    final JOTreeNodeType<CaDefinitionBone> in_tree,
+    final Map<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> in_nodes)
   {
     this.tree = NullCheck.notNull(in_tree, "in_tree");
     this.nodes = NullCheck.notNull(in_nodes, "in_nodes");

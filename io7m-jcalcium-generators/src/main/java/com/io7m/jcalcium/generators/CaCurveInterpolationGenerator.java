@@ -14,33 +14,34 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.compiled;
+package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
-import javaslang.collection.SortedMap;
+import com.io7m.jcalcium.core.CaCurveInterpolation;
+import net.java.quickcheck.Generator;
+import net.java.quickcheck.generator.support.IntegerGenerator;
 
 /**
- * The type of compiled skeletons.
+ * A generator for {@link CaCurveInterpolation}.
  */
 
-public interface CaCompiledSkeletonType
+public final class CaCurveInterpolationGenerator implements Generator<CaCurveInterpolation>
 {
-  /**
-   * @return The tree of bones for the skeleton
-   */
-
-  JOTreeNodeReadableType<CaCompiledBone> bones();
+  private final IntegerGenerator num_gen;
 
   /**
-   * @return A map of bone nodes by name
+   * Construct a generator.
    */
 
-  SortedMap<CaBoneName, JOTreeNodeReadableType<CaCompiledBone>> bonesByName();
+  public CaCurveInterpolationGenerator()
+  {
+    this.num_gen = new IntegerGenerator(
+      0,
+      CaCurveInterpolation.values().length - 1);
+  }
 
-  /**
-   * @return A map of bone nodes by ID
-   */
-
-  SortedMap<Integer, JOTreeNodeReadableType<CaCompiledBone>> bonesByID();
+  @Override
+  public CaCurveInterpolation next()
+  {
+    return CaCurveInterpolation.values()[this.num_gen.nextInt()];
+  }
 }
