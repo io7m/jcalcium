@@ -22,8 +22,6 @@ import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import javaslang.collection.List;
 import javaslang.control.Validation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Main implementation of the {@link CaCompilerType} interface.
@@ -31,12 +29,6 @@ import org.slf4j.LoggerFactory;
 
 public final class CaCompiler implements CaCompilerType
 {
-  private static final Logger LOG;
-
-  static {
-    LOG = LoggerFactory.getLogger(CaCompiler.class);
-  }
-
   private CaCompiler()
   {
 
