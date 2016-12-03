@@ -25,8 +25,8 @@ import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleActionCurves;
-import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleActionCurvesType;
+import com.io7m.jcalcium.evaluator.main.CaActionEvaluatorCurves;
+import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesType;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
@@ -47,14 +47,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-public final class CaEvaluatorSingleActionCurvesTest
+public final class CaActionEvaluatorCurvesTest
 {
   private CaSkeleton compile(
     final String name)
     throws IOException
   {
-    final Class<CaEvaluatorSingleActionCurvesTest> c =
-      CaEvaluatorSingleActionCurvesTest.class;
+    final Class<CaActionEvaluatorCurvesTest> c =
+      CaActionEvaluatorCurvesTest.class;
     final CaDefinitionParserFormatProviderType format =
       new CaJSONFormatProvider();
     final CaCompilerProviderType compiler_prov =
@@ -86,8 +86,8 @@ public final class CaEvaluatorSingleActionCurvesTest
       this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
-    final CaEvaluatorSingleActionCurvesType eval =
-      CaEvaluatorSingleActionCurves.create(skel, act);
+    final CaActionEvaluatorCurvesType eval =
+      CaActionEvaluatorCurves.create(skel, act);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -140,8 +140,8 @@ public final class CaEvaluatorSingleActionCurvesTest
       this.compile("single-scale-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
-    final CaEvaluatorSingleActionCurvesType eval =
-      CaEvaluatorSingleActionCurves.create(skel, act);
+    final CaActionEvaluatorCurvesType eval =
+      CaActionEvaluatorCurves.create(skel, act);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -194,8 +194,8 @@ public final class CaEvaluatorSingleActionCurvesTest
       this.compile("single-orient-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
-    final CaEvaluatorSingleActionCurvesType eval =
-      CaEvaluatorSingleActionCurves.create(skel, act);
+    final CaActionEvaluatorCurvesType eval =
+      CaActionEvaluatorCurves.create(skel, act);
 
     final Vector3DType s_out =
       new VectorM3D();

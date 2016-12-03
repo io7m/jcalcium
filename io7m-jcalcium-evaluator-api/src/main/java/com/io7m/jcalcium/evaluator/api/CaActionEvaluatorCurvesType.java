@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.evaluator.main;
+package com.io7m.jcalcium.evaluator.api;
 
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.Quaternion4DType;
@@ -25,7 +25,7 @@ import com.io7m.jtensors.parameterized.PVectorWritable3DType;
  * An evaluator for a single curve-based action.
  */
 
-public interface CaEvaluatorSingleActionCurvesType
+public interface CaActionEvaluatorCurvesType
 {
   /**
    * Evaluate the translation of the bone with ID {@code bone_id} at time

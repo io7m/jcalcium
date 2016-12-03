@@ -28,6 +28,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
@@ -42,28 +43,42 @@ import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
 import javaslang.control.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation.interpolateVector3D;
 import static com.io7m.jfunctional.Unit.unit;
 
 /**
- * The default implementation of the {@link CaEvaluatorSingleActionCurvesType}.
+ * The default implementation of the {@link CaActionEvaluatorCurvesType}.
  */
 
-public final class CaEvaluatorSingleActionCurves implements
-  CaEvaluatorSingleActionCurvesType
+public final class CaActionEvaluatorCurves implements
+  CaActionEvaluatorCurvesType
 {
+  private static final Logger LOG;
+
+  static {
+    LOG = LoggerFactory.getLogger(CaActionEvaluatorCurves.class);
+  }
+
   private final CaSkeleton skeleton;
   private final CaActionCurves action;
   private final BoneTracks[] bone_tracks;
   private double eval_time;
 
-  private CaEvaluatorSingleActionCurves(
+  private CaActionEvaluatorCurves(
     final CaSkeleton in_skeleton,
     final CaActionCurves in_action)
   {
     this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
     this.action = NullCheck.notNull(in_action, "Action");
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+        "instantiating bone tracks for action {}",
+        in_action.name().value());
+    }
 
     final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> by_id =
       this.skeleton.bonesByID();
@@ -85,6 +100,21 @@ public final class CaEvaluatorSingleActionCurves implements
 
       if (curves_opt.isDefined()) {
         current_tracks.populate(curves_opt.get());
+      }
+
+      if (LOG.isTraceEnabled()) {
+        LOG.trace(
+          "bone [{}] {} keyframes translation",
+          bone_id,
+          Integer.valueOf(current_tracks.keyframes_translation.size()));
+        LOG.trace(
+          "bone [{}] {} keyframes scale",
+          bone_id,
+          Integer.valueOf(current_tracks.keyframes_scale.size()));
+        LOG.trace(
+          "bone [{}] {} keyframes orientation",
+          bone_id,
+          Integer.valueOf(current_tracks.keyframes_orientation.size()));
       }
 
       this.bone_tracks[bone_id.intValue()] = current_tracks;
@@ -109,11 +139,11 @@ public final class CaEvaluatorSingleActionCurves implements
    * @return A new evaluator
    */
 
-  public static CaEvaluatorSingleActionCurvesType create(
+  public static CaActionEvaluatorCurvesType create(
     final CaSkeleton in_skeleton,
     final CaActionCurves in_action)
   {
-    return new CaEvaluatorSingleActionCurves(in_skeleton, in_action);
+    return new CaActionEvaluatorCurves(in_skeleton, in_action);
   }
 
   @Override
