@@ -83,7 +83,7 @@ public final class CaEvaluatorSingleActionCurvesTest
     throws IOException
   {
     final CaSkeleton skel =
-      this.compile("single-translate-linear.caj");
+      this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaEvaluatorSingleActionCurvesType eval =
@@ -137,7 +137,7 @@ public final class CaEvaluatorSingleActionCurvesTest
     throws IOException
   {
     final CaSkeleton skel =
-      this.compile("single-scale-linear.caj");
+      this.compile("single-scale-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaEvaluatorSingleActionCurvesType eval =
@@ -191,7 +191,7 @@ public final class CaEvaluatorSingleActionCurvesTest
     throws IOException
   {
     final CaSkeleton skel =
-      this.compile("single-orient-linear.caj");
+      this.compile("single-orient-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaEvaluatorSingleActionCurvesType eval =

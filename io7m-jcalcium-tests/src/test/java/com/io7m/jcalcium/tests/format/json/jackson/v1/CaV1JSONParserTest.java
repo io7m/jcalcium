@@ -61,7 +61,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("empty.caj"), uri("empty.caj"));
+      p.parseSkeletonFromStream(resource("empty.csj"), uri("empty.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -73,7 +73,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("bone0.caj"), uri("bone0.caj"));
+      p.parseSkeletonFromStream(resource("bone0.csj"), uri("bone0.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -103,7 +103,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("bone1.caj"), uri("bone1.caj"));
+      p.parseSkeletonFromStream(resource("bone1.csj"), uri("bone1.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -134,7 +134,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("action0.caj"), uri("action0.caj"));
+      p.parseSkeletonFromStream(resource("action0.csj"), uri("action0.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -147,7 +147,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("action1.caj"), uri("action1.caj"));
+      p.parseSkeletonFromStream(resource("action1.csj"), uri("action1.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -181,7 +181,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("action2.caj"), uri("action2.caj"));
+      p.parseSkeletonFromStream(resource("action2.csj"), uri("action2.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -215,7 +215,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("action3.caj"), uri("action3.caj"));
+      p.parseSkeletonFromStream(resource("action3.csj"), uri("action3.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
@@ -252,8 +252,8 @@ public final class CaV1JSONParserTest
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
       p.parseSkeletonFromStream(
-        resource("dup_action.caj"),
-        uri("dup_action.caj"));
+        resource("dup_action.csj"),
+        uri("dup_action.csj"));
 
     dump(r);
     Assert.assertFalse(r.isValid());
@@ -264,7 +264,7 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("dup_bone.caj"), uri("dup_bone.caj"));
+      p.parseSkeletonFromStream(resource("dup_bone.csj"), uri("dup_bone.csj"));
 
     dump(r);
     Assert.assertFalse(r.isValid());

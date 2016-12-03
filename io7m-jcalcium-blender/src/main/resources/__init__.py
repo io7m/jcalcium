@@ -19,7 +19,7 @@ bl_info = {
   "author":      "io7m",
   "version":     (0, 1, 0),
   "blender":     (2, 66, 0),
-  "location":    "File > Export > Calcium JSON (.caj)",
+  "location":    "File > Export > Calcium JSON (.csj)",
   "description": "Export armatures to Calcium format",
   "warning":     "",
   "wiki_url":    "",
@@ -34,17 +34,17 @@ import mathutils
 CalciumOrientationHelper = bpy_extras.io_utils.orientation_helper_factory("CalciumOrientationHelper", axis_forward='-Z', axis_up='Y')
 
 class ExportCalcium(bpy.types.Operator, bpy_extras.io_utils.ExportHelper, CalciumOrientationHelper):
-  bl_idname = "export_scene.caj"
+  bl_idname = "export_scene.csj"
   bl_label = "Export Calcium"
 
   # The filename_ext field is accessed by ExportHelper.
-  filename_ext = ".caj"
+  filename_ext = ".csj"
 
   filepath = bpy.props.StringProperty(subtype='FILE_PATH')
   verbose  = bpy.props.BoolProperty(name="Verbose logging",description="Enable verbose debug logging",default=True)
 
   def execute(self, context):
-    self.filepath = bpy.path.ensure_ext(self.filepath, ".caj")
+    self.filepath = bpy.path.ensure_ext(self.filepath, ".csj")
 
     args = {}
     args['verbose'] = self.verbose
@@ -71,14 +71,14 @@ class ExportCalcium(bpy.types.Operator, bpy_extras.io_utils.ExportHelper, Calciu
 
   def invoke(self, context, event):
     if not self.filepath:
-      self.filepath = bpy.path.ensure_ext(bpy.data.filepath, ".caj")
+      self.filepath = bpy.path.ensure_ext(bpy.data.filepath, ".csj")
     context.window_manager.fileselect_add(self)
     return {'RUNNING_MODAL'}
   #end
 #endclass
 
 def menuFunction(self, context):
-  self.layout.operator(ExportCalcium.bl_idname, text="Calcium JSON (.caj)")
+  self.layout.operator(ExportCalcium.bl_idname, text="Calcium JSON (.csj)")
 #end
 
 def register():

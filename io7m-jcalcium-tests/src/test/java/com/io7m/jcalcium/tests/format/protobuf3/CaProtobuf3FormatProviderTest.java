@@ -62,7 +62,7 @@ public final class CaProtobuf3FormatProviderTest
         0));
 
     final Validation<List<CaParseError>, CaDefinitionSkeleton> rj =
-      pj.parseSkeletonFromStream(resource("all-1.0.caj"), uri("all-1.0.caj"));
+      pj.parseSkeletonFromStream(resource("all-1.0.csj"), uri("all-1.0.csj"));
     dump(rj);
     Assert.assertTrue(rj.isValid());
 
@@ -72,7 +72,7 @@ public final class CaProtobuf3FormatProviderTest
     final Validation<List<CaParseError>, CaDefinitionSkeleton> rp =
       pp.parseSkeletonFromStream(
         new ByteArrayInputStream(bao.toByteArray()),
-        uri("all-1.0.caj"));
+        uri("all-1.0.csj"));
 
     dump(rp);
     Assert.assertTrue(rp.isValid());

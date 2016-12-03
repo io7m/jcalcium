@@ -73,7 +73,7 @@ public final class CaJSONFormatProvider implements
       b.setMimeType("application/vnd.io7m.calcium-json");
       b.setDescription("JSON encoded skeleton format");
       b.setName("CaJ");
-      b.setSuffix("caj");
+      b.setSuffix("csj");
       FORMAT = b.build();
     }
   }
