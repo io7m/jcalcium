@@ -25,7 +25,6 @@ import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.compiler.main.CaCompiler;
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -111,6 +110,94 @@ public final class Main implements Runnable
     final Main cm = new Main(args);
     cm.run();
     System.exit(cm.exitCode());
+  }
+
+  private static CaDefinitionParserFormatProviderType findParserProvider(
+    final String format,
+    final String file)
+  {
+    final ServiceLoader<CaDefinitionParserFormatProviderType> loader =
+      ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
+
+    if (format == null) {
+      LOG.debug("attempting to infer format from file suffix");
+      final int index = file.lastIndexOf('.');
+      if (index != -1) {
+        final String suffix = file.substring(index + 1);
+        final Iterator<CaDefinitionParserFormatProviderType> providers =
+          loader.iterator();
+        while (providers.hasNext()) {
+          final CaDefinitionParserFormatProviderType current_provider =
+            providers.next();
+          if (current_provider.parserFormat().suffix().equals(suffix)) {
+            LOG.debug("using provider: {}", current_provider);
+            return current_provider;
+          }
+        }
+      }
+
+      LOG.error("File {} does not have a recognized suffix", file);
+    } else {
+      LOG.debug("attempting to find provider for {}", format);
+      final Iterator<CaDefinitionParserFormatProviderType> providers =
+        loader.iterator();
+      while (providers.hasNext()) {
+        final CaDefinitionParserFormatProviderType current_provider =
+          providers.next();
+        if (current_provider.parserFormat().name().equals(format)) {
+          LOG.debug("using provider: {}", current_provider);
+          return current_provider;
+        }
+      }
+
+      LOG.error("Could not find a provider for the format '{}'", format);
+    }
+
+    return null;
+  }
+
+  private static CaDefinitionSerializerFormatProviderType findSerializerProvider(
+    final String format,
+    final String file)
+  {
+    final ServiceLoader<CaDefinitionSerializerFormatProviderType> loader =
+      ServiceLoader.load(CaDefinitionSerializerFormatProviderType.class);
+
+    if (format == null) {
+      LOG.debug("attempting to infer format from file suffix");
+      final int index = file.lastIndexOf('.');
+      if (index != -1) {
+        final String suffix = file.substring(index + 1);
+        final Iterator<CaDefinitionSerializerFormatProviderType> providers =
+          loader.iterator();
+        while (providers.hasNext()) {
+          final CaDefinitionSerializerFormatProviderType current_provider =
+            providers.next();
+          if (current_provider.serializerFormat().suffix().equals(suffix)) {
+            LOG.debug("using provider: {}", current_provider);
+            return current_provider;
+          }
+        }
+      }
+
+      LOG.error("File {} does not have a recognized suffix", file);
+    } else {
+      LOG.debug("attempting to find provider for {}", format);
+      final Iterator<CaDefinitionSerializerFormatProviderType> providers =
+        loader.iterator();
+      while (providers.hasNext()) {
+        final CaDefinitionSerializerFormatProviderType current_provider =
+          providers.next();
+        if (current_provider.serializerFormat().name().equals(format)) {
+          LOG.debug("using provider: {}", current_provider);
+          return current_provider;
+        }
+      }
+
+      LOG.error("Could not find a provider for the format '{}'", format);
+    }
+
+    return null;
   }
 
   /**
@@ -500,93 +587,5 @@ public final class Main implements Runnable
 
       return unit();
     }
-  }
-
-  private static CaDefinitionParserFormatProviderType findParserProvider(
-    final String format,
-    final String file)
-  {
-    final ServiceLoader<CaDefinitionParserFormatProviderType> loader =
-      ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
-
-    if (format == null) {
-      LOG.debug("attempting to infer format from file suffix");
-      final int index = file.lastIndexOf('.');
-      if (index != -1) {
-        final String suffix = file.substring(index + 1);
-        final Iterator<CaDefinitionParserFormatProviderType> providers =
-          loader.iterator();
-        while (providers.hasNext()) {
-          final CaDefinitionParserFormatProviderType current_provider =
-            providers.next();
-          if (current_provider.parserFormat().suffix().equals(suffix)) {
-            LOG.debug("using provider: {}", current_provider);
-            return current_provider;
-          }
-        }
-      }
-
-      LOG.error("File {} does not have a recognized suffix", file);
-    } else {
-      LOG.debug("attempting to find provider for {}", format);
-      final Iterator<CaDefinitionParserFormatProviderType> providers =
-        loader.iterator();
-      while (providers.hasNext()) {
-        final CaDefinitionParserFormatProviderType current_provider =
-          providers.next();
-        if (current_provider.parserFormat().name().equals(format)) {
-          LOG.debug("using provider: {}", current_provider);
-          return current_provider;
-        }
-      }
-
-      LOG.error("Could not find a provider for the format '{}'", format);
-    }
-
-    return null;
-  }
-
-  private static CaDefinitionSerializerFormatProviderType findSerializerProvider(
-    final String format,
-    final String file)
-  {
-    final ServiceLoader<CaDefinitionSerializerFormatProviderType> loader =
-      ServiceLoader.load(CaDefinitionSerializerFormatProviderType.class);
-
-    if (format == null) {
-      LOG.debug("attempting to infer format from file suffix");
-      final int index = file.lastIndexOf('.');
-      if (index != -1) {
-        final String suffix = file.substring(index + 1);
-        final Iterator<CaDefinitionSerializerFormatProviderType> providers =
-          loader.iterator();
-        while (providers.hasNext()) {
-          final CaDefinitionSerializerFormatProviderType current_provider =
-            providers.next();
-          if (current_provider.serializerFormat().suffix().equals(suffix)) {
-            LOG.debug("using provider: {}", current_provider);
-            return current_provider;
-          }
-        }
-      }
-
-      LOG.error("File {} does not have a recognized suffix", file);
-    } else {
-      LOG.debug("attempting to find provider for {}", format);
-      final Iterator<CaDefinitionSerializerFormatProviderType> providers =
-        loader.iterator();
-      while (providers.hasNext()) {
-        final CaDefinitionSerializerFormatProviderType current_provider =
-          providers.next();
-        if (current_provider.serializerFormat().name().equals(format)) {
-          LOG.debug("using provider: {}", current_provider);
-          return current_provider;
-        }
-      }
-
-      LOG.error("Could not find a provider for the format '{}'", format);
-    }
-
-    return null;
   }
 }

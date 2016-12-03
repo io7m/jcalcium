@@ -65,6 +65,10 @@ public interface CaSkeletonType
   @Value.Parameter
   SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID();
 
+  /**
+   * Check preconditions for the type.
+   */
+
   @Value.Check
   default void checkPreconditions()
   {

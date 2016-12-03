@@ -24,7 +24,6 @@ import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -51,6 +50,8 @@ import com.io7m.jorchard.core.JOTreeExceptionCycle;
 import com.io7m.jorchard.core.JOTreeNode;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
+import javaslang.collection.Array;
+import javaslang.collection.IndexedSeq;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Seq;
@@ -375,7 +376,7 @@ final class CaCompileTask
       action.curves();
 
     List<CaCompileError> errors = List.empty();
-    SortedMap<CaBoneName, List<CaCurveType>> results =
+    SortedMap<CaBoneName, IndexedSeq<CaCurveType>> results =
       javaslang.collection.TreeMap.empty();
 
     for (final CaBoneName bone : curves.keySet()) {
@@ -390,16 +391,22 @@ final class CaCompileTask
       final List<CaDefinitionCurveType> curves_for_bone =
         curves.get(bone).get();
 
-      List<CaCurveType> curves_ok = List.empty();
+      IndexedSeq<CaCurveType> curves_ok = Array.empty();
 
-      final CurveTypeCounter counter = new CurveTypeCounter(bone, action.name());
+      final CurveTypeCounter counter = new CurveTypeCounter(
+        bone,
+        action.name());
       for (final CaDefinitionCurveType curve : curves_for_bone) {
         final Validation<List<CaCompileError>, CaCurveType> r = curve.matchCurve(
           counter,
           CurveTypeCounter::onCurveTranslation,
           CurveTypeCounter::onCurveOrientation,
           CurveTypeCounter::onCurveScale).flatMap(
-            ignored -> compileActionCurve(bone_index, action.name(), bone, curve));
+          ignored -> compileActionCurve(
+            bone_index,
+            action.name(),
+            bone,
+            curve));
 
         if (r.isValid()) {
           curves_ok = curves_ok.append(r.get());
@@ -415,7 +422,7 @@ final class CaCompileTask
       compileActionFPS(action.name(), action.framesPerSecond());
 
     if (errors.isEmpty()) {
-      final SortedMap<CaBoneName, List<CaCurveType>> r_results = results;
+      final SortedMap<CaBoneName, IndexedSeq<CaCurveType>> r_results = results;
       return v_fps.flatMap(fps -> {
         final CaActionCurves.Builder b = CaActionCurves.builder();
         b.setName(action.name());
@@ -440,7 +447,10 @@ final class CaCompileTask
   {
     Invariants.checkInvariant(
       Objects.equals(curve.bone(), bone_name),
-      () -> String.format("Curve bone %s must match bone %s", curve.bone().value(), bone_name.value()));
+      () -> String.format(
+        "Curve bone %s must match bone %s",
+        curve.bone().value(),
+        bone_name.value()));
 
     return compileActionBoneName(bone_index, action_name, bone_name)
       .flatMap(ignored -> curve.matchCurve(

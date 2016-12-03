@@ -46,6 +46,6 @@ public interface CaCurveTranslationType extends CaCurveType
    * @return The list of keyframes for the curve
    */
 
-  SortedMap<Integer, CaCurveKeyframeTranslationType> keyframes();
+  SortedMap<Integer, CaCurveKeyframeTranslation> keyframes();
 
 }

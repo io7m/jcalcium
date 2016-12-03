@@ -32,6 +32,5 @@ public interface CaEvaluatorProviderType
    * @return A new evaluator
    */
 
-  CaEvaluatorType create(
-    CaSkeleton skeleton);
+  CaEvaluatorType create(CaSkeleton skeleton);
 }

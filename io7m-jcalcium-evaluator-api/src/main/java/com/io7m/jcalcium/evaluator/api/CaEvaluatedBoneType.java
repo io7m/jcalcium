@@ -14,36 +14,53 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.compiled.actions;
+package com.io7m.jcalcium.evaluator.api;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
-import com.io7m.jfunctional.PartialBiFunctionType;
-import com.io7m.jnull.NullCheck;
-import javaslang.collection.IndexedSeq;
-import javaslang.collection.SortedMap;
+import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jtensors.QuaternionReadable4DType;
+import com.io7m.jtensors.VectorReadable3DType;
+import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 import org.immutables.value.Value;
 
 /**
- * An action that is constructed from a set of keyframe curves.
+ * The type of evaluated bones.
  */
 
-@ImmutableStyleType
-@Value.Immutable
-public interface CaActionCurvesType extends CaActionType
+public interface CaEvaluatedBoneType
 {
-  @Override
-  default <A, B, E extends Exception> B matchAction(
-    final A context,
-    final PartialBiFunctionType<A, CaActionCurvesType, B, E> on_curves)
-    throws E
-  {
-    return NullCheck.notNull(on_curves, "on_curves").call(context, this);
-  }
-
   /**
-   * @return The curves for the action
+   * @return The bone name
    */
 
-  SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves();
+  @Value.Parameter
+  CaBoneName name();
+
+  /**
+   * @return The bone ID
+   */
+
+  @Value.Parameter
+  int id();
+
+  /**
+   * @return The parent-relative offset for the bone
+   */
+
+  @Value.Parameter
+  PVectorReadable3DType<CaSpaceBoneParentRelativeType> translation();
+
+  /**
+   * @return The parent-relative orientation of the bone
+   */
+
+  @Value.Parameter
+  QuaternionReadable4DType orientation();
+
+  /**
+   * @return The parent-relative scale of the bone
+   */
+
+  @Value.Parameter
+  VectorReadable3DType scale();
 }

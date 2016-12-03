@@ -65,6 +65,7 @@ import com.io7m.jtensors.generators.parameterized.PVectorI3DGenerator;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import javaslang.Tuple;
 import javaslang.collection.HashMap;
+import javaslang.collection.IndexedSeq;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.SortedMap;
@@ -936,7 +937,7 @@ public abstract class CaCompilerContract
               final CaDefinitionActionCurves act_orig_c =
                 (CaDefinitionActionCurves) act_orig;
 
-              final SortedMap<CaBoneName, List<CaCurveType>> curves_by_bone_comp =
+              final SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves_by_bone_comp =
                 act_comp_c.curves();
               final Map<CaBoneName, List<CaDefinitionCurveType>> curves_by_bone_orig =
                 act_orig_c.curves();
@@ -948,7 +949,7 @@ public abstract class CaCompilerContract
               for (final CaBoneName curve_bone : curves_by_bone_comp.keySet()) {
                 final List<CaDefinitionCurveType> curves_orig =
                   curves_by_bone_orig.get(curve_bone).get();
-                final List<CaCurveType> curves_comp =
+                final IndexedSeq<CaCurveType> curves_comp =
                   curves_by_bone_comp.get(curve_bone).get();
 
                 for (int index = 0; index < curves_comp.size(); ++index) {

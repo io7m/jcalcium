@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -864,19 +865,32 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     {
       final TreeNode n = p.getCodec().readTree(p);
       if (n instanceof TextNode) {
-        switch (((TextNode) n).asText()) {
-          case "linear":
-            return CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
-          case "constant":
-            return CaCurveInterpolation.CURVE_INTERPOLATION_CONSTANT;
-          case "exponential":
-            return CaCurveInterpolation.CURVE_INTERPOLATION_EXPONENTIAL;
+        try {
+          return CaCurveInterpolation.of(((TextNode) n).asText());
+        } catch (final IllegalArgumentException e) {
+          throw error(ctxt, n);
         }
       }
 
-      throw new JsonParseException(
-        p,
-        "Expected: linear | constant | exponential");
+      throw error(ctxt, n);
+    }
+
+    private static JsonMappingException error(
+      final DeserializationContext ctxt,
+      final TreeNode n)
+    {
+      final StringBuilder sb = new StringBuilder(128);
+      sb.append("Received: ");
+      sb.append(n);
+      sb.append(System.lineSeparator());
+      sb.append("Expected: ");
+      sb.append(
+        javaslang.collection.List.of(CaCurveInterpolation.values())
+          .toJavaStream()
+          .map(CaCurveInterpolation::getName)
+          .collect(Collectors.joining("|")));
+      sb.append(System.lineSeparator());
+      return ctxt.mappingException(sb.toString());
     }
   }
 

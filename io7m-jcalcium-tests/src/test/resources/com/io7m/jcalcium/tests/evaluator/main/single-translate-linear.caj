@@ -1,0 +1,48 @@
+{
+  "version": "calcium skeleton 1.0",
+  "skeleton": {
+    "name": "skeleton0",
+    "bones": [
+      {
+        "name": "bone.000",
+        "translation": [0.0, 0.0, 0.0],
+        "orientation-xyzw": [0.0, 0.0, 0.0, 1.0],
+        "scale": [1.0, 1.0, 1.0]
+      }
+    ],
+    "actions": [
+      {
+        "type": "curves",
+        "name": "action0",
+        "frames-per-second": 60,
+        "curves": [
+          {
+            "bone": "bone.000",
+            "type": "translation",
+            "keyframes": [
+              {
+                "index": 0,
+                "interpolation": "linear",
+                "easing": "in",
+                "translation": [0.000000, 0.000000, 0.000000]
+              },
+              {
+                "index": 10,
+                "interpolation": "linear",
+                "easing": "in-out",
+                "translation": [1.000000, 1.000000, 1.000000]
+              },
+              {
+                "index": 20,
+                "interpolation": "linear",
+                "easing": "out",
+                "translation": [2.000000, 2.000000, 2.000000]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+

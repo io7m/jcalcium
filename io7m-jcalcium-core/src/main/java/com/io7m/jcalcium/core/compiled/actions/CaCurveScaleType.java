@@ -45,5 +45,5 @@ public interface CaCurveScaleType extends CaCurveType
    * @return The list of keyframes for the curve
    */
 
-  SortedMap<Integer, CaCurveKeyframeScaleType> keyframes();
+  SortedMap<Integer, CaCurveKeyframeScale> keyframes();
 }

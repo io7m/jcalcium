@@ -386,6 +386,7 @@ class CalciumExporter:
   __supported_interpolation = {
     "CONSTANT" : "constant",
     "LINEAR"   : "linear",
+    "QUAD"     : "quadratic",
     "EXPO"     : "exponential"
   }
 

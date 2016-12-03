@@ -37,6 +37,12 @@ public enum CaCurveInterpolation
   CURVE_INTERPOLATION_LINEAR("linear"),
 
   /**
+   * Quadratic interpolation
+   */
+
+  CURVE_INTERPOLATION_QUADRATIC("quadratic"),
+
+  /**
    * Exponential interpolation
    */
 
@@ -66,9 +72,20 @@ public enum CaCurveInterpolation
         return CURVE_INTERPOLATION_EXPONENTIAL;
       case "constant":
         return CURVE_INTERPOLATION_CONSTANT;
+      case "quadratic":
+        return CURVE_INTERPOLATION_QUADRATIC;
     }
 
     throw new IllegalArgumentException(
       "Unrecognized curve interpolation: " + name);
+  }
+
+  /**
+   * @return The interpolation name
+   */
+
+  public String getName()
+  {
+    return this.name;
   }
 }

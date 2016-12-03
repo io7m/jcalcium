@@ -46,5 +46,5 @@ public interface CaCurveOrientationType extends CaCurveType
    * @return The list of keyframes for the bone
    */
 
-  SortedMap<Integer, CaCurveKeyframeOrientationType> keyframes();
+  SortedMap<Integer, CaCurveKeyframeOrientation> keyframes();
 }

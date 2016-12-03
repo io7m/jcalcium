@@ -45,6 +45,10 @@
     </dependency>
 
     <dependency>
+      <groupId>it.unimi.dsi</groupId>
+      <artifactId>fastutil</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.javaslang</groupId>
       <artifactId>javaslang</artifactId>
     </dependency>
