@@ -16,21 +16,11 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-
 /**
  * The type of evaluator providers.
  */
 
 public interface CaEvaluatorProviderType
 {
-  /**
-   * Create a new evaluator for the given skeleton.
-   *
-   * @param skeleton A compiled skeleton
-   *
-   * @return A new evaluator
-   */
 
-  CaEvaluatorType create(CaSkeleton skeleton);
 }

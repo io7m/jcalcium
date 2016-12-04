@@ -16,6 +16,8 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.Quaternion4DType;
 import com.io7m.jtensors.VectorWritable3DType;
@@ -27,6 +29,18 @@ import com.io7m.jtensors.parameterized.PVectorWritable3DType;
 
 public interface CaActionEvaluatorCurvesType
 {
+  /**
+   * @return The skeleton targeted by the evaluator
+   */
+
+  CaSkeleton skeleton();
+
+  /**
+   * @return The action being evaluated
+   */
+
+  CaActionCurvesType action();
+
   /**
    * Evaluate the translation of the bone with ID {@code bone_id} at time
    * {@code time}, writing the resulting value to {@code out}.

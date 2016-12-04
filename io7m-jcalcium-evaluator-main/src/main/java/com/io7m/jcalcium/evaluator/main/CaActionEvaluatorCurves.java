@@ -22,7 +22,7 @@ import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
+import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
@@ -53,8 +53,8 @@ import static com.io7m.jfunctional.Unit.unit;
  * The default implementation of the {@link CaActionEvaluatorCurvesType}.
  */
 
-public final class CaActionEvaluatorCurves implements
-  CaActionEvaluatorCurvesType
+public final class CaActionEvaluatorCurves
+  implements CaActionEvaluatorCurvesType
 {
   private static final Logger LOG;
 
@@ -63,13 +63,13 @@ public final class CaActionEvaluatorCurves implements
   }
 
   private final CaSkeleton skeleton;
-  private final CaActionCurves action;
+  private final CaActionCurvesType action;
   private final BoneTracks[] bone_tracks;
   private double eval_time;
 
   private CaActionEvaluatorCurves(
     final CaSkeleton in_skeleton,
-    final CaActionCurves in_action)
+    final CaActionCurvesType in_action)
   {
     this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
     this.action = NullCheck.notNull(in_action, "Action");
@@ -141,9 +141,21 @@ public final class CaActionEvaluatorCurves implements
 
   public static CaActionEvaluatorCurvesType create(
     final CaSkeleton in_skeleton,
-    final CaActionCurves in_action)
+    final CaActionCurvesType in_action)
   {
     return new CaActionEvaluatorCurves(in_skeleton, in_action);
+  }
+
+  @Override
+  public CaSkeleton skeleton()
+  {
+    return this.skeleton;
+  }
+
+  @Override
+  public CaActionCurvesType action()
+  {
+    return this.action;
   }
 
   @Override

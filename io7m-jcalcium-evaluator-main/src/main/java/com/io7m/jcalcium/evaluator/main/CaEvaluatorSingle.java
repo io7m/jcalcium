@@ -18,11 +18,13 @@ package com.io7m.jcalcium.evaluator.main;
 
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.compiled.CaBone;
-import com.io7m.jcalcium.core.compiled.CaSkeletonType;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedBoneType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorWeightedAction;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
+import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
@@ -32,26 +34,29 @@ import com.io7m.jtensors.VectorM3D;
 import com.io7m.jtensors.VectorReadable3DType;
 import com.io7m.jtensors.parameterized.PVectorM3D;
 import com.io7m.jtensors.parameterized.PVectorReadable3DType;
-import com.io7m.junreachable.UnimplementedCodeException;
-import javaslang.collection.List;
 
 import static com.io7m.jfunctional.Unit.unit;
 
 /**
- * The default implementation of {@link CaEvaluatorType}.
+ * The default implementation of the {@link CaEvaluatorSingleType} type.
  */
 
-public final class CaEvaluator implements CaEvaluatorType
+public final class CaEvaluatorSingle implements CaEvaluatorSingleType
 {
-  private final CaSkeletonType skeleton;
-  private final JOTreeNodeType<BoneState> state;
-  private final JOTreeNodeReadableType<CaEvaluatedBoneType> state_view;
+  private final CaSkeleton skeleton;
+  private final CaActionType action;
+  private final JOTreeNodeType<BoneState> bone_states;
+  private final JOTreeNodeReadableType<CaEvaluatedBoneType> bone_states_view;
+  private CaActionEvaluatorCurvesType eval_curves;
 
-  private CaEvaluator(
-    final CaSkeletonType in_skeleton)
+  private CaEvaluatorSingle(
+    final CaSkeleton in_skeleton,
+    final CaActionType in_action)
   {
     this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
-    this.state = in_skeleton.bones().mapBreadthFirst(
+    this.action = NullCheck.notNull(in_action, "Action");
+
+    this.bone_states = in_skeleton.bones().mapBreadthFirst(
       unit(), (input, depth, node) -> {
         final CaBone c_bone = node.value();
         return new BoneState(c_bone.name(), c_bone.id());
@@ -59,47 +64,66 @@ public final class CaEvaluator implements CaEvaluatorType
 
     @SuppressWarnings("unchecked")
     final JOTreeNodeReadableType<CaEvaluatedBoneType> view_typed =
-      (JOTreeNodeReadableType<CaEvaluatedBoneType>) (Object) this.state;
-    this.state_view = view_typed;
+      (JOTreeNodeReadableType<CaEvaluatedBoneType>) (Object) this.bone_states;
+    this.bone_states_view = view_typed;
+
+    this.action.matchAction(this, (t, curves) -> {
+      t.eval_curves = CaActionEvaluatorCurves.create(t.skeleton, curves);
+      return unit();
+    });
   }
 
   /**
-   * Construct a new evaluator for the skeleton.
+   * Create a new single-action evaluator.
    *
-   * @param skeleton The skeleton
+   * @param in_skeleton The skeleton
+   * @param in_action   The action
    *
-   * @return A new evaluator
+   * @return An evaluator
    */
 
-  public static CaEvaluatorType create(
-    final CaSkeletonType skeleton)
+  public static CaEvaluatorSingleType create(
+    final CaSkeleton in_skeleton,
+    final CaActionType in_action)
   {
-    return new CaEvaluator(skeleton);
+    return new CaEvaluatorSingle(in_skeleton, in_action);
+  }
+
+  @Override
+  public CaSkeleton skeleton()
+  {
+    return this.skeleton;
+  }
+
+  @Override
+  public CaActionType action()
+  {
+    return this.action;
   }
 
   @Override
   public JOTreeNodeReadableType<CaEvaluatedBoneType> evaluatedBones()
   {
-    return this.state_view;
-  }
-
-  @Override
-  public void evaluateTransitionTo(
-    final List<CaEvaluatorWeightedAction> actions,
-    final double time)
-  {
-    NullCheck.notNull(actions, "actions");
-
-    // TODO: Generated method stub
-    throw new UnimplementedCodeException();
+    return this.bone_states_view;
   }
 
   @Override
   public void evaluate(
     final double time)
   {
-    // TODO: Generated method stub
-    throw new UnimplementedCodeException();
+    this.action.matchAction(this, (t, curves) -> t.evaluateCurves(time));
+  }
+
+  private Unit evaluateCurves(
+    final double time)
+  {
+    this.bone_states.forEachBreadthFirst(this, (t, depth, node) -> {
+      final BoneState bone = node.value();
+      t.eval_curves.evaluateOrientation(bone.bone_id, time, bone.orientation);
+      t.eval_curves.evaluateTranslation(bone.bone_id, time, bone.translation);
+      t.eval_curves.evaluateScale(bone.bone_id, time, bone.scale);
+    });
+    return unit();
   }
 
   private static final class BoneState implements CaEvaluatedBoneType

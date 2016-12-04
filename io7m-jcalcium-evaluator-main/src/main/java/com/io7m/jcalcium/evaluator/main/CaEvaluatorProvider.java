@@ -16,9 +16,7 @@
 
 package com.io7m.jcalcium.evaluator.main;
 
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorProviderType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorType;
 
 /**
  * The default evaluator provider implementation.
@@ -33,12 +31,5 @@ public final class CaEvaluatorProvider implements CaEvaluatorProviderType
   public CaEvaluatorProvider()
   {
 
-  }
-
-  @Override
-  public CaEvaluatorType create(
-    final CaSkeleton skeleton)
-  {
-    return CaEvaluator.create(skeleton);
   }
 }
