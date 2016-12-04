@@ -14,30 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.serializer.api;
+package com.io7m.jcalcium.format.protobuf3;
 
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
+import com.io7m.jcalcium.loader.api.CaLoaderException;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.URI;
 
 /**
- * The type of serializers.
+ * An I/O error occurred during loading.
  */
 
-public interface CaDefinitionSerializerType
+public final class CaLoaderIOException extends CaLoaderException
 {
   /**
-   * Serialize a skeleton to a stream.
+   * Construct an exception.
    *
-   * @param skeleton The skeleton
-   * @param out      The output stream
-   *
-   * @throws IOException On I/O errors
+   * @param uri   The URI
+   * @param cause The cause
    */
 
-  void serializeSkeletonToStream(
-    CaDefinitionSkeleton skeleton,
-    OutputStream out)
-    throws IOException;
+  public CaLoaderIOException(
+    final URI uri,
+    final IOException cause)
+  {
+    super(uri, cause);
+  }
 }

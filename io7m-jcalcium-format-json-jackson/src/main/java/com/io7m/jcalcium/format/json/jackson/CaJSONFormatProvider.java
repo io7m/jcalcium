@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.core.definitions.CaFormatVersionType;
@@ -71,8 +70,8 @@ public final class CaJSONFormatProvider implements
     {
       final CaFormatDescription.Builder b = CaFormatDescription.builder();
       b.setMimeType("application/vnd.io7m.calcium-json");
-      b.setDescription("JSON encoded skeleton format");
-      b.setName("CaJ");
+      b.setDescription("JSON encoded skeleton definition format");
+      b.setName("csj");
       b.setSuffix("csj");
       FORMAT = b.build();
     }
@@ -169,7 +168,7 @@ public final class CaJSONFormatProvider implements
     }
   }
 
-  private static final class SkeletonSerializer extends StdSerializer<CaDefinitionSkeletonType>
+  private static final class SkeletonSerializer extends StdSerializer<CaDefinitionSkeleton>
   {
     private static final Logger LOG;
 
@@ -182,13 +181,13 @@ public final class CaJSONFormatProvider implements
     SkeletonSerializer(
       final CaFormatVersionType in_version)
     {
-      super(CaDefinitionSkeletonType.class);
+      super(CaDefinitionSkeleton.class);
       this.version = NullCheck.notNull(in_version, "Version");
     }
 
     @Override
     public void serialize(
-      final CaDefinitionSkeletonType value,
+      final CaDefinitionSkeleton value,
       final JsonGenerator gen,
       final SerializerProvider provider)
       throws IOException
@@ -281,7 +280,7 @@ public final class CaJSONFormatProvider implements
     {
       final SimpleModule m = new SimpleModule();
       m.addSerializer(
-        CaDefinitionSkeletonType.class,
+        CaDefinitionSkeleton.class,
         new SkeletonSerializer(v));
 
       this.mapper = CaJSON.createMapper();
@@ -291,7 +290,7 @@ public final class CaJSONFormatProvider implements
 
     @Override
     public void serializeSkeletonToStream(
-      final CaDefinitionSkeletonType skeleton,
+      final CaDefinitionSkeleton skeleton,
       final OutputStream out)
       throws IOException
     {

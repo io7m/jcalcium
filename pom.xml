@@ -27,6 +27,7 @@
     <module>io7m-jcalcium-format-json-jackson</module>
     <module>io7m-jcalcium-format-protobuf3</module>
     <module>io7m-jcalcium-generators</module>
+    <module>io7m-jcalcium-loader-api</module>
     <module>io7m-jcalcium-parser-api</module>
     <module>io7m-jcalcium-serializer-api</module>
     <module>io7m-jcalcium-tests</module>

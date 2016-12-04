@@ -14,30 +14,45 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.serializer.api;
+package com.io7m.jcalcium.format.protobuf3;
 
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
+import com.io7m.jcalcium.loader.api.CaLoaderException;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.net.URI;
 
 /**
- * The type of serializers.
+ * The data was corrupted in some manner.
  */
 
-public interface CaDefinitionSerializerType
+public final class CaLoaderCorruptedData extends CaLoaderException
 {
   /**
-   * Serialize a skeleton to a stream.
+   * Construct an exception.
    *
-   * @param skeleton The skeleton
-   * @param out      The output stream
-   *
-   * @throws IOException On I/O errors
+   * @param uri     The URI
+   * @param message The error message
    */
 
-  void serializeSkeletonToStream(
-    CaDefinitionSkeleton skeleton,
-    OutputStream out)
-    throws IOException;
+  public CaLoaderCorruptedData(
+    final URI uri,
+    final String message)
+  {
+    super(uri, message);
+  }
+
+  /**
+   * Construct an exception.
+   *
+   * @param uri     The URI
+   * @param cause   The cause
+   * @param message The error message
+   */
+
+  public CaLoaderCorruptedData(
+    final URI uri,
+    final Throwable cause,
+    final String message)
+  {
+    super(uri, message, cause);
+  }
 }

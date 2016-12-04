@@ -79,6 +79,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -132,6 +133,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       return Validation.valid(
         this.mapper.readValue(is, CaV1Skeleton.class).toSkeleton());
     } catch (final JsonParseException e) {
+      final Path path = Paths.get(uri.getPath());
       final JsonParser proc = e.getProcessor();
       final JsonLocation loc = proc.getCurrentLocation();
       final javaslang.collection.List<CaParseError> xs =
@@ -140,18 +142,19 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
             LexicalPosition.of(
               loc.getLineNr(),
               loc.getColumnNr(),
-              Optional.of(Paths.get(uri))),
+              Optional.of(path)),
             e.getMessage()
           ));
       return Validation.invalid(xs);
     } catch (final IOException e) {
+      final Path path = Paths.get(uri.getPath());
       final javaslang.collection.List<CaParseError> xs =
         javaslang.collection.List.of(
           CaParseError.of(
             LexicalPosition.of(
               -1,
               -1,
-              Optional.of(Paths.get(uri))),
+              Optional.of(path)),
             e.getMessage()
           ));
       return Validation.invalid(xs);
@@ -160,7 +163,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
 
   @Override
   public void serializeSkeletonToStream(
-    final CaDefinitionSkeletonType skeleton,
+    final CaDefinitionSkeleton skeleton,
     final OutputStream out)
     throws IOException
   {
@@ -962,6 +965,10 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
         }
         case CURVE_INTERPOLATION_LINEAR: {
           gen.writeRawValue("\"linear\"");
+          break;
+        }
+        case CURVE_INTERPOLATION_QUADRATIC: {
+          gen.writeRawValue("\"quadratic\"");
           break;
         }
         case CURVE_INTERPOLATION_EXPONENTIAL: {

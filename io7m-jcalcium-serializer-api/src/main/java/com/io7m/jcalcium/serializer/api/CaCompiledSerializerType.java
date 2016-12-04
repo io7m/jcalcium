@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.serializer.api;
 
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,7 +25,7 @@ import java.io.OutputStream;
  * The type of serializers.
  */
 
-public interface CaDefinitionSerializerType
+public interface CaCompiledSerializerType
 {
   /**
    * Serialize a skeleton to a stream.
@@ -36,8 +36,8 @@ public interface CaDefinitionSerializerType
    * @throws IOException On I/O errors
    */
 
-  void serializeSkeletonToStream(
-    CaDefinitionSkeleton skeleton,
+  void serializeCompiledSkeletonToStream(
+    CaSkeleton skeleton,
     OutputStream out)
     throws IOException;
 }

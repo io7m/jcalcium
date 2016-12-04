@@ -21,10 +21,10 @@ import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import javaslang.collection.SortedSet;
 
 /**
- * A provider of definition serializers for a given format.
+ * A provider of serializers for a given format.
  */
 
-public interface CaDefinitionSerializerFormatProviderType
+public interface CaCompiledSerializerFormatProviderType
 {
   /**
    * @return The format that this provider supports
@@ -50,7 +50,7 @@ public interface CaDefinitionSerializerFormatProviderType
    *                                       #serializerSupportedVersions()}
    */
 
-  CaDefinitionSerializerType serializerCreate(
+  CaCompiledSerializerType serializerCreate(
     CaFormatVersion v)
     throws UnsupportedOperationException;
 }

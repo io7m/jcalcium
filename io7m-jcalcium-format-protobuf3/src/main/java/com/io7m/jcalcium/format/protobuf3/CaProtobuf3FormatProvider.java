@@ -16,22 +16,17 @@
 
 package com.io7m.jcalcium.format.protobuf3;
 
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
+import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.protobuf3.v1.CaV1Protobuf3Format;
-import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
-import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
-import com.io7m.jcalcium.parser.api.CaParseError;
-import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
-import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
-import com.io7m.jfunctional.Unit;
-import com.io7m.jlexing.core.LexicalPosition;
+import com.io7m.jcalcium.loader.api.CaLoaderException;
+import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
+import com.io7m.jcalcium.loader.api.CaLoaderType;
+import com.io7m.jcalcium.serializer.api.CaCompiledSerializerFormatProviderType;
+import com.io7m.jcalcium.serializer.api.CaCompiledSerializerType;
 import com.io7m.jnull.NullCheck;
-import javaslang.collection.List;
 import javaslang.collection.SortedSet;
-import javaslang.control.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,23 +36,18 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-
-import static javaslang.control.Validation.invalid;
-import static javaslang.control.Validation.valid;
 
 /**
  * A provider for the protobuf3 format.
  */
 
 public final class CaProtobuf3FormatProvider implements
-  CaDefinitionParserFormatProviderType,
-  CaDefinitionSerializerFormatProviderType
+  CaLoaderFormatProviderType,
+  CaCompiledSerializerFormatProviderType
 {
   private static final Logger LOG;
   private static final CaFormatDescription FORMAT;
+  private static final int[] MAGIC_NUMBER;
 
   static {
     LOG = LoggerFactory.getLogger(CaProtobuf3FormatProvider.class);
@@ -65,10 +55,22 @@ public final class CaProtobuf3FormatProvider implements
     {
       final CaFormatDescription.Builder b = CaFormatDescription.builder();
       b.setMimeType("application/vnd.io7m.calcium-protobuf");
-      b.setDescription("Protobuf 3 encoded binary skeleton format");
-      b.setName("CaP");
-      b.setSuffix("cap");
+      b.setDescription("Protobuf 3 encoded compiled skeleton format");
+      b.setName("ccp");
+      b.setSuffix("ccp");
       FORMAT = b.build();
+    }
+
+    {
+      MAGIC_NUMBER = new int[8];
+      MAGIC_NUMBER[0] = 0x89;
+      MAGIC_NUMBER[1] = 'C';
+      MAGIC_NUMBER[2] = 'C';
+      MAGIC_NUMBER[3] = 'P';
+      MAGIC_NUMBER[4] = 0x0D;
+      MAGIC_NUMBER[5] = 0x0A;
+      MAGIC_NUMBER[6] = 0x1A;
+      MAGIC_NUMBER[7] = 0x0A;
     }
   }
 
@@ -81,22 +83,31 @@ public final class CaProtobuf3FormatProvider implements
 
   }
 
+  /**
+   * @return The eight-octet magic number
+   */
+
+  public static int[] magicNumber()
+  {
+    return MAGIC_NUMBER;
+  }
+
   @Override
-  public CaFormatDescription parserFormat()
+  public CaFormatDescription loaderFormat()
   {
     return FORMAT;
   }
 
   @Override
-  public SortedSet<CaFormatVersion> parserSupportedVersions()
+  public SortedSet<CaFormatVersion> loaderSupportedVersions()
   {
     return CaV1Protobuf3Format.supported();
   }
 
   @Override
-  public CaDefinitionParserType parserCreate()
+  public CaLoaderType loaderCreate()
   {
-    return new DetectingParser();
+    return new DetectingLoader();
   }
 
   @Override
@@ -112,7 +123,7 @@ public final class CaProtobuf3FormatProvider implements
   }
 
   @Override
-  public CaDefinitionSerializerType serializerCreate(
+  public CaCompiledSerializerType serializerCreate(
     final CaFormatVersion v)
     throws UnsupportedOperationException
   {
@@ -127,7 +138,7 @@ public final class CaProtobuf3FormatProvider implements
   }
 
   private static final class PrefixingSerializer implements
-    CaDefinitionSerializerType
+    CaCompiledSerializerType
   {
     private final CaFormatVersion version;
 
@@ -138,187 +149,146 @@ public final class CaProtobuf3FormatProvider implements
     }
 
     @Override
-    public void serializeSkeletonToStream(
-      final CaDefinitionSkeletonType skeleton,
+    public void serializeCompiledSkeletonToStream(
+      final CaSkeleton skeleton,
       final OutputStream out)
       throws IOException
     {
-      final byte[] buffer = new byte[2];
+      final byte[] buffer = new byte[4];
       final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
       wrapper.order(ByteOrder.BIG_ENDIAN);
 
-      out.write('C');
-      out.write('a');
-      out.write('\r');
-      out.write('\n');
-      wrapper.putShort(0, (short) (this.version.major() & 0xffff));
+      for (int index = 0; index < MAGIC_NUMBER.length; ++index) {
+        out.write(MAGIC_NUMBER[index]);
+      }
+
+      wrapper.putInt(0, this.version.major());
       out.write(buffer);
-      wrapper.putShort(0, (short) (this.version.minor() & 0xffff));
+      wrapper.putInt(0, this.version.minor());
       out.write(buffer);
 
-      new CaV1Protobuf3Format().serializeSkeletonToStream(skeleton, out);
+      new CaV1Protobuf3Format().serializeCompiledSkeletonToStream(
+        skeleton,
+        out);
     }
   }
 
-  private static final class DetectingParser implements CaDefinitionParserType
+  private static final class DetectingLoader implements CaLoaderType
   {
-    private DetectingParser()
+    private DetectingLoader()
     {
 
     }
 
-    private static Validation<List<CaParseError>, CaFormatVersion> parseVersion(
-      final InputStream is,
-      final URI uri)
+    private static CaFormatVersion parseVersion(
+      final InputStream is)
+      throws IOException
     {
-      final byte[] buffer = new byte[2];
+      final byte[] buffer = new byte[4];
       final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
       wrapper.order(ByteOrder.BIG_ENDIAN);
 
-      try {
-        final int major;
+      final int major;
 
-        {
-          final int r = is.read(buffer);
-          if (r != 2) {
-            final StringBuilder sb = new StringBuilder(128);
-            sb.append("Failed to read major version number.");
-            sb.append(System.lineSeparator());
-            sb.append("  Expected: 2 octets");
-            sb.append(System.lineSeparator());
-            sb.append("  Received: ");
-            sb.append(r);
-            sb.append(" octets");
-            sb.append(System.lineSeparator());
-            return invalid(
-              List.of(CaParseError.of(position(uri), sb.toString())));
-          }
-
-          major = (int) wrapper.getShort(0) & 0xffff;
+      {
+        final int r = is.read(buffer);
+        if (r != 4) {
+          final StringBuilder sb = new StringBuilder(128);
+          sb.append("Failed to read major version number.");
+          sb.append(System.lineSeparator());
+          sb.append("  Expected: 2 octets");
+          sb.append(System.lineSeparator());
+          sb.append("  Received: ");
+          sb.append(r);
+          sb.append(" octets");
+          sb.append(System.lineSeparator());
+          throw new IOException(sb.toString());
         }
 
-        final int minor;
-
-        {
-          final int r = is.read(buffer);
-          if (r != 2) {
-            final StringBuilder sb = new StringBuilder(128);
-            sb.append("Failed to read minor version number.");
-            sb.append(System.lineSeparator());
-            sb.append("  Expected: 2 octets");
-            sb.append(System.lineSeparator());
-            sb.append("  Received: ");
-            sb.append(r);
-            sb.append(" octets");
-            sb.append(System.lineSeparator());
-            return invalid(
-              List.of(CaParseError.of(position(uri), sb.toString())));
-          }
-
-          minor = (int) wrapper.getShort(0) & 0xffff;
-        }
-
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(
-            "parsed version {} {}",
-            Integer.valueOf(major),
-            Integer.valueOf(minor));
-        }
-
-        return valid(CaFormatVersion.of(major, minor));
-      } catch (final IOException e) {
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append("Failed to read version number.");
-        sb.append(System.lineSeparator());
-        sb.append("  I/O error: ");
-        sb.append(e.getMessage());
-        sb.append(System.lineSeparator());
-        return invalid(List.of(CaParseError.of(position(uri), sb.toString())));
+        major = wrapper.getInt(0);
       }
+
+      final int minor;
+
+      {
+        final int r = is.read(buffer);
+        if (r != 4) {
+          final StringBuilder sb = new StringBuilder(128);
+          sb.append("Failed to read minor version number.");
+          sb.append(System.lineSeparator());
+          sb.append("  Expected: 2 octets");
+          sb.append(System.lineSeparator());
+          sb.append("  Received: ");
+          sb.append(r);
+          sb.append(" octets");
+          sb.append(System.lineSeparator());
+          throw new IOException(sb.toString());
+        }
+
+        minor = wrapper.getInt(0);
+      }
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(
+          "parsed version {} {}",
+          Integer.valueOf(major),
+          Integer.valueOf(minor));
+      }
+
+      return CaFormatVersion.of(major, minor);
     }
 
-    private static LexicalPosition<Path> position(final URI uri)
-    {
-      return LexicalPosition.of(0, 0, Optional.of(Paths.get(uri)));
-    }
-
-    private static Validation<List<CaParseError>, Unit> parseMagicNumber(
+    private static void parseMagicNumber(
       final InputStream is,
       final URI uri)
+      throws CaLoaderException, IOException
     {
       LOG.debug("attempting to parse magic number");
 
-      try {
-        final int x0 = is.read();
-        final int x1 = is.read();
-        final int x2 = is.read();
-        final int x3 = is.read();
+      final int[] input = new int[8];
+      for (int index = 0; index < MAGIC_NUMBER.length; ++index) {
+        input[index] = is.read();
+      }
 
-        boolean ok = true;
-        ok &= x0 == (int) 'C';
-        ok &= x1 == (int) 'a';
-        ok &= x2 == (int) '\r';
-        ok &= x3 == (int) '\n';
+      for (int index = 0; index < MAGIC_NUMBER.length; ++index) {
+        final int received = input[index];
+        final int expected = MAGIC_NUMBER[index];
 
-        if (!ok) {
+        if (received != expected) {
           final StringBuilder sb = new StringBuilder(128);
           sb.append("Magic number incorrect.");
           sb.append(System.lineSeparator());
-          sb.append("  Expected: 0x43 0x61 0x0D 0x0A");
+
+          sb.append("  Expected: ");
+          for (int x = 0; x < MAGIC_NUMBER.length; ++x) {
+            sb.append("0x");
+            sb.append(Integer.toHexString(MAGIC_NUMBER[x]));
+            sb.append(" ");
+          }
+
           sb.append(System.lineSeparator());
           sb.append("  Received: ");
-          sb.append("0x");
-          sb.append(Integer.toHexString(x0));
-          sb.append("0x");
-          sb.append(Integer.toHexString(x1));
-          sb.append("0x");
-          sb.append(Integer.toHexString(x2));
-          sb.append("0x");
-          sb.append(Integer.toHexString(x3));
+
+          for (int x = 0; x < MAGIC_NUMBER.length; ++x) {
+            sb.append("0x");
+            sb.append(Integer.toHexString(input[x]));
+            sb.append(" ");
+          }
+
           sb.append(System.lineSeparator());
-          return invalid(
-            List.of(CaParseError.of(position(uri), sb.toString())));
+          throw new CaLoaderBadMagicNumber(uri, sb.toString());
         }
-
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(
-            "parsed {} {} {} {}",
-            Integer.valueOf(x0),
-            Integer.valueOf(x1),
-            Integer.valueOf(x2),
-            Integer.valueOf(x3));
-        }
-
-        return valid(Unit.unit());
-      } catch (final IOException e) {
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append("Failed to read magic number.");
-        sb.append(System.lineSeparator());
-        sb.append("  I/O error: ");
-        sb.append(e.getMessage());
-        sb.append(System.lineSeparator());
-        return invalid(List.of(CaParseError.of(position(uri), sb.toString())));
       }
     }
 
-    @Override
-    public Validation<List<CaParseError>, CaDefinitionSkeleton> parseSkeletonFromStream(
-      final InputStream is,
-      final URI uri)
-    {
-      return parseMagicNumber(is, uri)
-        .flatMap(u -> parseVersion(is, uri)
-          .flatMap(version -> this.parserForVersion(version, uri)
-            .flatMap(p -> p.parseSkeletonFromStream(is, uri))));
-    }
-
-    private Validation<List<CaParseError>, CaDefinitionParserType> parserForVersion(
+    private static CaLoaderType loaderForVersion(
       final CaFormatVersion version,
       final URI uri)
+      throws CaLoaderUnsupportedVersion
     {
       for (final CaFormatVersion supported : CaV1Protobuf3Format.supported()) {
         if (supported.equals(version)) {
-          return valid(new CaV1Protobuf3Format());
+          return new CaV1Protobuf3Format();
         }
       }
 
@@ -341,10 +311,26 @@ public final class CaProtobuf3FormatProvider implements
         sb.append(System.lineSeparator());
       }
 
-      return invalid(List.of(CaParseError.of(
-        position(uri),
-        sb.toString()
-      )));
+      throw new CaLoaderUnsupportedVersion(uri, sb.toString());
+    }
+
+    @Override
+    public CaSkeleton loadCompiledSkeletonFromStream(
+      final InputStream is,
+      final URI uri)
+      throws CaLoaderException
+    {
+      NullCheck.notNull(is, "Input");
+      NullCheck.notNull(uri, "URI");
+
+      try {
+        parseMagicNumber(is, uri);
+        final CaFormatVersion v = parseVersion(is);
+        final CaLoaderType loader = loaderForVersion(v, uri);
+        return loader.loadCompiledSkeletonFromStream(is, uri);
+      } catch (final IOException e) {
+        throw new CaLoaderIOException(uri, e);
+      }
     }
   }
 }

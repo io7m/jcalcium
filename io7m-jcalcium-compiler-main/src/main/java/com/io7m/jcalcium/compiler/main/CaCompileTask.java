@@ -22,6 +22,7 @@ import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
@@ -745,6 +746,7 @@ final class CaCompileTask
   }
 
   private static CaSkeleton make(
+    final CaSkeletonName name,
     final BoneIndex index,
     final SortedMap<CaActionName, CaActionType> actions)
   {
@@ -753,6 +755,7 @@ final class CaCompileTask
     b.setBonesByID(index.bones_by_id.mapValues(x -> x));
     b.setBonesByName(index.bones_by_name.mapValues(x -> x));
     b.setBones(index.bones);
+    b.setName(name);
     return b.build();
   }
 
@@ -766,7 +769,7 @@ final class CaCompileTask
       .flatMap(CaCompileTask::compileBonesAssignIdentifiers)
       .flatMap(CaCompileTask::compileBonesCreateIndex)
       .flatMap(index -> compileActions(index, in_actions).flatMap(
-        actions -> valid(make(index, actions))));
+        actions -> valid(make(this.input.name(), index, actions))));
   }
 
   private static final class CurveTypeCounter

@@ -46,6 +46,7 @@ enum V1Interpolation
   V1_INTERPOLATION_LINEAR      = 0;
   V1_INTERPOLATION_EXPONENTIAL = 1;
   V1_INTERPOLATION_CONSTANT    = 2;
+  V1_INTERPOLATION_QUADRATIC   = 3;
 }
 
 enum V1Easing
@@ -81,20 +82,20 @@ message V1CurveKeyframeTranslation
 
 message V1CurveScale
 {
-  string                        bone      = 1;
-  repeated V1CurveKeyframeScale keyframes = 2;
+  string                            bone      = 1;
+  map<uint32, V1CurveKeyframeScale> keyframes = 2;
 }
 
 message V1CurveOrientation
 {
-  string                              bone      = 1;
-  repeated V1CurveKeyframeOrientation keyframes = 2;
+  string                                  bone      = 1;
+  map<uint32, V1CurveKeyframeOrientation> keyframes = 2;
 }
 
 message V1CurveTranslation
 {
-  string                              bone      = 1;
-  repeated V1CurveKeyframeTranslation keyframes = 2;
+  string                                  bone      = 1;
+  map<uint32, V1CurveKeyframeTranslation> keyframes = 2;
 }
 
 message V1Curve
@@ -106,20 +107,26 @@ message V1Curve
   }
 }
 
+message V1CurveList
+{
+  repeated V1Curve curves = 1;
+}
+
 message V1Bone
 {
-  string        name        = 1;
-  string        parent      = 2;
-  V1Scale       scale       = 3;
-  V1Quaternion  orientation = 4;
-  V1Translation translation = 5;
+  uint32        id          = 1;
+  uint32        parent      = 2;
+  string        name        = 3;
+  V1Scale       scale       = 4;
+  V1Quaternion  orientation = 5;
+  V1Translation translation = 6;
 }
 
 message V1ActionCurves
 {
-  string           name              = 1;
-  uint32           frames_per_second = 2;
-  repeated V1Curve curves            = 3;
+  string                   name              = 1;
+  uint32                   frames_per_second = 2;
+  map<string, V1CurveList> curves            = 3;
 }
 
 message V1Action
@@ -131,7 +138,7 @@ message V1Action
 
 message V1Skeleton
 {
-  string            name    = 1;
-  repeated V1Bone   bones   = 2;
-  repeated V1Action actions = 3;
+  string                name    = 1;
+  map<uint32, V1Bone>   bones   = 2;
+  map<string, V1Action> actions = 3;
 }

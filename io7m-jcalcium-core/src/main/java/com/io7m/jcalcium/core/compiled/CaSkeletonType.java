@@ -19,6 +19,7 @@ package com.io7m.jcalcium.core.compiled;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
@@ -37,6 +38,13 @@ import static com.io7m.jfunctional.Unit.unit;
 @ImmutableStyleType
 public interface CaSkeletonType
 {
+  /**
+   * @return The name of the skeleton
+   */
+
+  @Value.Parameter
+  CaSkeletonName name();
+
   /**
    * @return The tree of bones for the skeleton
    */

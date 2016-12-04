@@ -14,30 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.serializer.api;
-
-import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
 /**
- * The type of serializers.
+ * Loader API for compiled skeletons.
  */
 
-public interface CaDefinitionSerializerType
-{
-  /**
-   * Serialize a skeleton to a stream.
-   *
-   * @param skeleton The skeleton
-   * @param out      The output stream
-   *
-   * @throws IOException On I/O errors
-   */
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.jcalcium.loader.api;
 
-  void serializeSkeletonToStream(
-    CaDefinitionSkeleton skeleton,
-    OutputStream out)
-    throws IOException;
-}

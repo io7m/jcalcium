@@ -28,9 +28,11 @@ import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
+import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
+import com.io7m.jcalcium.serializer.api.CaCompiledSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
 import com.io7m.jfunctional.Unit;
@@ -200,6 +202,50 @@ public final class Main implements Runnable
     return null;
   }
 
+  private static CaCompiledSerializerFormatProviderType findCompiledSerializerProvider(
+    final String format,
+    final String file)
+  {
+    final ServiceLoader<CaCompiledSerializerFormatProviderType> loader =
+      ServiceLoader.load(CaCompiledSerializerFormatProviderType.class);
+
+    if (format == null) {
+      LOG.debug("attempting to infer format from file suffix");
+      final int index = file.lastIndexOf('.');
+      if (index != -1) {
+        final String suffix = file.substring(index + 1);
+        final Iterator<CaCompiledSerializerFormatProviderType> providers =
+          loader.iterator();
+        while (providers.hasNext()) {
+          final CaCompiledSerializerFormatProviderType current_provider =
+            providers.next();
+          if (current_provider.serializerFormat().suffix().equals(suffix)) {
+            LOG.debug("using provider: {}", current_provider);
+            return current_provider;
+          }
+        }
+      }
+
+      LOG.error("File {} does not have a recognized suffix", file);
+    } else {
+      LOG.debug("attempting to find provider for {}", format);
+      final Iterator<CaCompiledSerializerFormatProviderType> providers =
+        loader.iterator();
+      while (providers.hasNext()) {
+        final CaCompiledSerializerFormatProviderType current_provider =
+          providers.next();
+        if (current_provider.serializerFormat().name().equals(format)) {
+          LOG.debug("using provider: {}", current_provider);
+          return current_provider;
+        }
+      }
+
+      LOG.error("Could not find a provider for the format '{}'", format);
+    }
+
+    return null;
+  }
+
   /**
    * @return The program exit code
    */
@@ -281,28 +327,41 @@ public final class Main implements Runnable
     {
       super.call();
 
-
+      final String fmt_s = "%-6s : %-6s : %-48s : %-10s : %-12s : %s\n";
       System.out.printf(
-        "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
+        fmt_s,
         "# Name",
         "Suffix",
         "Mime type",
         "Version",
-        "R/W",
+        "Op",
         "Description");
 
-      final ServiceLoader<CaDefinitionParserFormatProviderType> parser_loader =
-        ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
-      final Iterator<CaDefinitionParserFormatProviderType> parser_providers =
-        parser_loader.iterator();
+      this.listParserFormats(fmt_s);
+      this.listDefinitionSerializerFormats(fmt_s);
+      this.listCompiledSerializerFormats(fmt_s);
+      this.listLoaderFormats(fmt_s);
+      return unit();
+    }
 
-      while (parser_providers.hasNext()) {
-        final CaDefinitionParserFormatProviderType provider = parser_providers.next();
-        final CaFormatDescriptionType format = provider.parserFormat();
-        final SortedSet<CaFormatVersion> versions = provider.parserSupportedVersions();
+    private void listLoaderFormats(
+      final String fmt_s)
+    {
+      final ServiceLoader<CaLoaderFormatProviderType> loader_loader =
+        ServiceLoader.load(CaLoaderFormatProviderType.class);
+      final Iterator<CaLoaderFormatProviderType> loader_providers =
+        loader_loader.iterator();
+
+      while (loader_providers.hasNext()) {
+        final CaLoaderFormatProviderType provider =
+          loader_providers.next();
+        final CaFormatDescriptionType format =
+          provider.loaderFormat();
+        final SortedSet<CaFormatVersion> versions =
+          provider.loaderSupportedVersions();
         versions.forEach(version -> {
           System.out.printf(
-            "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
+            fmt_s,
             format.name(),
             format.suffix(),
             format.mimeType(),
@@ -310,23 +369,61 @@ public final class Main implements Runnable
               "%d.%d",
               Integer.valueOf(version.major()),
               Integer.valueOf(version.minor())),
-            "read",
+            "load",
             format.description());
         });
       }
+    }
 
+    private void listCompiledSerializerFormats(
+      final String fmt_s)
+    {
+      final ServiceLoader<CaCompiledSerializerFormatProviderType> compiled_serializer_loader =
+        ServiceLoader.load(CaCompiledSerializerFormatProviderType.class);
+      final Iterator<CaCompiledSerializerFormatProviderType> compiled_serializer_providers =
+        compiled_serializer_loader.iterator();
+
+      while (compiled_serializer_providers.hasNext()) {
+        final CaCompiledSerializerFormatProviderType provider =
+          compiled_serializer_providers.next();
+        final CaFormatDescriptionType format =
+          provider.serializerFormat();
+        final SortedSet<CaFormatVersion> versions =
+          provider.serializerSupportedVersions();
+        versions.forEach(version -> {
+          System.out.printf(
+            fmt_s,
+            format.name(),
+            format.suffix(),
+            format.mimeType(),
+            String.format(
+              "%d.%d",
+              Integer.valueOf(version.major()),
+              Integer.valueOf(version.minor())),
+            "compile",
+            format.description());
+        });
+      }
+    }
+
+    private void listDefinitionSerializerFormats(
+      final String fmt_s)
+    {
       final ServiceLoader<CaDefinitionSerializerFormatProviderType> serializer_loader =
         ServiceLoader.load(CaDefinitionSerializerFormatProviderType.class);
       final Iterator<CaDefinitionSerializerFormatProviderType> serializer_providers =
         serializer_loader.iterator();
 
       while (serializer_providers.hasNext()) {
-        final CaDefinitionSerializerFormatProviderType provider = serializer_providers.next();
-        final CaFormatDescriptionType format = provider.serializerFormat();
-        final SortedSet<CaFormatVersion> versions = provider.serializerSupportedVersions();
+        final CaDefinitionSerializerFormatProviderType provider =
+          serializer_providers.next();
+        final CaFormatDescriptionType format =
+          provider.serializerFormat();
+        final SortedSet<CaFormatVersion> versions =
+          provider.serializerSupportedVersions();
         versions.forEach(version -> {
           System.out.printf(
-            "%-6s : %-6s : %-48s : %-10s : %-6s : %s\n",
+            fmt_s,
             format.name(),
             format.suffix(),
             format.mimeType(),
@@ -334,16 +431,45 @@ public final class Main implements Runnable
               "%d.%d",
               Integer.valueOf(version.major()),
               Integer.valueOf(version.minor())),
-            "write",
+            "serialize",
             format.description());
         });
       }
+    }
 
-      return unit();
+    private void listParserFormats(
+      final String fmt_s)
+    {
+      final ServiceLoader<CaDefinitionParserFormatProviderType> parser_loader =
+        ServiceLoader.load(CaDefinitionParserFormatProviderType.class);
+      final Iterator<CaDefinitionParserFormatProviderType> parser_providers =
+        parser_loader.iterator();
+
+      while (parser_providers.hasNext()) {
+        final CaDefinitionParserFormatProviderType provider =
+          parser_providers.next();
+        final CaFormatDescriptionType format =
+          provider.parserFormat();
+        final SortedSet<CaFormatVersion> versions =
+          provider.parserSupportedVersions();
+        versions.forEach(version -> {
+          System.out.printf(
+            fmt_s,
+            format.name(),
+            format.suffix(),
+            format.mimeType(),
+            String.format(
+              "%d.%d",
+              Integer.valueOf(version.major()),
+              Integer.valueOf(version.minor())),
+            "parse",
+            format.description());
+        });
+      }
     }
   }
 
-  @Parameters(commandDescription = "Transcode a skeleton file")
+  @Parameters(commandDescription = "Transcode a skeleton definition file")
   private final class CommandTranscode extends CommandRoot
   {
     @Parameter(
@@ -461,7 +587,7 @@ public final class Main implements Runnable
             parser.parseSkeletonFromStream(is, URI.create(this.file));
           if (result.isValid()) {
             LOG.debug("parsed successfully");
-            // ...
+            this.validate(result.get());
           } else {
             LOG.error("parsing failed");
             result.getError().forEach(error -> {
@@ -498,15 +624,26 @@ public final class Main implements Runnable
   private final class CommandCompile extends CommandRoot
   {
     @Parameter(
-      names = "-file",
+      names = "-file-in",
       required = true,
       description = "The input file")
-    private String file;
+    private String file_in;
 
     @Parameter(
-      names = "-format",
+      names = "-format-in",
       description = "The input file format")
-    private String format;
+    private String format_in;
+
+    @Parameter(
+      names = "-file-out",
+      required = true,
+      description = "The output file")
+    private String file_out;
+
+    @Parameter(
+      names = "-format-out",
+      description = "The output file format")
+    private String format_out;
 
     CommandCompile()
     {
@@ -520,69 +657,86 @@ public final class Main implements Runnable
       super.call();
 
       final CaCompilerType compiler = CaCompiler.create();
-      final CaDefinitionParserFormatProviderType provider =
-        findParserProvider(this.format, this.file);
+      final CaDefinitionParserFormatProviderType parser_provider =
+        findParserProvider(this.format_in, this.file_in);
+      final CaCompiledSerializerFormatProviderType serial_provider =
+        findCompiledSerializerProvider(this.format_out, this.file_out);
 
-      if (provider != null) {
-        final CaDefinitionParserType parser = provider.parserCreate();
-
-        final Path path = Paths.get(this.file);
-        try (final InputStream is = Files.newInputStream(path)) {
-          final Validation<List<CaParseError>, CaDefinitionSkeleton> parse_result =
-            parser.parseSkeletonFromStream(is, URI.create(this.file));
-
-          if (!parse_result.isValid()) {
-            LOG.error("parsing failed");
-            parse_result.getError().forEach(error -> {
-              final LexicalPosition<Path> lexical = error.lexical();
-              LOG.error(
-                "{}:{}: {}",
-                Integer.valueOf(lexical.line()),
-                Integer.valueOf(lexical.column()),
-                error.message());
-            });
-            return unit();
-          }
-
-          LOG.debug("compiling");
-          final Validation<List<CaCompileError>, CaSkeleton> compile_result =
-            compiler.compile(parse_result.get());
-
-          if (!compile_result.isValid()) {
-            LOG.error("compilation failed");
-            compile_result.getError().forEach(
-              error -> LOG.error("{}: {}", error.code(), error.message()));
-            return unit();
-          }
-
-          final CaSkeleton compiled = compile_result.get();
-          compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
-            final CaBone bone = node.value();
-
-            final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
-              node.parentReadable();
-            if (parent_opt.isPresent()) {
-              final JOTreeNodeReadableType<CaBone> parent = parent_opt.get();
-              LOG.debug(
-                "{}:{}:{}:{}",
-                Integer.valueOf(depth),
-                Integer.valueOf(parent.value().id()),
-                Integer.valueOf(bone.id()),
-                bone.name().value());
-            } else {
-              LOG.debug(
-                "{}:{}:{}:{}",
-                Integer.valueOf(depth),
-                "-",
-                Integer.valueOf(bone.id()),
-                bone.name().value());
-            }
-          });
-        }
-
-      } else {
+      if (parser_provider == null) {
         LOG.error("Could not find a suitable format provider");
         Main.this.exit_code = 1;
+        return unit();
+      }
+
+      if (serial_provider == null) {
+        LOG.error("Could not find a suitable format provider");
+        Main.this.exit_code = 1;
+        return unit();
+      }
+
+      final CaDefinitionParserType parser = parser_provider.parserCreate();
+
+      final Path path_in = Paths.get(this.file_in);
+      final Path path_out = Paths.get(this.file_out);
+
+      try (final InputStream is = Files.newInputStream(path_in)) {
+        final Validation<List<CaParseError>, CaDefinitionSkeleton> parse_result =
+          parser.parseSkeletonFromStream(is, URI.create(this.file_in));
+
+        if (!parse_result.isValid()) {
+          LOG.error("parsing failed");
+          parse_result.getError().forEach(error -> {
+            final LexicalPosition<Path> lexical = error.lexical();
+            LOG.error(
+              "{}:{}: {}",
+              Integer.valueOf(lexical.line()),
+              Integer.valueOf(lexical.column()),
+              error.message());
+          });
+          return unit();
+        }
+
+        LOG.debug("compiling");
+        final Validation<List<CaCompileError>, CaSkeleton> compile_result =
+          compiler.compile(parse_result.get());
+
+        if (!compile_result.isValid()) {
+          LOG.error("compilation failed");
+          compile_result.getError().forEach(
+            error -> LOG.error("{}: {}", error.code(), error.message()));
+          return unit();
+        }
+
+        final CaSkeleton compiled = compile_result.get();
+        compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
+          final CaBone bone = node.value();
+
+          final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
+            node.parentReadable();
+          if (parent_opt.isPresent()) {
+            final JOTreeNodeReadableType<CaBone> parent = parent_opt.get();
+            LOG.debug(
+              "{}:{}:{}:{}",
+              Integer.valueOf(depth),
+              Integer.valueOf(parent.value().id()),
+              Integer.valueOf(bone.id()),
+              bone.name().value());
+          } else {
+            LOG.debug(
+              "{}:{}:{}:{}",
+              Integer.valueOf(depth),
+              "-",
+              Integer.valueOf(bone.id()),
+              bone.name().value());
+          }
+        });
+
+        try (final OutputStream out = Files.newOutputStream(path_out)) {
+          final CaFormatVersion version =
+            serial_provider.serializerSupportedVersions().last();
+          serial_provider.serializerCreate(version)
+            .serializeCompiledSkeletonToStream(compiled, out);
+        }
       }
 
       return unit();

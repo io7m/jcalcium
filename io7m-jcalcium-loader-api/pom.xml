@@ -10,11 +10,11 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
+  <artifactId>io7m-jcalcium-loader-api</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-format-protobuf3</name>
-  <description>Skeletal animation (Protobuf3 format)</description>
+  <name>io7m-jcalcium-loader-api</name>
+  <description>Skeletal animation (Loader API)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
@@ -29,21 +29,6 @@
       <artifactId>io7m-jcalcium-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-parser-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-loader-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-serializer-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>com.io7m.jnull</groupId>
@@ -53,14 +38,19 @@
       <groupId>com.io7m.jtensors</groupId>
       <artifactId>io7m-jtensors-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.io7m.jlexing</groupId>
+      <artifactId>io7m-jlexing-core</artifactId>
+    </dependency>
 
     <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
+      <groupId>io.javaslang</groupId>
+      <artifactId>javaslang</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -72,19 +62,6 @@
 
   <build>
     <plugins>
-      <!-- Generate protobuf sources -->
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Check style -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -99,8 +76,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.io7m.jcalcium.parser.protobuf3,
-              com.io7m.jcalcium.parser.protobuf3.v1
+              com.io7m.jcalcium.loader.api
             </Export-Package>
           </instructions>
         </configuration>
