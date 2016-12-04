@@ -56,6 +56,30 @@ public final class CaV1JSONParserTest
     LOG = LoggerFactory.getLogger(CaV1JSONParserTest.class);
   }
 
+  private static void dump(
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
+  {
+    if (r.isValid()) {
+      LOG.debug("valid: {}", r.get());
+    } else {
+      r.getError().forEach(e -> LOG.error("invalid: {}", e));
+    }
+  }
+
+  private static URI uri(final String s)
+  {
+    try {
+      return CaV1JSONParserTest.class.getResource(s).toURI();
+    } catch (final URISyntaxException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private static InputStream resource(final String s)
+  {
+    return CaV1JSONParserTest.class.getResourceAsStream(s);
+  }
+
   @Test
   public void testEmpty()
   {
@@ -268,29 +292,5 @@ public final class CaV1JSONParserTest
 
     dump(r);
     Assert.assertFalse(r.isValid());
-  }
-
-  private static void dump(
-    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
-  {
-    if (r.isValid()) {
-      LOG.debug("valid: {}", r.get());
-    } else {
-      r.getError().forEach(e -> LOG.error("invalid: {}", e));
-    }
-  }
-
-  private static URI uri(final String s)
-  {
-    try {
-      return CaV1JSONParserTest.class.getResource(s).toURI();
-    } catch (final URISyntaxException e) {
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  private static InputStream resource(final String s)
-  {
-    return CaV1JSONParserTest.class.getResourceAsStream(s);
   }
 }

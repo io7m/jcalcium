@@ -16,14 +16,9 @@
 
 package com.io7m.jcalcium.tests.loader.protobuf3;
 
-import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.compiler.main.CaCompiler;
-import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
@@ -31,13 +26,8 @@ import com.io7m.jcalcium.format.protobuf3.CaProtobuf3FormatProvider;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
-import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaCompiledSerializerType;
 import com.io7m.jcalcium.tests.loader.api.CaLoaderContract;
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
-import javaslang.collection.List;
-import javaslang.collection.SortedMap;
-import javaslang.control.Validation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,22 +37,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Random;
-
-import static javaslang.control.Validation.valid;
 
 public final class CaLoaderProtobuf3Test extends CaLoaderContract
 {
   private static final Logger LOG;
+  private static final CaProtobuf3FormatProvider PROVIDER =
+    new CaProtobuf3FormatProvider();
 
   static {
     LOG = LoggerFactory.getLogger(CaLoaderProtobuf3Test.class);
   }
-
-  private static final CaProtobuf3FormatProvider PROVIDER =
-    new CaProtobuf3FormatProvider();
 
   @Override
   protected Logger log()

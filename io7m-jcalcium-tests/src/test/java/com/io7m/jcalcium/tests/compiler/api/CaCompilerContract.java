@@ -16,7 +16,6 @@
 
 package com.io7m.jcalcium.tests.compiler.api;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
@@ -55,7 +54,6 @@ import com.io7m.jcalcium.generators.BoneNameTreeGenerator;
 import com.io7m.jcalcium.generators.BoneTree;
 import com.io7m.jcalcium.generators.BoneTreeGenerator;
 import com.io7m.jcalcium.generators.CaDefinitionSkeletonGenerator;
-import com.io7m.jfunctional.Unit;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
@@ -975,7 +973,8 @@ public abstract class CaCompilerContract
                         orig_translation.keyframes()) {
 
                         final Integer kf_index = Integer.valueOf(kf.index());
-                        Assert.assertTrue(comp_translation.keyframes().containsKey(kf_index));
+                        Assert.assertTrue(comp_translation.keyframes().containsKey(
+                          kf_index));
 
                         final CaCurveKeyframeTranslationType comp_kf =
                           comp_translation.keyframes().get(kf_index).get();
@@ -1005,7 +1004,8 @@ public abstract class CaCompilerContract
                         orig_orientation.keyframes()) {
 
                         final Integer kf_index = Integer.valueOf(kf.index());
-                        Assert.assertTrue(comp_orientation.keyframes().containsKey(kf_index));
+                        Assert.assertTrue(comp_orientation.keyframes().containsKey(
+                          kf_index));
 
                         final CaCurveKeyframeOrientationType comp_kf =
                           comp_orientation.keyframes().get(kf_index).get();
@@ -1035,7 +1035,8 @@ public abstract class CaCompilerContract
                         orig_scale.keyframes()) {
 
                         final Integer kf_index = Integer.valueOf(kf.index());
-                        Assert.assertTrue(comp_scale.keyframes().containsKey(kf_index));
+                        Assert.assertTrue(comp_scale.keyframes().containsKey(
+                          kf_index));
 
                         final CaCurveKeyframeScaleType comp_kf =
                           comp_scale.keyframes().get(kf_index).get();

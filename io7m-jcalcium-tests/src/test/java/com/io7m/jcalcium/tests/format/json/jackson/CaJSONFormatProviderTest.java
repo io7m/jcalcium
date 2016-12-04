@@ -39,6 +39,30 @@ public final class CaJSONFormatProviderTest
     LOG = LoggerFactory.getLogger(CaJSONFormatProviderTest.class);
   }
 
+  private static void dump(
+    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
+  {
+    if (r.isValid()) {
+      LOG.debug("valid: {}", r.get());
+    } else {
+      r.getError().forEach(e -> LOG.error("invalid: {}", e));
+    }
+  }
+
+  private static URI uri(final String s)
+  {
+    try {
+      return CaJSONFormatProviderTest.class.getResource(s).toURI();
+    } catch (final URISyntaxException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private static InputStream resource(final String s)
+  {
+    return CaJSONFormatProviderTest.class.getResourceAsStream(s);
+  }
+
   @Test
   public void testEmpty()
   {
@@ -86,29 +110,5 @@ public final class CaJSONFormatProviderTest
 
     dump(r);
     Assert.assertTrue(r.isValid());
-  }
-
-  private static void dump(
-    final Validation<List<CaParseError>, CaDefinitionSkeleton> r)
-  {
-    if (r.isValid()) {
-      LOG.debug("valid: {}", r.get());
-    } else {
-      r.getError().forEach(e -> LOG.error("invalid: {}", e));
-    }
-  }
-
-  private static URI uri(final String s)
-  {
-    try {
-      return CaJSONFormatProviderTest.class.getResource(s).toURI();
-    } catch (final URISyntaxException e) {
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  private static InputStream resource(final String s)
-  {
-    return CaJSONFormatProviderTest.class.getResourceAsStream(s);
   }
 }

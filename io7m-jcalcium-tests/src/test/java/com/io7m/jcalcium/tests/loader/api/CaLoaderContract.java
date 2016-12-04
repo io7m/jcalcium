@@ -37,7 +37,6 @@ import javaslang.control.Validation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,7 +81,9 @@ public abstract class CaLoaderContract
 
     this.log().debug(
       "parsed in {}ms",
-      Long.valueOf(Duration.between(parse_time_then, parse_time_now).toMillis()));
+      Long.valueOf(Duration.between(
+        parse_time_then,
+        parse_time_now).toMillis()));
 
     this.dumpParse(rj);
     Assert.assertTrue(rj.isValid());
@@ -95,7 +96,9 @@ public abstract class CaLoaderContract
 
     this.log().debug(
       "compiled in {}ms",
-      Long.valueOf(Duration.between(compile_time_then, compile_time_now).toMillis()));
+      Long.valueOf(Duration.between(
+        compile_time_then,
+        compile_time_now).toMillis()));
 
     this.dumpCompile(cr);
     Assert.assertTrue(cr.isValid());
@@ -111,7 +114,9 @@ public abstract class CaLoaderContract
 
     this.log().debug(
       "serialized in {}ms",
-      Long.valueOf(Duration.between(serial_time_then, serial_time_now).toMillis()));
+      Long.valueOf(Duration.between(
+        serial_time_then,
+        serial_time_now).toMillis()));
 
     this.log().debug("loading skeleton");
 
