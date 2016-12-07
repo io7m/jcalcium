@@ -742,7 +742,13 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        value = self.__transformTranslationToExport(bone.matrix_basis.to_translation())
+        if bone.parent == None:
+          bone_matrix = bone.matrix
+        else:
+          bone_matrix = bone.parent.inverted() * bone.matrix
+        #endif
+
+        value = self.__transformTranslationToExport(bone_matrix.to_translation())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'translation', value)
         evaluated_keyframes[index] = keyframe
       #end
@@ -796,7 +802,13 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        value = self.__transformScaleToExport(bone.matrix_basis.to_scale())
+        if bone.parent == None:
+          bone_matrix = bone.matrix
+        else:
+          bone_matrix = bone.parent.inverted() * bone.matrix
+        #endif
+
+        value = self.__transformScaleToExport(bone_matrix.to_scale())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'scale', value)
         evaluated_keyframes[index] = keyframe
       #end
@@ -851,7 +863,13 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        value = self.__transformOrientationToExport(bone.matrix_basis.to_quaternion())
+        if bone.parent == None:
+          bone_matrix = bone.matrix
+        else:
+          bone_matrix = bone.parent.inverted() * bone.matrix
+        #endif
+
+        value = self.__transformOrientationToExport(bone_matrix.to_quaternion())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'orientation', value)
         evaluated_keyframes[index] = keyframe
       #end
