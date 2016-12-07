@@ -745,7 +745,7 @@ class CalciumExporter:
         if bone.parent == None:
           bone_matrix = bone.matrix
         else:
-          bone_matrix = bone.parent.inverted() * bone.matrix
+          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
         #endif
 
         value = self.__transformTranslationToExport(bone_matrix.to_translation())
@@ -805,7 +805,7 @@ class CalciumExporter:
         if bone.parent == None:
           bone_matrix = bone.matrix
         else:
-          bone_matrix = bone.parent.inverted() * bone.matrix
+          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
         #endif
 
         value = self.__transformScaleToExport(bone_matrix.to_scale())
@@ -866,7 +866,7 @@ class CalciumExporter:
         if bone.parent == None:
           bone_matrix = bone.matrix
         else:
-          bone_matrix = bone.parent.inverted() * bone.matrix
+          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
         #endif
 
         value = self.__transformOrientationToExport(bone_matrix.to_quaternion())
