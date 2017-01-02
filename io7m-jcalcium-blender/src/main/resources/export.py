@@ -703,6 +703,22 @@ class CalciumExporter:
   #end
 
   #
+  # A pose bone's matrix is relative to the root of the armature, so in order
+  # to get a parent-relative matrix, the bone's matrix must be multiplied by the
+  # inverse of the parent's matrix.
+  #
+
+  def __makePoseBoneParentRelativeMatrix(self, bone):
+    assert type(bone) == bpy_types.PoseBone
+    if bone.parent == None:
+      return bone.matrix
+    else:
+      return bone.parent.matrix.inverted() * bone.matrix
+    #endif
+    assert type(bone_matrix) == mathutils.Matrix
+  #end
+
+  #
   # Aggregate all of the translation curves for the given bone in the given action.
   #
 
@@ -742,11 +758,8 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        if bone.parent == None:
-          bone_matrix = bone.matrix
-        else:
-          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
-        #endif
+        bone_matrix = self.__makePoseBoneParentRelativeMatrix(bone)
+        assert type(bone_matrix) == mathutils.Matrix
 
         value = self.__transformTranslationToExport(bone_matrix.to_translation())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'translation', value)
@@ -802,11 +815,8 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        if bone.parent == None:
-          bone_matrix = bone.matrix
-        else:
-          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
-        #endif
+        bone_matrix = self.__makePoseBoneParentRelativeMatrix(bone)
+        assert type(bone_matrix) == mathutils.Matrix
 
         value = self.__transformScaleToExport(bone_matrix.to_scale())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'scale', value)
@@ -863,11 +873,8 @@ class CalciumExporter:
 
         bpy.context.scene.frame_set(index)
 
-        if bone.parent == None:
-          bone_matrix = bone.matrix
-        else:
-          bone_matrix = bone.parent.matrix.inverted() * bone.matrix
-        #endif
+        bone_matrix = self.__makePoseBoneParentRelativeMatrix(bone)
+        assert type(bone_matrix) == mathutils.Matrix
 
         value = self.__transformOrientationToExport(bone_matrix.to_quaternion())
         keyframe = CalciumKeyframe(index, frame.interpolation, frame.easing, 'orientation', value)
@@ -965,21 +972,21 @@ class CalciumExporter:
       assert type(bone) == bpy_types.Bone
 
       #
-      # The matrix_local field of each bone is relative to the origin
-      # of the armature. To retrieve a parent-relative matrix, it's
-      # necessary to multiply the bone's matrix by the inverse of its
-      # parent matrix.
+      # The bone matrix is relative to the root of the armature, so in order
+      # to get the required parent-relative matrix, the matrix must be
+      # multiplied by the inverse of the parent matrix.
       #
 
-      if bone.parent:
-        mat = bone.matrix_local * bone.parent.matrix_local.inverted()
+      if bone.parent == None:
+        bone_matrix = bone.matrix_local
       else:
-        mat = bone.matrix_local
+        bone_matrix = bone.parent.matrix_local.inverted() * bone.matrix_local
       #endif
+      assert type(bone_matrix) == mathutils.Matrix
 
-      bone_trans  = self.__transformTranslationToExport(mat.to_translation())
-      bone_scale  = self.__transformScaleToExport(mat.to_scale())
-      bone_orient = self.__transformOrientationToExport(bone.matrix.to_quaternion())
+      bone_trans  = self.__transformTranslationToExport(bone_matrix.to_translation())
+      bone_scale  = self.__transformScaleToExport(bone_matrix.to_scale())
+      bone_orient = self.__transformOrientationToExport(bone_matrix.to_quaternion())
 
       bone_parent = None
       if bone.parent != None:
