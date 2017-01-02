@@ -16,24 +16,24 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 
 import java.util.OptionalInt;
 
 /**
- * The type of evaluated bones.
+ * The type of evaluated joints.
  */
 
-public interface CaEvaluatedBoneType
+public interface CaEvaluatedJointType
 {
   /**
-   * @return The bone name
+   * @return The joint name
    */
 
-  CaBoneName name();
+  CaJointName name();
 
   /**
-   * @return The bone ID
+   * @return The joint ID
    */
 
   int id();

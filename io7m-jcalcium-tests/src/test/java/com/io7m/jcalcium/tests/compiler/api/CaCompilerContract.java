@@ -20,11 +20,11 @@ import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientationType;
@@ -34,7 +34,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScaleType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
@@ -48,11 +48,11 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveOrientation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveScale;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jcalcium.generators.BoneNameTree;
-import com.io7m.jcalcium.generators.BoneNameTreeGenerator;
-import com.io7m.jcalcium.generators.BoneTree;
-import com.io7m.jcalcium.generators.BoneTreeGenerator;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.generators.JointNameTree;
+import com.io7m.jcalcium.generators.JointNameTreeGenerator;
+import com.io7m.jcalcium.generators.JointTree;
+import com.io7m.jcalcium.generators.JointTreeGenerator;
 import com.io7m.jcalcium.generators.CaDefinitionSkeletonGenerator;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.QuaternionI4D;
@@ -109,7 +109,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(HashMap.empty());
-    b.setBones(HashMap.empty());
+    b.setJoints(HashMap.empty());
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -118,7 +118,7 @@ public abstract class CaCompilerContract
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_BONE_NO_ROOT,
+      CaCompileErrorCode.ERROR_JOINT_NO_ROOT,
       r.getError().get(0).code());
   }
 
@@ -127,15 +127,15 @@ public abstract class CaCompilerContract
   {
     final CaCompilerType cc = this.create();
 
-    final CaBoneName bone_0_name = CaBoneName.of("root0");
-    final CaDefinitionBone bone_0 = CaDefinitionBone.of(
+    final CaJointName bone_0_name = CaJointName.of("root0");
+    final CaDefinitionJoint bone_0 = CaDefinitionJoint.of(
       bone_0_name,
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
       new VectorI3D());
-    final CaBoneName bone_1_name = CaBoneName.of("root1");
-    final CaDefinitionBone bone_1 = CaDefinitionBone.of(
+    final CaJointName bone_1_name = CaJointName.of("root1");
+    final CaDefinitionJoint bone_1 = CaDefinitionJoint.of(
       bone_1_name,
       Optional.empty(),
       new PVectorI3D<>(),
@@ -145,7 +145,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(HashMap.empty());
-    b.setBones(HashMap.ofEntries(
+    b.setJoints(HashMap.ofEntries(
       Tuple.of(bone_0_name, bone_0),
       Tuple.of(bone_1_name, bone_1)));
 
@@ -156,7 +156,7 @@ public abstract class CaCompilerContract
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_BONE_MULTIPLE_ROOTS,
+      CaCompileErrorCode.ERROR_MULTIPLE_ROOT_JOINTS,
       r.getError().get(0).code());
   }
 
@@ -165,16 +165,16 @@ public abstract class CaCompilerContract
   {
     final CaCompilerType cc = this.create();
 
-    final CaBoneName bone_0_name = CaBoneName.of("root0");
-    final CaDefinitionBone bone_0 = CaDefinitionBone.of(
+    final CaJointName bone_0_name = CaJointName.of("root0");
+    final CaDefinitionJoint bone_0 = CaDefinitionJoint.of(
       bone_0_name,
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
       new VectorI3D());
-    final CaBoneName bone_1_name = CaBoneName.of("root1");
-    final CaBoneName bone_2_name = CaBoneName.of("root2");
-    final CaDefinitionBone bone_1 = CaDefinitionBone.of(
+    final CaJointName bone_1_name = CaJointName.of("root1");
+    final CaJointName bone_2_name = CaJointName.of("root2");
+    final CaDefinitionJoint bone_1 = CaDefinitionJoint.of(
       bone_1_name,
       Optional.of(bone_2_name),
       new PVectorI3D<>(),
@@ -184,7 +184,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(HashMap.empty());
-    b.setBones(HashMap.ofEntries(
+    b.setJoints(HashMap.ofEntries(
       Tuple.of(bone_0_name, bone_0),
       Tuple.of(bone_1_name, bone_1)));
 
@@ -195,7 +195,7 @@ public abstract class CaCompilerContract
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_BONE_NONEXISTENT_PARENT,
+      CaCompileErrorCode.ERROR_JOINT_NONEXISTENT_PARENT,
       r.getError().get(0).code());
   }
 
@@ -204,23 +204,23 @@ public abstract class CaCompilerContract
   {
     final CaCompilerType cc = this.create();
 
-    final CaBoneName bone_0_name = CaBoneName.of("root0");
-    final CaDefinitionBone bone_0 = CaDefinitionBone.of(
+    final CaJointName bone_0_name = CaJointName.of("root0");
+    final CaDefinitionJoint bone_0 = CaDefinitionJoint.of(
       bone_0_name,
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
       new VectorI3D());
 
-    final CaBoneName bone_1_name = CaBoneName.of("root1");
-    final CaBoneName bone_2_name = CaBoneName.of("root2");
-    final CaDefinitionBone bone_1 = CaDefinitionBone.of(
+    final CaJointName bone_1_name = CaJointName.of("root1");
+    final CaJointName bone_2_name = CaJointName.of("root2");
+    final CaDefinitionJoint bone_1 = CaDefinitionJoint.of(
       bone_1_name,
       Optional.of(bone_2_name),
       new PVectorI3D<>(),
       new QuaternionI4D(),
       new VectorI3D());
-    final CaDefinitionBone bone_2 = CaDefinitionBone.of(
+    final CaDefinitionJoint bone_2 = CaDefinitionJoint.of(
       bone_2_name,
       Optional.of(bone_1_name),
       new PVectorI3D<>(),
@@ -230,7 +230,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(HashMap.empty());
-    b.setBones(HashMap.ofEntries(
+    b.setJoints(HashMap.ofEntries(
       Tuple.of(bone_0_name, bone_0),
       Tuple.of(bone_1_name, bone_1),
       Tuple.of(bone_2_name, bone_2)));
@@ -242,17 +242,17 @@ public abstract class CaCompilerContract
     dump(r);
     Assert.assertFalse(r.isValid());
     Assert.assertEquals(
-      CaCompileErrorCode.ERROR_BONE_CYCLE,
+      CaCompileErrorCode.ERROR_JOINT_CYCLE,
       r.getError().get(0).code());
   }
 
   @Test
-  public void testCompileActionNonexistentBone()
+  public void testCompileActionNonexistentJoint()
   {
     final CaCompilerType cc = this.create();
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("nonexistent"), List.empty());
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("nonexistent"), List.empty());
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -263,11 +263,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -276,7 +276,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -294,8 +294,8 @@ public abstract class CaCompilerContract
   {
     final CaCompilerType cc = this.create();
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), List.empty());
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), List.empty());
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -306,11 +306,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -319,7 +319,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -350,14 +350,14 @@ public abstract class CaCompilerContract
 
     final CaDefinitionCurveTranslation.Builder curve_b =
       CaDefinitionCurveTranslation.builder();
-    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setJoint(CaJointName.of("bone0"));
     curve_b.setKeyframes(curve_keyframes);
 
     List<CaDefinitionCurveType> curves = List.empty();
     curves = curves.append(curve_b.build());
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -368,11 +368,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -381,7 +381,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -412,14 +412,14 @@ public abstract class CaCompilerContract
 
     final CaDefinitionCurveOrientation.Builder curve_b =
       CaDefinitionCurveOrientation.builder();
-    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setJoint(CaJointName.of("bone0"));
     curve_b.setKeyframes(curve_keyframes);
 
     List<CaDefinitionCurveType> curves = List.empty();
     curves = curves.append(curve_b.build());
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -430,11 +430,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -443,7 +443,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -474,14 +474,14 @@ public abstract class CaCompilerContract
 
     final CaDefinitionCurveScale.Builder curve_b =
       CaDefinitionCurveScale.builder();
-    curve_b.setBone(CaBoneName.of("bone0"));
+    curve_b.setJoint(CaJointName.of("bone0"));
     curve_b.setKeyframes(curve_keyframes);
 
     List<CaDefinitionCurveType> curves = List.empty();
     curves = curves.append(curve_b.build());
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -492,11 +492,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -505,7 +505,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -538,7 +538,7 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveTranslation.Builder curve_b =
         CaDefinitionCurveTranslation.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
@@ -556,13 +556,13 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveTranslation.Builder curve_b =
         CaDefinitionCurveTranslation.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -573,11 +573,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -586,7 +586,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -619,7 +619,7 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveOrientation.Builder curve_b =
         CaDefinitionCurveOrientation.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
@@ -637,13 +637,13 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveOrientation.Builder curve_b =
         CaDefinitionCurveOrientation.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -654,11 +654,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -667,7 +667,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -700,7 +700,7 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveScale.Builder curve_b =
         CaDefinitionCurveScale.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
@@ -718,13 +718,13 @@ public abstract class CaCompilerContract
 
       final CaDefinitionCurveScale.Builder curve_b =
         CaDefinitionCurveScale.builder();
-      curve_b.setBone(CaBoneName.of("bone0"));
+      curve_b.setJoint(CaJointName.of("bone0"));
       curve_b.setKeyframes(curve_keyframes);
       curves = curves.append(curve_b.build());
     }
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
-    act_curves = act_curves.put(CaBoneName.of("bone0"), curves);
+    Map<CaJointName, List<CaDefinitionCurveType>> act_curves = HashMap.empty();
+    act_curves = act_curves.put(CaJointName.of("bone0"), curves);
 
     final CaDefinitionActionCurves.Builder act_b =
       CaDefinitionActionCurves.builder();
@@ -735,11 +735,11 @@ public abstract class CaCompilerContract
     Map<CaActionName, CaDefinitionActionType> actions = HashMap.empty();
     actions = actions.put(CaActionName.of("act0"), act_b.build());
 
-    Map<CaBoneName, CaDefinitionBone> bones = HashMap.empty();
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
     bones = bones.put(
-      CaBoneName.of("bone0"),
-      CaDefinitionBone.of(
-        CaBoneName.of("bone0"),
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
@@ -748,7 +748,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(actions);
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -762,19 +762,19 @@ public abstract class CaCompilerContract
   }
 
   @Test
-  public void testCompileCorrectBones()
+  public void testCompileCorrectJoints()
   {
     final CaCompilerType cc = this.create();
 
     final VectorI3DGenerator vgen =
       new VectorI3DGenerator();
-    final PVectorI3DGenerator<CaSpaceBoneParentRelativeType> pvgen =
+    final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvgen =
       new PVectorI3DGenerator<>();
     final QuaternionI4DGenerator qgen =
       new QuaternionI4DGenerator();
 
-    final BoneNameTreeGenerator gen = new BoneNameTreeGenerator();
-    final BoneNameTree tree = gen.next();
+    final JointNameTreeGenerator gen = new JointNameTreeGenerator();
+    final JointNameTree tree = gen.next();
 
     final StringBuilder sb = new StringBuilder(100);
     tree.tree().forEachDepthFirst(unit(), (input, depth, node) -> {
@@ -786,9 +786,9 @@ public abstract class CaCompilerContract
       LOG.debug("tree: {}", sb.toString());
     });
 
-    final Map<CaBoneName, CaDefinitionBone> bones =
-      tree.nodes().map((CaBoneName bone_name, JOTreeNodeReadableType<CaBoneName> node) -> {
-        final CaDefinitionBone.Builder cb = CaDefinitionBone.builder();
+    final Map<CaJointName, CaDefinitionJoint> bones =
+      tree.nodes().map((CaJointName bone_name, JOTreeNodeReadableType<CaJointName> node) -> {
+        final CaDefinitionJoint.Builder cb = CaDefinitionJoint.builder();
         cb.setName(node.value());
         cb.setScale(vgen.next());
         cb.setOrientation(qgen.next());
@@ -800,7 +800,7 @@ public abstract class CaCompilerContract
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
     b.setActions(HashMap.empty());
-    b.setBones(bones);
+    b.setJoints(bones);
 
     final CaDefinitionSkeleton s = b.build();
     final Validation<List<CaCompileError>, CaSkeleton> r =
@@ -811,30 +811,30 @@ public abstract class CaCompilerContract
 
     final CaSkeleton compiled = r.get();
 
-    final Map<CaBoneName, JOTreeNodeReadableType<CaBone>> by_name =
-      compiled.bonesByName();
-    final Map<Integer, JOTreeNodeReadableType<CaBone>> by_id =
-      compiled.bonesByID();
+    final Map<CaJointName, JOTreeNodeReadableType<CaJoint>> by_name =
+      compiled.jointsByName();
+    final Map<Integer, JOTreeNodeReadableType<CaJoint>> by_id =
+      compiled.jointsByID();
 
     Assert.assertEquals((long) by_id.size(), (long) by_name.size());
 
     final Collection<Integer> ids_unique = new HashSet<>();
 
-    for (final CaBoneName bone_name : bones.keySet()) {
+    for (final CaJointName bone_name : bones.keySet()) {
       Assert.assertTrue(by_name.containsKey(bone_name));
 
-      final JOTreeNodeReadableType<CaBone> compiled_node =
+      final JOTreeNodeReadableType<CaJoint> compiled_node =
         by_name.get(bone_name).get();
-      final CaBone compiled_bone =
+      final CaJoint compiled_bone =
         compiled_node.value();
 
       final Integer id = Integer.valueOf(compiled_bone.id());
       Assert.assertFalse(ids_unique.contains(id));
       ids_unique.add(id);
 
-      final JOTreeNodeReadableType<CaBoneName> original_node =
+      final JOTreeNodeReadableType<CaJointName> original_node =
         tree.nodes().get(bone_name).get();
-      final CaDefinitionBone original_bone =
+      final CaDefinitionJoint original_bone =
         bones.get(bone_name).get();
 
       Assert.assertEquals(
@@ -842,9 +842,9 @@ public abstract class CaCompilerContract
         Boolean.valueOf(original_bone.parent().isPresent()));
 
       if (compiled_node.parentReadable().isPresent()) {
-        final JOTreeNodeReadableType<CaBone> c_parent =
+        final JOTreeNodeReadableType<CaJoint> c_parent =
           compiled_node.parentReadable().get();
-        final CaBoneName b_parent =
+        final CaJointName b_parent =
           original_bone.parent().get();
         Assert.assertEquals(b_parent, c_parent.value().name());
       }
@@ -868,8 +868,8 @@ public abstract class CaCompilerContract
   public void testCompileCorrectAll()
   {
     final CaCompilerType cc = this.create();
-    final BoneTreeGenerator gen = new BoneTreeGenerator();
-    final BoneTree tree = gen.next();
+    final JointTreeGenerator gen = new JointTreeGenerator();
+    final JointTree tree = gen.next();
 
     QuickCheck.forAll(
       100,
@@ -887,19 +887,19 @@ public abstract class CaCompilerContract
 
           final CaSkeleton compiled = r.get();
           Assert.assertEquals(
-            (long) original.bones().size(),
-            (long) compiled.bonesByName().size());
+            (long) original.joints().size(),
+            (long) compiled.jointsByName().size());
           Assert.assertEquals(
-            (long) original.bones().size(),
-            (long) compiled.bonesByID().size());
+            (long) original.joints().size(),
+            (long) compiled.jointsByID().size());
 
-          for (final CaBoneName bone_name : original.bones().keySet()) {
-            Assert.assertTrue(compiled.bonesByName().containsKey(bone_name));
+          for (final CaJointName bone_name : original.joints().keySet()) {
+            Assert.assertTrue(compiled.jointsByName().containsKey(bone_name));
 
-            final CaDefinitionBone bone_orig =
-              original.bones().get(bone_name).get();
-            final CaBone bone_comp =
-              compiled.bonesByName().get(bone_name).get().value();
+            final CaDefinitionJoint bone_orig =
+              original.joints().get(bone_name).get();
+            final CaJoint bone_comp =
+              compiled.jointsByName().get(bone_name).get().value();
 
             Assert.assertEquals(
               bone_orig.name(), bone_comp.name());
@@ -935,16 +935,16 @@ public abstract class CaCompilerContract
               final CaDefinitionActionCurves act_orig_c =
                 (CaDefinitionActionCurves) act_orig;
 
-              final SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves_by_bone_comp =
+              final SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves_by_bone_comp =
                 act_comp_c.curves();
-              final Map<CaBoneName, List<CaDefinitionCurveType>> curves_by_bone_orig =
+              final Map<CaJointName, List<CaDefinitionCurveType>> curves_by_bone_orig =
                 act_orig_c.curves();
 
               Assert.assertEquals(
                 (long) curves_by_bone_orig.size(),
                 (long) curves_by_bone_comp.size());
 
-              for (final CaBoneName curve_bone : curves_by_bone_comp.keySet()) {
+              for (final CaJointName curve_bone : curves_by_bone_comp.keySet()) {
                 final List<CaDefinitionCurveType> curves_orig =
                   curves_by_bone_orig.get(curve_bone).get();
                 final IndexedSeq<CaCurveType> curves_comp =
@@ -956,8 +956,8 @@ public abstract class CaCompilerContract
                   final CaDefinitionCurveType curve_orig =
                     curves_orig.get(index);
 
-                  Assert.assertEquals(curve_orig.bone(), curve_bone);
-                  Assert.assertEquals(curve_orig.bone(), curve_comp.bone());
+                  Assert.assertEquals(curve_orig.joint(), curve_bone);
+                  Assert.assertEquals(curve_orig.joint(), curve_comp.joint());
 
                   curve_orig.matchCurve(
                     unit(),

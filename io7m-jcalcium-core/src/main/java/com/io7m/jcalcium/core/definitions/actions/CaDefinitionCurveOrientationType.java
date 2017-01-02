@@ -24,7 +24,7 @@ import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
- * A curve that affects the orientation of a bone.
+ * A curve that affects the orientation of a joint.
  */
 
 @CaImmutableStyleType
@@ -46,7 +46,7 @@ public interface CaDefinitionCurveOrientationType extends CaDefinitionCurveType
   }
 
   /**
-   * @return The list of keyframes for the bone
+   * @return The list of keyframes for the joint
    */
 
   List<CaDefinitionCurveKeyframeOrientationType> keyframes();

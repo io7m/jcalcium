@@ -14,17 +14,17 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.examples.jogl.boneview;
+package com.io7m.jcalcium.examples.jogl;
 
 import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jareas.core.AreaInclusiveUnsignedL;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -32,7 +32,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedBoneDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
@@ -164,18 +164,17 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.io7m.jfunctional.Unit.unit;
 
-public final class BoneViewCmdline implements Runnable, KeyListener
+public final class JointViewCmdline implements Runnable, KeyListener
 {
   private static final Logger LOG;
   private static final boolean FILE;
 
   static {
-    LOG = LoggerFactory.getLogger(BoneViewCmdline.class);
+    LOG = LoggerFactory.getLogger(JointViewCmdline.class);
     FILE = true;
   }
 
@@ -233,7 +232,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
   private R2InstanceBillboardedDynamicType skeleton_joints;
   private AreaInclusiveUnsignedL window_area;
 
-  private BoneViewCmdline(
+  private JointViewCmdline(
     final String[] in_args)
   {
     this.args = NullCheck.notNull(in_args, "args");
@@ -264,7 +263,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
   {
     TimeHack6435126.enableHighResolutionTimer();
 
-    new BoneViewCmdline(args).run();
+    new JointViewCmdline(args).run();
   }
 
   private static CaSkeleton loadSkeleton(
@@ -283,39 +282,39 @@ public final class BoneViewCmdline implements Runnable, KeyListener
         final CaSkeleton skeleton =
           loader.loadCompiledSkeletonFromStream(is, path.toUri());
         LOG.debug(
-          "bones: {} bones", Integer.valueOf(skeleton.bonesByID().size()));
+          "joints: {} joints", Integer.valueOf(skeleton.jointsByID().size()));
         return skeleton;
       }
     }
 
-    final CaBone root =
-      CaBone.of(
-        CaBoneName.of("root"),
+    final CaJoint root =
+      CaJoint.of(
+        CaJointName.of("root"),
         0,
         new PVectorI3D<>(0.0, 0.0, 0.0),
         new QuaternionI4D(),
         new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone hip =
-      CaBone.of(
-        CaBoneName.of("hip"),
+    final CaJoint hip =
+      CaJoint.of(
+        CaJointName.of("hip"),
         1,
         new PVectorI3D<>(0.0, 3.0, 0.0),
         new QuaternionI4D(),
         new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone shoulder_left =
-      CaBone.of(
-        CaBoneName.of("shoulder-left"),
+    final CaJoint shoulder_left =
+      CaJoint.of(
+        CaJointName.of("shoulder-left"),
         2,
         new PVectorI3D<>(0.0, 0.0, 0.0),
         QuaternionI4D.makeFromAxisAngle(
           new VectorI3D(0.0, 0.0, -1.0),
           Math.toRadians(45.0)),
         new VectorI3D(1.0, 1.0, 1.0));
-    final CaBone shoulder_right =
-      CaBone.of(
-        CaBoneName.of("shoulder-right"),
+    final CaJoint shoulder_right =
+      CaJoint.of(
+        CaJointName.of("shoulder-right"),
         3,
         new PVectorI3D<>(0.0, 0.0, 0.0),
         QuaternionI4D.makeFromAxisAngle(
@@ -323,28 +322,28 @@ public final class BoneViewCmdline implements Runnable, KeyListener
           Math.toRadians(-45.0)),
         new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone hand_left =
-      CaBone.of(
-        CaBoneName.of("hand-left"),
+    final CaJoint hand_left =
+      CaJoint.of(
+        CaJointName.of("hand-left"),
         4,
         new PVectorI3D<>(-1.0, 0.0, 0.0),
         new QuaternionI4D(),
         new VectorI3D(1.0, 1.0, 1.0));
-    final CaBone hand_right =
-      CaBone.of(
-        CaBoneName.of("hand-right"),
+    final CaJoint hand_right =
+      CaJoint.of(
+        CaJointName.of("hand-right"),
         5,
         new PVectorI3D<>(1.0, 0.0, 0.0),
         new QuaternionI4D(),
         new VectorI3D(1.0, 1.0, 1.0));
 
-    final JOTreeNodeType<CaBone> tree_root = JOTreeNode.create(root);
-    final JOTreeNodeType<CaBone> tree_hip = JOTreeNode.create(hip);
+    final JOTreeNodeType<CaJoint> tree_root = JOTreeNode.create(root);
+    final JOTreeNodeType<CaJoint> tree_hip = JOTreeNode.create(hip);
     tree_root.childAdd(tree_hip);
-    final JOTreeNodeType<CaBone> tree_arm_left = JOTreeNode.create(shoulder_left);
+    final JOTreeNodeType<CaJoint> tree_arm_left = JOTreeNode.create(shoulder_left);
     tree_arm_left.childAdd(JOTreeNode.create(hand_left));
     tree_hip.childAdd(tree_arm_left);
-    final JOTreeNodeType<CaBone> tree_arm_right = JOTreeNode.create(
+    final JOTreeNodeType<CaJoint> tree_arm_right = JOTreeNode.create(
       shoulder_right);
     tree_arm_right.childAdd(JOTreeNode.create(hand_right));
     tree_hip.childAdd(tree_arm_right);
@@ -379,7 +378,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
     final CaCurveOrientation curve_orientation =
       CaCurveOrientation.builder()
         .setAction(CaActionName.of("action"))
-        .setBone(CaBoneName.of("shoulder-left"))
+        .setJoint(CaJointName.of("shoulder-left"))
         .putKeyframes(Integer.valueOf(0), o_keyframe_0)
         .putKeyframes(Integer.valueOf(30), o_keyframe_1)
         .putKeyframes(Integer.valueOf(60), o_keyframe_2)
@@ -409,7 +408,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
     final CaCurveTranslation curve_translation =
       CaCurveTranslation.builder()
         .setAction(CaActionName.of("action"))
-        .setBone(CaBoneName.of("shoulder-right"))
+        .setJoint(CaJointName.of("shoulder-right"))
         .putKeyframes(Integer.valueOf(0), t_keyframe_0)
         .putKeyframes(Integer.valueOf(30), t_keyframe_1)
         .putKeyframes(Integer.valueOf(60), t_keyframe_2)
@@ -419,15 +418,15 @@ public final class BoneViewCmdline implements Runnable, KeyListener
       CaActionCurves.builder()
         .setName(CaActionName.of("action"))
         .setFramesPerSecond(60)
-        .putCurves(CaBoneName.of("shoulder-left"), Vector.of(curve_orientation))
+        .putCurves(CaJointName.of("shoulder-left"), Vector.of(curve_orientation))
         .putCurves(
-          CaBoneName.of("shoulder-right"),
+          CaJointName.of("shoulder-right"),
           Vector.of(curve_translation))
         .build();
 
     final CaSkeleton.Builder sb = CaSkeleton.builder();
     sb.setName(CaSkeletonName.of("skeleton"));
-    sb.setBones(tree_root);
+    sb.setJoints(tree_root);
     sb.putActionsByName(action.name(), action);
     return sb.build();
   }
@@ -452,7 +451,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
       final GLCapabilities caps = new GLCapabilities(profile);
       this.window = GLWindow.create(caps);
       this.window.setSize(640, 480);
-      this.window.setTitle("Boneview: " + path);
+      this.window.setTitle("Jointview: " + path);
       this.window.setVisible(true, true);
       this.window.addKeyListener(this);
       this.window_area = this.windowMakeArea();
@@ -700,7 +699,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
         this.main.getIDPool(),
         this.g33.getArrayBuffers(),
         this.g33.getArrayObjects(),
-        this.skeleton.bonesByID().size());
+        this.skeleton.jointsByID().size());
   }
 
   private AreaInclusiveUnsignedL windowMakeArea()
@@ -741,26 +740,26 @@ public final class BoneViewCmdline implements Runnable, KeyListener
       this.actions.get(this.actions_ordered.get(this.actions_index));
     eval.evaluateForGlobalFrame(this.frame_start, this.frame, time_scale);
 
-    final Int2ReferenceSortedMap<CaEvaluatedBoneDType> bones =
-      eval.evaluatedBonesDByID();
+    final Int2ReferenceSortedMap<CaEvaluatedJointDType> joints =
+      eval.evaluatedJointsDByID();
 
-    final java.util.List<R2DebugLineSegment> bone_lines = new ArrayList<>();
+    final java.util.List<R2DebugLineSegment> joint_lines = new ArrayList<>();
 
     this.skeleton_joints.clear();
     final VectorM4D out_current = new VectorM4D();
     final VectorM4D out_parent = new VectorM4D();
-    final int index_start = bones.firstIntKey();
-    final int index_end = bones.lastIntKey();
+    final int index_start = joints.firstIntKey();
+    final int index_end = joints.lastIntKey();
     for (int index = index_start; index <= index_end; ++index) {
       Invariants.checkInvariantI(
         index,
-        bones.containsKey(index),
-        b -> "Bone map must contain bone " + b);
+        joints.containsKey(index),
+        b -> "Joint map must contain joint " + b);
 
-      final CaEvaluatedBoneDType bone_current = bones.get(index);
+      final CaEvaluatedJointDType joint_current = joints.get(index);
       MatrixM4x4D.multiplyVector4D(
         this.matrix_context4x4d,
-        bone_current.transformAbsolute4x4D(),
+        joint_current.transformAbsolute4x4D(),
         new VectorI4D(0.0, 0.0, 0.0, 1.0),
         out_current);
 
@@ -771,14 +770,14 @@ public final class BoneViewCmdline implements Runnable, KeyListener
           (float) out_current.getZD());
       this.skeleton_joints.addInstance(position_current, 0.1f, 0.0f);
 
-      final OptionalInt parent_opt = bone_current.parent();
+      final OptionalInt parent_opt = joint_current.parent();
       if (parent_opt.isPresent()) {
-        final CaEvaluatedBoneDType bone_parent =
-          bones.get(parent_opt.getAsInt());
+        final CaEvaluatedJointDType joint_parent =
+          joints.get(parent_opt.getAsInt());
 
         MatrixM4x4D.multiplyVector4D(
           this.matrix_context4x4d,
-          bone_parent.transformAbsolute4x4D(),
+          joint_parent.transformAbsolute4x4D(),
           new VectorI4D(0.0, 0.0, 0.0, 1.0),
           out_parent);
         final PVectorI3F<R2SpaceWorldType> position_parent =
@@ -787,13 +786,13 @@ public final class BoneViewCmdline implements Runnable, KeyListener
             (float) out_parent.getYD(),
             (float) out_parent.getZD());
 
-        bone_lines.add(R2DebugLineSegment.of(
+        joint_lines.add(R2DebugLineSegment.of(
           position_parent,
           new PVectorI4F<>(0.8f, 1.0f, 1.0f, 1.0f),
           position_current,
           new PVectorI4F<>(1.0f, 0.8f, 1.0f, 1.0f)));
       } else {
-        bone_lines.add(R2DebugLineSegment.of(
+        joint_lines.add(R2DebugLineSegment.of(
           position_current,
           new PVectorI4F<>(0.8f, 1.0f, 1.0f, 1.0f),
           position_current,
@@ -801,19 +800,19 @@ public final class BoneViewCmdline implements Runnable, KeyListener
       }
     }
 
-    bone_lines.add(R2DebugLineSegment.of(
+    joint_lines.add(R2DebugLineSegment.of(
       new PVectorI3F<>(0.0f, 0.0f, 0.0f),
       new PVectorI4F<>(1.0f, 0.0f, 0.0f, 1.0f),
       new PVectorI3F<>(1.0f, 0.0f, 0.0f),
       new PVectorI4F<>(1.0f, 0.0f, 0.0f, 1.0f)));
 
-    bone_lines.add(R2DebugLineSegment.of(
+    joint_lines.add(R2DebugLineSegment.of(
       new PVectorI3F<>(0.0f, 0.0f, 0.0f),
       new PVectorI4F<>(0.0f, 1.0f, 0.0f, 1.0f),
       new PVectorI3F<>(0.0f, 1.0f, 0.0f),
       new PVectorI4F<>(0.0f, 1.0f, 0.0f, 1.0f)));
 
-    bone_lines.add(R2DebugLineSegment.of(
+    joint_lines.add(R2DebugLineSegment.of(
       new PVectorI3F<>(0.0f, 0.0f, 0.0f),
       new PVectorI4F<>(0.0f, 0.0f, 1.0f, 1.0f),
       new PVectorI3F<>(0.0f, 0.0f, -1.0f),
@@ -821,7 +820,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
 
     this.render_debug_parameters =
       this.render_debug_parameters.withDebugInstances(
-        R2DebugInstances.builder().addAllLineSegments(bone_lines).build());
+        R2DebugInstances.builder().addAllLineSegments(joint_lines).build());
 
     this.render_stencils.stencilsReset();
     this.render_stencils.stencilsSetMode(

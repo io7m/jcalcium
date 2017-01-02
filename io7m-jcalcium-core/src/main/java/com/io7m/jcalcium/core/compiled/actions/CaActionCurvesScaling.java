@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import javaslang.Tuple;
@@ -130,7 +130,7 @@ public final class CaActionCurvesScaling
     final double scale =
       (double) target_fps / (double) action.framesPerSecond();
 
-    final SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves =
+    final SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves =
       action.curves().map(
         (bone_name, bone_curves) ->
           Tuple.of(bone_name, bone_curves.map(

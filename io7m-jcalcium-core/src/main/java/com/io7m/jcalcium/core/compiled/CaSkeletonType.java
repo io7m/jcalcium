@@ -18,7 +18,7 @@ package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -51,11 +51,11 @@ public interface CaSkeletonType
   CaSkeletonName name();
 
   /**
-   * @return The tree of bones for the skeleton
+   * @return The tree of joints for the skeleton
    */
 
   @Value.Parameter
-  JOTreeNodeReadableType<CaBone> bones();
+  JOTreeNodeReadableType<CaJoint> joints();
 
   /**
    * @return The actions by name
@@ -65,41 +65,41 @@ public interface CaSkeletonType
   SortedMap<CaActionName, CaActionType> actionsByName();
 
   /**
-   * @return A map of bone nodes by name
+   * @return A map of joint nodes by name
    */
 
   @Value.Derived
-  default SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName()
+  default SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> jointsByName()
   {
-    final Map<CaBoneName, JOTreeNodeReadableType<CaBone>> hm = new HashMap<>();
-    this.bones().forEachBreadthFirst(
+    final Map<CaJointName, JOTreeNodeReadableType<CaJoint>> hm = new HashMap<>();
+    this.joints().forEachBreadthFirst(
       hm, (t, depth, node) -> {
-        final CaBone bone = node.value();
+        final CaJoint joint = node.value();
         Preconditions.checkPrecondition(
-          bone.name(),
-          !t.containsKey(bone.name()),
-          name -> "Bone name must be unique");
-        t.put(bone.name(), node);
+          joint.name(),
+          !t.containsKey(joint.name()),
+          name -> "Joint name must be unique");
+        t.put(joint.name(), node);
       });
     return TreeMap.ofAll(hm);
   }
 
   /**
-   * @return A map of bone nodes by ID
+   * @return A map of joint nodes by ID
    */
 
   @Value.Derived
-  default SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID()
+  default SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> jointsByID()
   {
-    final Map<Integer, JOTreeNodeReadableType<CaBone>> hm = new HashMap<>();
-    this.bones().forEachBreadthFirst(
+    final Map<Integer, JOTreeNodeReadableType<CaJoint>> hm = new HashMap<>();
+    this.joints().forEachBreadthFirst(
       hm, (t, depth, node) -> {
-        final CaBone bone = node.value();
+        final CaJoint joint = node.value();
         Preconditions.checkPreconditionI(
-          bone.id(),
-          !t.containsKey(Integer.valueOf(bone.id())),
-          id -> "Bone ID must be unique");
-        t.put(Integer.valueOf(bone.id()), node);
+          joint.id(),
+          !t.containsKey(Integer.valueOf(joint.id())),
+          id -> "Joint ID must be unique");
+        t.put(Integer.valueOf(joint.id()), node);
       });
     return TreeMap.ofAll(hm);
   }
@@ -112,35 +112,35 @@ public interface CaSkeletonType
   default void checkPreconditions()
   {
     Preconditions.checkPrecondition(
-      this.bonesByID().size() == this.bonesByName().size(),
-      "Bone maps must be the same size");
+      this.jointsByID().size() == this.jointsByName().size(),
+      "Joint maps must be the same size");
 
-    this.bones().forEachBreadthFirst(this, (t, depth, node) -> {
-      final CaBone bone = node.value();
-      final Integer bone_id = Integer.valueOf(bone.id());
-
-      Preconditions.checkPrecondition(
-        bone_id,
-        t.bonesByID().containsKey(bone_id),
-        id -> "Bone " + id + " must exist in ID map");
-      Preconditions.checkPrecondition(
-        bone.name(),
-        t.bonesByName().containsKey(bone.name()),
-        name -> "Bone " + name + " must exist in name map");
-
-      final JOTreeNodeReadableType<CaBone> bone_by_name =
-        t.bonesByName().get(bone.name()).get();
-      final JOTreeNodeReadableType<CaBone> bone_by_id =
-        t.bonesByID().get(bone_id).get();
+    this.joints().forEachBreadthFirst(this, (t, depth, node) -> {
+      final CaJoint joint = node.value();
+      final Integer joint_id = Integer.valueOf(joint.id());
 
       Preconditions.checkPrecondition(
-        bone.name(),
-        Objects.equals(bone_by_name.value().name(), bone.name()),
-        name -> "Bone name " + name + " must match name in map");
+        joint_id,
+        t.jointsByID().containsKey(joint_id),
+        id -> "Joint " + id + " must exist in ID map");
       Preconditions.checkPrecondition(
-        bone_id,
-        bone_by_id.value().id() == bone.id(),
-        id -> "Bone ID " + id + " must match id in map");
+        joint.name(),
+        t.jointsByName().containsKey(joint.name()),
+        name -> "Joint " + name + " must exist in name map");
+
+      final JOTreeNodeReadableType<CaJoint> joint_by_name =
+        t.jointsByName().get(joint.name()).get();
+      final JOTreeNodeReadableType<CaJoint> joint_by_id =
+        t.jointsByID().get(joint_id).get();
+
+      Preconditions.checkPrecondition(
+        joint.name(),
+        Objects.equals(joint_by_name.value().name(), joint.name()),
+        name -> "Joint name " + name + " must match name in map");
+      Preconditions.checkPrecondition(
+        joint_id,
+        joint_by_id.value().id() == joint.id(),
+        id -> "Joint ID " + id + " must match id in map");
     });
 
     this.actionsByName().forEach(pair -> {
@@ -154,17 +154,17 @@ public interface CaSkeletonType
 
       act.matchAction(this, (t, act_curves) -> {
         act_curves.curves().forEach(curve_pair -> {
-          final CaBoneName act_bone = curve_pair._1;
+          final CaJointName act_joint = curve_pair._1;
 
           Preconditions.checkPrecondition(
-            act_bone,
-            t.bonesByName().containsKey(act_bone),
-            name -> "Action must not refer to nonexistent bone " + name);
+            act_joint,
+            t.jointsByName().containsKey(act_joint),
+            name -> "Action must not refer to nonexistent joint " + name);
 
           curve_pair._2.forEach(curve -> {
             Preconditions.checkPrecondition(
-              Objects.equals(curve.bone(), act_bone),
-              "Curve must refer to correct bone");
+              Objects.equals(curve.joint(), act_joint),
+              "Curve must refer to correct joint");
             Preconditions.checkPrecondition(
               Objects.equals(curve.action(), act_name),
               "Curve must refer to correct action");

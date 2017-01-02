@@ -3,16 +3,16 @@
   "skeleton": {
     "name": "skeleton0",
 
-    "bones": [
+    "joints": [
       {
-        "name": "bone.000",
+        "name": "joint.000",
         "translation": [1.0, 2.0, 3.0],
         "orientation-xyzw": [10.0, 20.0, 30.0, 40.0],
         "scale": [100.0, 200.0, 300.0]
       },
       {
-        "name": "bone.001",
-        "parent": "bone.000",
+        "name": "joint.001",
+        "parent": "joint.000",
         "translation": [1.0, 2.0, 3.0],
         "orientation-xyzw": [10.0, 20.0, 30.0, 40.0],
         "scale": [100.0, 200.0, 300.0]
@@ -26,7 +26,7 @@
         "frames-per-second": 60,
         "curves": [
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "orientation",
             "keyframes": [
               {
@@ -50,7 +50,7 @@
             ]
           },
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "translation",
             "keyframes": [
               {
@@ -74,7 +74,7 @@
             ]
           },
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "scale",
             "keyframes": [
               {
@@ -106,7 +106,7 @@
         "frames-per-second": 30,
         "curves": [
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "orientation",
             "keyframes": [
               {
@@ -130,7 +130,7 @@
             ]
           },
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "translation",
             "keyframes": [
               {
@@ -154,7 +154,7 @@
             ]
           },
           {
-            "bone": "bone.000",
+            "joint": "joint.000",
             "type": "scale",
             "keyframes": [
               {

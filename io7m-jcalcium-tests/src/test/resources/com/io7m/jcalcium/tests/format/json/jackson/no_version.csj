@@ -1,7 +1,7 @@
 {
   "skeleton": {
     "name": "empty",
-    "bones": [
+    "joints": [
     ],
     "actions": [
     ]

@@ -16,9 +16,9 @@
 
 package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.CaJointName;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jorchard.generators.JOTreeNodeGenerator;
@@ -32,25 +32,25 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * A generator for bone trees.
+ * A generator for joint trees.
  */
 
-public final class BoneTreeGenerator implements Generator<BoneTree>
+public final class JointTreeGenerator implements Generator<JointTree>
 {
-  private final CaBoneNameGenerator names;
+  private final CaJointNameGenerator names;
   private final IntegerGenerator sizes;
-  private final Generator<JOTreeNodeType<CaBoneName>> tree_gen;
+  private final Generator<JOTreeNodeType<CaJointName>> tree_gen;
   private final VectorI3DGenerator vec_gen;
-  private final PVectorI3DGenerator<CaSpaceBoneParentRelativeType> pvec_gen;
+  private final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvec_gen;
   private final QuaternionI4DGenerator quat_gen;
 
   /**
-   * Construct a bone tree generator.
+   * Construct a joint tree generator.
    */
 
-  public BoneTreeGenerator()
+  public JointTreeGenerator()
   {
-    this.names = new CaBoneNameGenerator();
+    this.names = new CaJointNameGenerator();
     this.sizes = new IntegerGenerator(1, 32);
     this.tree_gen = JOTreeNodeGenerator.create(this.sizes, this.names, 0.2);
     this.vec_gen = new VectorI3DGenerator();
@@ -59,26 +59,26 @@ public final class BoneTreeGenerator implements Generator<BoneTree>
   }
 
   @Override
-  public BoneTree next()
+  public JointTree next()
   {
-    final JOTreeNodeType<CaBoneName> tree =
+    final JOTreeNodeType<CaJointName> tree =
       this.tree_gen.next();
-    final HashMap<CaBoneName, JOTreeNodeReadableType<CaDefinitionBone>> map =
+    final HashMap<CaJointName, JOTreeNodeReadableType<CaDefinitionJoint>> map =
       new HashMap<>();
 
-    final JOTreeNodeType<CaDefinitionBone> out =
+    final JOTreeNodeType<CaDefinitionJoint> out =
       tree.mapDepthFirst(map, (input, depth, node) -> {
 
-        final CaDefinitionBone.Builder b = CaDefinitionBone.builder();
+        final CaDefinitionJoint.Builder b = CaDefinitionJoint.builder();
         b.setName(node.value());
         b.setScale(this.vec_gen.next());
         b.setTranslation(this.pvec_gen.next());
         b.setOrientation(this.quat_gen.next());
 
-        final Optional<JOTreeNodeReadableType<CaBoneName>> parent_opt =
+        final Optional<JOTreeNodeReadableType<CaJointName>> parent_opt =
           node.parentReadable();
         if (parent_opt.isPresent()) {
-          final JOTreeNodeReadableType<CaBoneName> parent_name = parent_opt.get();
+          final JOTreeNodeReadableType<CaJointName> parent_name = parent_opt.get();
           b.setParent(parent_name.value());
         }
 
@@ -89,6 +89,6 @@ public final class BoneTreeGenerator implements Generator<BoneTree>
       map.put(node.value().name(), node);
     });
 
-    return new BoneTree(out, javaslang.collection.HashMap.ofAll(map));
+    return new JointTree(out, javaslang.collection.HashMap.ofAll(map));
   }
 }

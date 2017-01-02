@@ -14,36 +14,47 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.generators;
+package com.io7m.jcalcium.core;
 
-import com.io7m.jcalcium.core.CaBoneName;
-import net.java.quickcheck.Generator;
-import net.java.quickcheck.generator.support.CharacterGenerator;
-import net.java.quickcheck.generator.support.IntegerGenerator;
-import net.java.quickcheck.generator.support.StringGenerator;
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.regex.Pattern;
 
 /**
- * A generator for {@link CaBoneName}.
+ * Validity checks for joint names.
  */
 
-public final class CaBoneNameGenerator implements Generator<CaBoneName>
+public final class CaJointNames
 {
-  private final StringGenerator gen;
-
   /**
-   * Construct a generator.
+   * The pattern that defines a valid joint name.
    */
 
-  public CaBoneNameGenerator()
-  {
-    this.gen = new StringGenerator(
-      new IntegerGenerator(1, 32),
-      new CharacterGenerator('a', 'z'));
+  public static final Pattern PATTERN;
+
+  private static final String PATTERN_TEXT;
+
+  static {
+    PATTERN_TEXT = "[\\p{IsAlphabetic}\\p{IsDigit}_\\-\\.:]+";
+    PATTERN = NullCheck.notNull(
+      Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
   }
 
-  @Override
-  public CaBoneName next()
+  private CaJointNames()
   {
-    return CaBoneName.of(this.gen.next());
+    throw new UnreachableCodeException();
+  }
+
+  /**
+   * @param text The text
+   *
+   * @return {@code true} iff the given text is a valid joint name
+   */
+
+  public static boolean isValid(
+    final CharSequence text)
+  {
+    return PATTERN.matcher(text).matches();
   }
 }

@@ -2,7 +2,7 @@
   "version": "calcium skeleton 1.0",
   "skeleton": {
     "name": "empty",
-    "bones": [
+    "joints": [
     ],
     "actions": [
     ]

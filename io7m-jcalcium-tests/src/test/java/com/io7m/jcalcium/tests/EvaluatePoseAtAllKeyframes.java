@@ -3,9 +3,9 @@ package com.io7m.jcalcium.tests;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedBoneDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
@@ -94,10 +94,10 @@ public final class EvaluatePoseAtAllKeyframes
         eval.evaluateForGlobalFrame(0L, index, 1.0);
 
         System.out.println("Keyframe " + index + ":");
-        eval.evaluatedBonesD().forEachBreadthFirst(unit(), (i, depth, node) -> {
-          final CaEvaluatedBoneDType bone = node.value();
-          final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType> m =
-            bone.transformAbsolute4x4D();
+        eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
+          final CaEvaluatedJointDType joint = node.value();
+          final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> m =
+            joint.transformAbsolute4x4D();
           final VectorM4D out = new VectorM4D();
           MatrixM4x4D.multiplyVector4D(
             context,
@@ -106,7 +106,7 @@ public final class EvaluatePoseAtAllKeyframes
             out);
           System.out.printf(
             "%d: %f,%f,%f\n",
-            Integer.valueOf(bone.id()),
+            Integer.valueOf(joint.id()),
             Double.valueOf(out.getXD()),
             Double.valueOf(out.getYD()),
             Double.valueOf(out.getZD()));

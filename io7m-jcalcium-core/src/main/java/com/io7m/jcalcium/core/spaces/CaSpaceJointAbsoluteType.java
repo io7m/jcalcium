@@ -17,12 +17,12 @@
 package com.io7m.jcalcium.core.spaces;
 
 /**
- * The bone-absolute space. This coordinate space is the per-bone coordinate
- * space that results from concatenating the current bone's parent-relative
- * transform with all of the transforms of its ancestor bones.
+ * The joint-absolute space. This coordinate space is the per-joint coordinate
+ * space that results from concatenating the current joint's parent-relative
+ * transform with all of the transforms of its ancestor joints.
  */
 
-public interface CaSpaceBoneAbsoluteType extends CaSpaceType
+public interface CaSpaceJointAbsoluteType extends CaSpaceType
 {
   // No extra methods
 }

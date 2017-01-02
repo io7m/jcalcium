@@ -18,7 +18,7 @@ package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
@@ -60,7 +60,7 @@ public interface CaActionCurvesType extends CaActionType
    */
 
   @Value.Parameter
-  SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves();
+  SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves();
 
   /**
    * Check preconditions for the type.
@@ -75,14 +75,14 @@ public interface CaActionCurvesType extends CaActionType
       f -> "Frames per second must be > 0");
 
     this.curves().forEach(
-      (bone_name, sequence) ->
+      (joint_name, sequence) ->
         sequence.forEach(curve -> {
           Preconditions.checkPrecondition(
             Objects.equals(curve.action(), this.name()),
             () -> "Action names must match (" + curve.action() + " == " + this.name() + ")");
           Preconditions.checkPrecondition(
-            Objects.equals(curve.bone(), bone_name),
-            () -> "Bone names must match (" + curve.bone() + " == " + bone_name + ")");
+            Objects.equals(curve.joint(), joint_name),
+            () -> "Joint names must match (" + curve.joint() + " == " + joint_name + ")");
         }));
   }
 }

@@ -36,12 +36,12 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.CaBoneNameType;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaJointName;
+import com.io7m.jcalcium.core.CaJointNameType;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
@@ -61,7 +61,7 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveScaleType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslationType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
@@ -274,48 +274,48 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       act_b.setCurves(this.curves.stream()
                         .map(CaV1Curve::toCurve)
                         .collect(javaslang.collection.List.collector())
-                        .groupBy(CaDefinitionCurveType::bone));
+                        .groupBy(CaDefinitionCurveType::joint));
       return act_b.build();
     }
   }
 
   /**
-   * A version 1 bone.
+   * A version 1 joint.
    */
 
   @JsonDeserialize
   @JsonSerialize
-  public static final class CaV1Bone
+  public static final class CaV1Joint
   {
     @JsonProperty(value = "name", required = true)
     private final String name;
     @JsonProperty("parent")
     private final Optional<String> parent;
     @JsonProperty(value = "translation", required = true)
-    private final PVectorI3D<CaSpaceBoneParentRelativeType> translation;
+    private final PVectorI3D<CaSpaceJointParentRelativeType> translation;
     @JsonProperty(value = "orientation-xyzw", required = true)
     private final QuaternionI4D orientation;
     @JsonProperty(value = "scale", required = true)
     private final VectorI3D scale;
 
     /**
-     * Construct a bone
+     * Construct a joint
      *
-     * @param in_name        The bone name
-     * @param in_parent      The bone parent
-     * @param in_translation The bone translation
-     * @param in_orientation The bone orientation
-     * @param in_scale       The bone scale
+     * @param in_name        The joint name
+     * @param in_parent      The joint parent
+     * @param in_translation The joint translation
+     * @param in_orientation The joint orientation
+     * @param in_scale       The joint scale
      */
 
     @JsonCreator
-    public CaV1Bone(
+    public CaV1Joint(
       @JsonProperty(value = "name", required = true)
       final String in_name,
       @JsonProperty("parent")
       final Optional<String> in_parent,
       @JsonProperty(value = "translation", required = true)
-      final PVectorI3D<CaSpaceBoneParentRelativeType> in_translation,
+      final PVectorI3D<CaSpaceJointParentRelativeType> in_translation,
       @JsonProperty(value = "orientation-xyzw", required = true)
       final QuaternionI4D in_orientation,
       @JsonProperty(value = "scale", required = true)
@@ -329,34 +329,34 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     }
 
     /**
-     * @param b A bone
+     * @param b A joint
      *
-     * @return A bone
+     * @return A joint
      */
 
-    public static CaV1Bone fromCore(
-      final CaDefinitionBone b)
+    public static CaV1Joint fromCore(
+      final CaDefinitionJoint b)
     {
-      return new CaV1Bone(
+      return new CaV1Joint(
         b.name().value(),
-        b.parent().map(CaBoneNameType::value),
+        b.parent().map(CaJointNameType::value),
         b.translation(),
         b.orientation(),
         b.scale());
     }
 
     /**
-     * @return A bone
+     * @return A joint
      */
 
-    public CaDefinitionBone toBone()
+    public CaDefinitionJoint toJoint()
     {
-      final CaDefinitionBone.Builder bb = CaDefinitionBone.builder();
-      bb.setParent(this.parent.map(CaBoneName::of));
+      final CaDefinitionJoint.Builder bb = CaDefinitionJoint.builder();
+      bb.setParent(this.parent.map(CaJointName::of));
       bb.setOrientation(this.orientation);
       bb.setTranslation(this.translation);
       bb.setScale(this.scale);
-      bb.setName(CaBoneName.of(this.name));
+      bb.setName(CaJointName.of(this.name));
       return bb.build();
     }
   }
@@ -375,14 +375,14 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
   @JsonSerialize
   public abstract static class CaV1Curve
   {
-    @JsonProperty(value = "bone", required = true)
-    private final String bone;
+    @JsonProperty(value = "joint", required = true)
+    private final String joint;
 
     protected CaV1Curve(
-      @JsonProperty(value = "bone", required = true)
-      final String in_bone)
+      @JsonProperty(value = "joint", required = true)
+      final String in_joint)
     {
-      this.bone = NullCheck.notNull(in_bone, "Bone");
+      this.joint = NullCheck.notNull(in_joint, "Joint");
     }
 
     /**
@@ -420,12 +420,12 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     private final List<CaV1KeyframeCurveOrientation> keyframes;
 
     protected CaV1CurveQuaternion(
-      @JsonProperty(value = "bone", required = true)
-      final String in_bone,
+      @JsonProperty(value = "joint", required = true)
+      final String in_joint,
       @JsonProperty(value = "keyframes", required = true)
       final List<CaV1KeyframeCurveOrientation> in_keyframes)
     {
-      super(in_bone);
+      super(in_joint);
       this.keyframes = NullCheck.notNull(in_keyframes, "Keyframes");
     }
 
@@ -439,7 +439,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       final CaDefinitionCurveOrientationType c)
     {
       return new CaV1CurveQuaternion(
-        c.bone().value(),
+        c.joint().value(),
         c.keyframes().map(CaV1KeyframeCurveOrientation::fromCore).toJavaList());
     }
 
@@ -448,7 +448,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     {
       final CaDefinitionCurveOrientation.Builder cb =
         CaDefinitionCurveOrientation.builder();
-      cb.setBone(CaBoneName.of(super.bone));
+      cb.setJoint(CaJointName.of(super.joint));
       cb.setKeyframes(this.keyframes.stream()
                         .map(CaV1KeyframeCurveOrientation::toKeyframe)
                         .collect(javaslang.collection.List.collector()));
@@ -468,12 +468,12 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     private final List<CaV1KeyframeCurveScale> keyframes;
 
     protected CaV1CurveScale(
-      @JsonProperty(value = "bone", required = true)
-      final String in_bone,
+      @JsonProperty(value = "joint", required = true)
+      final String in_joint,
       @JsonProperty(value = "keyframes", required = true)
       final List<CaV1KeyframeCurveScale> in_keyframes)
     {
-      super(in_bone);
+      super(in_joint);
       this.keyframes = NullCheck.notNull(in_keyframes, "Keyframes");
     }
 
@@ -487,7 +487,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       final CaDefinitionCurveScaleType c)
     {
       return new CaV1CurveScale(
-        c.bone().value(),
+        c.joint().value(),
         c.keyframes().map(CaV1KeyframeCurveScale::fromCore).toJavaList());
     }
 
@@ -496,7 +496,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     {
       final CaDefinitionCurveScale.Builder cb =
         CaDefinitionCurveScale.builder();
-      cb.setBone(CaBoneName.of(super.bone));
+      cb.setJoint(CaJointName.of(super.joint));
       cb.setKeyframes(this.keyframes.stream()
                         .map(CaV1KeyframeCurveScale::toKeyframe)
                         .collect(javaslang.collection.List.collector()));
@@ -516,12 +516,12 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     private final List<CaV1KeyframeCurveTranslation> keyframes;
 
     protected CaV1CurveTranslation(
-      @JsonProperty(value = "bone", required = true)
-      final String in_bone,
+      @JsonProperty(value = "joint", required = true)
+      final String in_joint,
       @JsonProperty(value = "keyframes", required = true)
       final List<CaV1KeyframeCurveTranslation> in_keyframes)
     {
-      super(in_bone);
+      super(in_joint);
       this.keyframes = NullCheck.notNull(in_keyframes, "Keyframes");
     }
 
@@ -535,7 +535,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       final CaDefinitionCurveTranslationType c)
     {
       return new CaV1CurveTranslation(
-        c.bone().value(),
+        c.joint().value(),
         c.keyframes().map(CaV1KeyframeCurveTranslation::fromCore).toJavaList());
     }
 
@@ -544,7 +544,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     {
       final CaDefinitionCurveTranslation.Builder cb =
         CaDefinitionCurveTranslation.builder();
-      cb.setBone(CaBoneName.of(super.bone));
+      cb.setJoint(CaJointName.of(super.joint));
       cb.setKeyframes(this.keyframes.stream()
                         .map(CaV1KeyframeCurveTranslation::toKeyframe)
                         .collect(javaslang.collection.List.collector()));
@@ -632,7 +632,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     @JsonProperty(value = "easing", required = true)
     private final CaCurveEasing easing;
     @JsonProperty(value = "translation", required = true)
-    private final PVectorI3D<CaSpaceBoneParentRelativeType> translation;
+    private final PVectorI3D<CaSpaceJointParentRelativeType> translation;
 
     CaV1KeyframeCurveTranslation(
       @JsonProperty(value = "index", required = true)
@@ -642,7 +642,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       @JsonProperty(value = "easing", required = true)
       final CaCurveEasing in_easing,
       @JsonProperty(value = "translation", required = true)
-      final PVectorI3D<CaSpaceBoneParentRelativeType> in_translation)
+      final PVectorI3D<CaSpaceJointParentRelativeType> in_translation)
     {
       this.index = in_index;
       this.interpolation = NullCheck.notNull(in_interpolation, "Interpolation");
@@ -757,8 +757,8 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
   {
     @JsonProperty(value = "name", required = true)
     private final String name;
-    @JsonProperty(value = "bones", required = true)
-    private final List<CaV1Bone> bones;
+    @JsonProperty(value = "joints", required = true)
+    private final List<CaV1Joint> joints;
     @JsonProperty(value = "actions", required = true)
     private final List<CaV1Action> actions;
 
@@ -766,13 +766,13 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     CaV1Skeleton(
       @JsonProperty(value = "name", required = true)
       final String in_name,
-      @JsonProperty(value = "bones", required = true)
-      final List<CaV1Bone> in_bones,
+      @JsonProperty(value = "joints", required = true)
+      final List<CaV1Joint> in_joints,
       @JsonProperty(value = "actions", required = true)
       final List<CaV1Action> in_actions)
     {
       this.name = NullCheck.notNull(in_name, "Name");
-      this.bones = NullCheck.notNull(in_bones, "Bones");
+      this.joints = NullCheck.notNull(in_joints, "Joints");
       this.actions = NullCheck.notNull(in_actions, "Actions");
 
       final Collection<String> act_names = new HashSet<>(this.actions.size());
@@ -784,25 +784,25 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
         act_names.add(act.name);
       });
 
-      final Collection<String> bone_names = new HashSet<>(this.bones.size());
-      final Collection<String> bone_dup = new HashSet<>(this.bones.size());
-      this.bones.forEach(act -> {
-        if (bone_names.contains(act.name)) {
-          bone_dup.add(act.name);
+      final Collection<String> joint_names = new HashSet<>(this.joints.size());
+      final Collection<String> joint_dup = new HashSet<>(this.joints.size());
+      this.joints.forEach(act -> {
+        if (joint_names.contains(act.name)) {
+          joint_dup.add(act.name);
         }
-        bone_names.add(act.name);
+        joint_names.add(act.name);
       });
 
-      if ((!act_dup.isEmpty()) || (!bone_dup.isEmpty())) {
+      if ((!act_dup.isEmpty()) || (!joint_dup.isEmpty())) {
         final StringBuilder b = new StringBuilder(128);
         if (!act_dup.isEmpty()) {
           b.append("Duplicate actions: ");
           b.append(act_dup.stream().collect(Collectors.joining(" ")));
           b.append(System.lineSeparator());
         }
-        if (!bone_dup.isEmpty()) {
-          b.append("Duplicate bones: ");
-          b.append(bone_dup.stream().collect(Collectors.joining(" ")));
+        if (!joint_dup.isEmpty()) {
+          b.append("Duplicate joints: ");
+          b.append(joint_dup.stream().collect(Collectors.joining(" ")));
           b.append(System.lineSeparator());
         }
         throw new IllegalArgumentException(b.toString());
@@ -820,7 +820,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     {
       return new CaV1Skeleton(
         c.name().value(),
-        c.bones().values().map(CaV1Bone::fromCore).toJavaList(),
+        c.joints().values().map(CaV1Joint::fromCore).toJavaList(),
         c.actions().values().map(CaV1Action::fromCore).toJavaList());
     }
 
@@ -836,10 +836,10 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
                         .map(CaV1Action::toAction)
                         .collect(javaslang.collection.List.collector())
                         .toMap(act -> Tuple.of(act.name(), act)));
-      sk_b.setBones(this.bones.stream()
-                      .map(CaV1Bone::toBone)
-                      .collect(javaslang.collection.List.collector())
-                      .toMap(bone -> Tuple.of(bone.name(), bone)));
+      sk_b.setJoints(this.joints.stream()
+                       .map(CaV1Joint::toJoint)
+                       .collect(javaslang.collection.List.collector())
+                       .toMap(joint -> Tuple.of(joint.name(), joint)));
       return sk_b.build();
     }
   }
@@ -860,24 +860,6 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       super(PVectorI3D.class);
     }
 
-    @Override
-    public CaCurveInterpolation deserialize(
-      final JsonParser p,
-      final DeserializationContext ctxt)
-      throws IOException, JsonProcessingException
-    {
-      final TreeNode n = p.getCodec().readTree(p);
-      if (n instanceof TextNode) {
-        try {
-          return CaCurveInterpolation.of(((TextNode) n).asText());
-        } catch (final IllegalArgumentException e) {
-          throw error(ctxt, n);
-        }
-      }
-
-      throw error(ctxt, n);
-    }
-
     private static JsonMappingException error(
       final DeserializationContext ctxt,
       final TreeNode n)
@@ -894,6 +876,24 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
           .collect(Collectors.joining("|")));
       sb.append(System.lineSeparator());
       return ctxt.mappingException(sb.toString());
+    }
+
+    @Override
+    public CaCurveInterpolation deserialize(
+      final JsonParser p,
+      final DeserializationContext ctxt)
+      throws IOException, JsonProcessingException
+    {
+      final TreeNode n = p.getCodec().readTree(p);
+      if (n instanceof TextNode) {
+        try {
+          return CaCurveInterpolation.of(((TextNode) n).asText());
+        } catch (final IllegalArgumentException e) {
+          throw error(ctxt, n);
+        }
+      }
+
+      throw error(ctxt, n);
     }
   }
 

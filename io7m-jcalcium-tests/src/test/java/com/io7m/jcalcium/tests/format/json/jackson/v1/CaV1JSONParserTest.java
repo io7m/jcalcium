@@ -17,10 +17,10 @@
 package com.io7m.jcalcium.tests.format.json.jackson.v1;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBoneType;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJointType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
@@ -93,20 +93,20 @@ public final class CaV1JSONParserTest
   }
 
   @Test
-  public void testBone0()
+  public void testJoint0()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("bone0.csj"), uri("bone0.csj"));
+      p.parseSkeletonFromStream(resource("joint0.csj"), uri("joint0.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
     final CaDefinitionSkeletonType s = r.get();
-    Assert.assertEquals("bone0", s.name().value());
-    Assert.assertEquals(1L, (long) s.bones().size());
+    Assert.assertEquals("joint0", s.name().value());
+    Assert.assertEquals(1L, (long) s.joints().size());
 
-    final CaDefinitionBoneType b = s.bones().get(CaBoneName.of("bone.000")).get();
-    Assert.assertEquals("bone.000", b.name().value());
+    final CaDefinitionJointType b = s.joints().get(CaJointName.of("joint.000")).get();
+    Assert.assertEquals("joint.000", b.name().value());
 
     Assert.assertEquals(0.0, b.translation().getXD(), 0.0);
     Assert.assertEquals(1.0, b.translation().getYD(), 0.0);
@@ -123,21 +123,21 @@ public final class CaV1JSONParserTest
   }
 
   @Test
-  public void testBone1()
+  public void testJoint1()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("bone1.csj"), uri("bone1.csj"));
+      p.parseSkeletonFromStream(resource("joint1.csj"), uri("joint1.csj"));
 
     dump(r);
     Assert.assertTrue(r.isValid());
     final CaDefinitionSkeleton s = r.get();
-    Assert.assertEquals("bone1", s.name().value());
-    Assert.assertEquals(1L, (long) s.bones().size());
+    Assert.assertEquals("joint1", s.name().value());
+    Assert.assertEquals(1L, (long) s.joints().size());
 
-    final CaDefinitionBoneType b = s.bones().get(CaBoneName.of("bone.000")).get();
-    Assert.assertEquals("bone.000", b.name().value());
-    Assert.assertEquals("bone.001", b.parent().get().value());
+    final CaDefinitionJointType b = s.joints().get(CaJointName.of("joint.000")).get();
+    Assert.assertEquals("joint.000", b.name().value());
+    Assert.assertEquals("joint.001", b.parent().get().value());
 
     Assert.assertEquals(0.0, b.translation().getXD(), 0.0);
     Assert.assertEquals(1.0, b.translation().getYD(), 0.0);
@@ -185,7 +185,7 @@ public final class CaV1JSONParserTest
     Assert.assertEquals(1L, (long) act.curves().size());
 
     final List<CaDefinitionCurveType> cs =
-      act.curves().get(CaBoneName.of("bone.000")).get();
+      act.curves().get(CaJointName.of("joint.000")).get();
     Assert.assertEquals(1L, (long) cs.size());
 
     final CaDefinitionCurveTranslationType c =
@@ -219,7 +219,7 @@ public final class CaV1JSONParserTest
     Assert.assertEquals(1L, (long) act.curves().size());
 
     final List<CaDefinitionCurveType> cs =
-      act.curves().get(CaBoneName.of("bone.000")).get();
+      act.curves().get(CaJointName.of("joint.000")).get();
     Assert.assertEquals(1L, (long) cs.size());
 
     final CaDefinitionCurveScaleType c =
@@ -253,7 +253,7 @@ public final class CaV1JSONParserTest
     Assert.assertEquals(1L, (long) act.curves().size());
 
     final List<CaDefinitionCurveType> cs =
-      act.curves().get(CaBoneName.of("bone.000")).get();
+      act.curves().get(CaJointName.of("joint.000")).get();
     Assert.assertEquals(1L, (long) cs.size());
 
     final CaDefinitionCurveOrientationType c =
@@ -284,11 +284,11 @@ public final class CaV1JSONParserTest
   }
 
   @Test
-  public void testDuplicateBone()
+  public void testDuplicateJoint()
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("dup_bone.csj"), uri("dup_bone.csj"));
+      p.parseSkeletonFromStream(resource("dup_joint.csj"), uri("dup_joint.csj"));
 
     dump(r);
     Assert.assertFalse(r.isValid());

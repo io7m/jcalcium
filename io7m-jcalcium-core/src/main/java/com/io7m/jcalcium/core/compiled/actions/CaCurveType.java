@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jfunctional.PartialBiFunctionType;
 
 /**
@@ -57,8 +57,8 @@ public interface CaCurveType
   CaActionName action();
 
   /**
-   * @return The name of the bone to which the curve refers
+   * @return The name of the joint to which the curve refers
    */
 
-  CaBoneName bone();
+  CaJointName joint();
 }

@@ -1,10 +1,10 @@
 package com.io7m.jcalcium.tests;
 
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
@@ -83,10 +83,10 @@ public final class EvaluateRestPose
         CaSkeletonRestPose.createD(skel);
 
       final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
-      skel.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
-        final CaBone bone = node.value();
-        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType> m =
-          transforms.transformAbsolute4x4D(bone.id());
+      skel.joints().forEachBreadthFirst(unit(), (input, depth, node) -> {
+        final CaJoint joint = node.value();
+        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> m =
+          transforms.transformAbsolute4x4D(joint.id());
         final VectorM4D out = new VectorM4D();
         MatrixM4x4D.multiplyVector4D(
           context,

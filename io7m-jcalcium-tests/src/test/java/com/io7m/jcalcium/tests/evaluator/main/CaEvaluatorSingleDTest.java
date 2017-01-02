@@ -17,11 +17,11 @@
 package com.io7m.jcalcium.tests.evaluator.main;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -30,7 +30,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedBoneDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jorchard.core.JOTreeNode;
@@ -42,7 +42,6 @@ import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorM4D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
-import com.io7m.junreachable.UnimplementedCodeException;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
 import javaslang.collection.TreeMap;
@@ -57,55 +56,55 @@ public final class CaEvaluatorSingleDTest
   @Test
   public void testTransforms()
   {
-    SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bones_by_id = TreeMap.empty();
-    SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bones_by_name = TreeMap.empty();
+    SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> joints_by_id = TreeMap.empty();
+    SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> joints_by_name = TreeMap.empty();
 
-    final CaBone bone_0 = CaBone.of(
-      CaBoneName.of("bone.000"),
+    final CaJoint joint_0 = CaJoint.of(
+      CaJointName.of("joint.000"),
       0,
       new PVectorI3D<>(0.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_1 = CaBone.of(
-      CaBoneName.of("bone.001"),
+    final CaJoint joint_1 = CaJoint.of(
+      CaJointName.of("joint.001"),
       1,
       new PVectorI3D<>(1.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_2 = CaBone.of(
-      CaBoneName.of("bone.002"),
+    final CaJoint joint_2 = CaJoint.of(
+      CaJointName.of("joint.002"),
       2,
       new PVectorI3D<>(1.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_3 = CaBone.of(
-      CaBoneName.of("bone.003"),
+    final CaJoint joint_3 = CaJoint.of(
+      CaJointName.of("joint.003"),
       3,
       new PVectorI3D<>(1.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final JOTreeNodeType<CaBone> node_0 = JOTreeNode.create(bone_0);
-    final JOTreeNodeType<CaBone> node_1 = JOTreeNode.create(bone_1);
-    final JOTreeNodeType<CaBone> node_2 = JOTreeNode.create(bone_2);
-    final JOTreeNodeType<CaBone> node_3 = JOTreeNode.create(bone_3);
+    final JOTreeNodeType<CaJoint> node_0 = JOTreeNode.create(joint_0);
+    final JOTreeNodeType<CaJoint> node_1 = JOTreeNode.create(joint_1);
+    final JOTreeNodeType<CaJoint> node_2 = JOTreeNode.create(joint_2);
+    final JOTreeNodeType<CaJoint> node_3 = JOTreeNode.create(joint_3);
 
     node_0.childAdd(node_1);
     node_1.childAdd(node_2);
     node_2.childAdd(node_3);
 
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_0.id()), node_0);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_1.id()), node_1);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_2.id()), node_2);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_3.id()), node_3);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_0.id()), node_0);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_1.id()), node_1);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_2.id()), node_2);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_3.id()), node_3);
 
-    bones_by_name = bones_by_name.put(bone_0.name(), node_0);
-    bones_by_name = bones_by_name.put(bone_1.name(), node_1);
-    bones_by_name = bones_by_name.put(bone_2.name(), node_2);
-    bones_by_name = bones_by_name.put(bone_3.name(), node_3);
+    joints_by_name = joints_by_name.put(joint_0.name(), node_0);
+    joints_by_name = joints_by_name.put(joint_1.name(), node_1);
+    joints_by_name = joints_by_name.put(joint_2.name(), node_2);
+    joints_by_name = joints_by_name.put(joint_3.name(), node_3);
 
     SortedMap<CaActionName, CaActionType> actions_by_name = TreeMap.empty();
     final CaActionCurves act;
@@ -120,14 +119,14 @@ public final class CaEvaluatorSingleDTest
 
       final CaCurveTranslation.Builder curve_b = CaCurveTranslation.builder();
       curve_b.setAction(CaActionName.of("act"));
-      curve_b.setBone(CaBoneName.of("bone.000"));
+      curve_b.setJoint(CaJointName.of("joint.000"));
       curve_b.setKeyframes(TreeMap.of(
         Integer.valueOf(curve_kf.index()),
         curve_kf));
       final CaCurveTranslation curve = curve_b.build();
 
-      SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
-      curves = curves.put(CaBoneName.of("bone.000"), Vector.of(curve));
+      SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
+      curves = curves.put(CaJointName.of("joint.000"), Vector.of(curve));
 
       final CaActionCurves.Builder act_b = CaActionCurves.builder();
       act_b.setName(CaActionName.of("act"));
@@ -140,7 +139,7 @@ public final class CaEvaluatorSingleDTest
 
     final CaSkeleton.Builder cb = CaSkeleton.builder();
     cb.setName(CaSkeletonName.of("skeleton"));
-    cb.setBones(node_0);
+    cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
     final CaSkeleton skeleton = cb.build();
@@ -149,31 +148,31 @@ public final class CaEvaluatorSingleDTest
 
     eval.evaluateForGlobalFrame(0L, 0L, 1.0);
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_bones =
-      eval.evaluatedBonesD();
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
+      eval.evaluatedJointsD();
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_0 =
-      eval_bones;
-    final CaEvaluatedBoneDType eval_bone_0 = eval_node_0.value();
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+      eval_joints;
+    final CaEvaluatedJointDType eval_joint_0 = eval_node_0.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_1 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_1 = eval_node_1.value();
+    final CaEvaluatedJointDType eval_joint_1 = eval_node_1.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_2 = eval_node_2.value();
+    final CaEvaluatedJointDType eval_joint_2 = eval_node_2.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_3 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_3 =
       eval_node_2.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_3 = eval_node_3.value();
+    final CaEvaluatedJointDType eval_joint_3 = eval_node_3.value();
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final VectorM4D output = new VectorM4D();
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_0.transformAbsolute4x4D(),
+      eval_joint_0.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -183,7 +182,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_1.transformAbsolute4x4D(),
+      eval_joint_1.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -193,7 +192,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_2.transformAbsolute4x4D(),
+      eval_joint_2.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(2.0, output.getXD(), DELTA);
@@ -203,7 +202,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_3.transformAbsolute4x4D(),
+      eval_joint_3.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(3.0, output.getXD(), DELTA);
@@ -213,50 +212,50 @@ public final class CaEvaluatorSingleDTest
   }
 
   /**
-   * Translating the root bone results in a correctly translated transform
-   * for all bones.
+   * Translating the root joint results in a correctly translated transform
+   * for all joints.
    */
 
   @Test
   public void testTranslateThree()
   {
-    SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bones_by_id = TreeMap.empty();
-    SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bones_by_name = TreeMap.empty();
+    SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> joints_by_id = TreeMap.empty();
+    SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> joints_by_name = TreeMap.empty();
 
-    final CaBone bone_0 = CaBone.of(
-      CaBoneName.of("bone.000"),
+    final CaJoint joint_0 = CaJoint.of(
+      CaJointName.of("joint.000"),
       0,
       new PVectorI3D<>(0.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_1 = CaBone.of(
-      CaBoneName.of("bone.001"),
+    final CaJoint joint_1 = CaJoint.of(
+      CaJointName.of("joint.001"),
       1,
       new PVectorI3D<>(0.0, 0.0, -1.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_2 = CaBone.of(
-      CaBoneName.of("bone.002"),
+    final CaJoint joint_2 = CaJoint.of(
+      CaJointName.of("joint.002"),
       2,
       new PVectorI3D<>(0.0, 0.0, -1.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final JOTreeNodeType<CaBone> node_0 = JOTreeNode.create(bone_0);
-    final JOTreeNodeType<CaBone> node_1 = JOTreeNode.create(bone_1);
-    final JOTreeNodeType<CaBone> node_2 = JOTreeNode.create(bone_2);
+    final JOTreeNodeType<CaJoint> node_0 = JOTreeNode.create(joint_0);
+    final JOTreeNodeType<CaJoint> node_1 = JOTreeNode.create(joint_1);
+    final JOTreeNodeType<CaJoint> node_2 = JOTreeNode.create(joint_2);
     node_0.childAdd(node_1);
     node_1.childAdd(node_2);
 
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_0.id()), node_0);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_1.id()), node_1);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_2.id()), node_2);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_0.id()), node_0);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_1.id()), node_1);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_2.id()), node_2);
 
-    bones_by_name = bones_by_name.put(bone_0.name(), node_0);
-    bones_by_name = bones_by_name.put(bone_1.name(), node_1);
-    bones_by_name = bones_by_name.put(bone_2.name(), node_2);
+    joints_by_name = joints_by_name.put(joint_0.name(), node_0);
+    joints_by_name = joints_by_name.put(joint_1.name(), node_1);
+    joints_by_name = joints_by_name.put(joint_2.name(), node_2);
 
     SortedMap<CaActionName, CaActionType> actions_by_name = TreeMap.empty();
     final CaActionCurves act;
@@ -285,12 +284,12 @@ public final class CaEvaluatorSingleDTest
 
       final CaCurveTranslation.Builder curve_b = CaCurveTranslation.builder();
       curve_b.setAction(CaActionName.of("act"));
-      curve_b.setBone(bone_0.name());
+      curve_b.setJoint(joint_0.name());
       curve_b.setKeyframes(keyframes);
       final CaCurveTranslation curve = curve_b.build();
 
-      SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
-      curves = curves.put(bone_0.name(), Vector.of(curve));
+      SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
+      curves = curves.put(joint_0.name(), Vector.of(curve));
 
       final CaActionCurves.Builder act_b = CaActionCurves.builder();
       act_b.setName(CaActionName.of("act"));
@@ -303,26 +302,26 @@ public final class CaEvaluatorSingleDTest
 
     final CaSkeleton.Builder cb = CaSkeleton.builder();
     cb.setName(CaSkeletonName.of("skeleton"));
-    cb.setBones(node_0);
+    cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
     final CaSkeleton skeleton = cb.build();
     final CaEvaluatorSingleDType eval =
       CaEvaluatorSingleD.create(skeleton, act, 60);
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_bones =
-      eval.evaluatedBonesD();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_0 =
-      eval_bones;
-    final CaEvaluatedBoneDType eval_bone_0 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
+      eval.evaluatedJointsD();
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+      eval_joints;
+    final CaEvaluatedJointDType eval_joint_0 =
       eval_node_0.value();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_1 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_1 =
+    final CaEvaluatedJointDType eval_joint_1 =
       eval_node_1.value();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_2 =
+    final CaEvaluatedJointDType eval_joint_2 =
       eval_node_2.value();
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
@@ -332,7 +331,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_0.transformAbsolute4x4D(),
+      eval_joint_0.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -342,7 +341,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_1.transformAbsolute4x4D(),
+      eval_joint_1.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -352,7 +351,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_2.transformAbsolute4x4D(),
+      eval_joint_2.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -364,7 +363,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_0.transformAbsolute4x4D(),
+      eval_joint_0.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -374,7 +373,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_1.transformAbsolute4x4D(),
+      eval_joint_1.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -384,7 +383,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_2.transformAbsolute4x4D(),
+      eval_joint_2.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -394,50 +393,50 @@ public final class CaEvaluatorSingleDTest
   }
 
   /**
-   * Rotating the root bone results in a correctly rotated transform
-   * for all bones.
+   * Rotating the root joint results in a correctly rotated transform
+   * for all joints.
    */
 
   @Test
   public void testRotateThree()
   {
-    SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bones_by_id = TreeMap.empty();
-    SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bones_by_name = TreeMap.empty();
+    SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> joints_by_id = TreeMap.empty();
+    SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> joints_by_name = TreeMap.empty();
 
-    final CaBone bone_0 = CaBone.of(
-      CaBoneName.of("bone.000"),
+    final CaJoint joint_0 = CaJoint.of(
+      CaJointName.of("joint.000"),
       0,
       new PVectorI3D<>(0.0, 0.0, 0.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_1 = CaBone.of(
-      CaBoneName.of("bone.001"),
+    final CaJoint joint_1 = CaJoint.of(
+      CaJointName.of("joint.001"),
       1,
       new PVectorI3D<>(0.0, 0.0, -1.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final CaBone bone_2 = CaBone.of(
-      CaBoneName.of("bone.002"),
+    final CaJoint joint_2 = CaJoint.of(
+      CaJointName.of("joint.002"),
       2,
       new PVectorI3D<>(0.0, 0.0, -1.0),
       new QuaternionI4D(),
       new VectorI3D(1.0, 1.0, 1.0));
 
-    final JOTreeNodeType<CaBone> node_0 = JOTreeNode.create(bone_0);
-    final JOTreeNodeType<CaBone> node_1 = JOTreeNode.create(bone_1);
-    final JOTreeNodeType<CaBone> node_2 = JOTreeNode.create(bone_2);
+    final JOTreeNodeType<CaJoint> node_0 = JOTreeNode.create(joint_0);
+    final JOTreeNodeType<CaJoint> node_1 = JOTreeNode.create(joint_1);
+    final JOTreeNodeType<CaJoint> node_2 = JOTreeNode.create(joint_2);
     node_0.childAdd(node_1);
     node_1.childAdd(node_2);
 
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_0.id()), node_0);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_1.id()), node_1);
-    bones_by_id = bones_by_id.put(Integer.valueOf(bone_2.id()), node_2);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_0.id()), node_0);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_1.id()), node_1);
+    joints_by_id = joints_by_id.put(Integer.valueOf(joint_2.id()), node_2);
 
-    bones_by_name = bones_by_name.put(bone_0.name(), node_0);
-    bones_by_name = bones_by_name.put(bone_1.name(), node_1);
-    bones_by_name = bones_by_name.put(bone_2.name(), node_2);
+    joints_by_name = joints_by_name.put(joint_0.name(), node_0);
+    joints_by_name = joints_by_name.put(joint_1.name(), node_1);
+    joints_by_name = joints_by_name.put(joint_2.name(), node_2);
 
     SortedMap<CaActionName, CaActionType> actions_by_name = TreeMap.empty();
     final CaActionCurves act;
@@ -479,12 +478,12 @@ public final class CaEvaluatorSingleDTest
 
       final CaCurveOrientation.Builder curve_b = CaCurveOrientation.builder();
       curve_b.setAction(CaActionName.of("act"));
-      curve_b.setBone(bone_0.name());
+      curve_b.setJoint(joint_0.name());
       curve_b.setKeyframes(keyframes);
       final CaCurveOrientation curve = curve_b.build();
 
-      SortedMap<CaBoneName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
-      curves = curves.put(bone_0.name(), Vector.of(curve));
+      SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
+      curves = curves.put(joint_0.name(), Vector.of(curve));
 
       final CaActionCurves.Builder act_b = CaActionCurves.builder();
       act_b.setName(CaActionName.of("act"));
@@ -497,26 +496,26 @@ public final class CaEvaluatorSingleDTest
 
     final CaSkeleton.Builder cb = CaSkeleton.builder();
     cb.setName(CaSkeletonName.of("skeleton"));
-    cb.setBones(node_0);
+    cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
     final CaSkeleton skeleton = cb.build();
     final CaEvaluatorSingleDType eval =
       CaEvaluatorSingleD.create(skeleton, act, 60);
 
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_bones =
-      eval.evaluatedBonesD();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_0 =
-      eval_bones;
-    final CaEvaluatedBoneDType eval_bone_0 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
+      eval.evaluatedJointsD();
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+      eval_joints;
+    final CaEvaluatedJointDType eval_joint_0 =
       eval_node_0.value();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_1 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_1 =
+    final CaEvaluatedJointDType eval_joint_1 =
       eval_node_1.value();
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedBoneDType eval_bone_2 =
+    final CaEvaluatedJointDType eval_joint_2 =
       eval_node_2.value();
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
@@ -526,7 +525,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_0.transformAbsolute4x4D(),
+      eval_joint_0.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -536,7 +535,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_1.transformAbsolute4x4D(),
+      eval_joint_1.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -546,7 +545,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_2.transformAbsolute4x4D(),
+      eval_joint_2.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -558,7 +557,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_0.transformAbsolute4x4D(),
+      eval_joint_0.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -568,7 +567,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_1.transformAbsolute4x4D(),
+      eval_joint_1.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(-1.0, output.getXD(), DELTA);
@@ -578,7 +577,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_bone_2.transformAbsolute4x4D(),
+      eval_joint_2.transformAbsolute4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(-2.0, output.getXD(), DELTA);

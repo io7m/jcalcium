@@ -19,8 +19,8 @@ package com.io7m.jcalcium.tests.loader.api;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.CaJointName;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
@@ -141,20 +141,20 @@ public abstract class CaLoaderContract
     }
 
     {
-      final SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> l_bones =
-        sk_l.bonesByName();
-      final SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> c_bones =
-        sk_c.bonesByName();
-      Assert.assertEquals((long) c_bones.size(), (long) l_bones.size());
+      final SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> l_joints =
+        sk_l.jointsByName();
+      final SortedMap<CaJointName, JOTreeNodeReadableType<CaJoint>> c_joints =
+        sk_c.jointsByName();
+      Assert.assertEquals((long) c_joints.size(), (long) l_joints.size());
 
-      for (final CaBoneName id : c_bones.keySet()) {
-        final JOTreeNodeReadableType<CaBone> c_node = c_bones.get(id).get();
-        final JOTreeNodeReadableType<CaBone> l_node = l_bones.get(id).get();
+      for (final CaJointName id : c_joints.keySet()) {
+        final JOTreeNodeReadableType<CaJoint> c_node = c_joints.get(id).get();
+        final JOTreeNodeReadableType<CaJoint> l_node = l_joints.get(id).get();
         Assert.assertEquals(c_node.value(), l_node.value());
 
         if (c_node.parentReadable().isPresent()) {
-          final CaBone c_parent = c_node.parentReadable().get().value();
-          final CaBone l_parent = l_node.parentReadable().get().value();
+          final CaJoint c_parent = c_node.parentReadable().get().value();
+          final CaJoint l_parent = l_node.parentReadable().get().value();
           Assert.assertEquals(c_parent, l_parent);
         }
 
@@ -165,20 +165,20 @@ public abstract class CaLoaderContract
     }
 
     {
-      final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> l_bones =
-        sk_l.bonesByID();
-      final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> c_bones =
-        sk_c.bonesByID();
-      Assert.assertEquals((long) c_bones.size(), (long) l_bones.size());
+      final SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> l_joints =
+        sk_l.jointsByID();
+      final SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> c_joints =
+        sk_c.jointsByID();
+      Assert.assertEquals((long) c_joints.size(), (long) l_joints.size());
 
-      for (final Integer id : c_bones.keySet()) {
-        final JOTreeNodeReadableType<CaBone> c_node = c_bones.get(id).get();
-        final JOTreeNodeReadableType<CaBone> l_node = l_bones.get(id).get();
+      for (final Integer id : c_joints.keySet()) {
+        final JOTreeNodeReadableType<CaJoint> c_node = c_joints.get(id).get();
+        final JOTreeNodeReadableType<CaJoint> l_node = l_joints.get(id).get();
         Assert.assertEquals(c_node.value(), l_node.value());
 
         if (c_node.parentReadable().isPresent()) {
-          final CaBone c_parent = c_node.parentReadable().get().value();
-          final CaBone l_parent = l_node.parentReadable().get().value();
+          final CaJoint c_parent = c_node.parentReadable().get().value();
+          final CaJoint l_parent = l_node.parentReadable().get().value();
           Assert.assertEquals(c_parent, l_parent);
         }
 

@@ -16,41 +16,41 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
-import com.io7m.jtensors.QuaternionReadable4FType;
-import com.io7m.jtensors.VectorReadable3FType;
-import com.io7m.jtensors.parameterized.PMatrixReadable4x4FType;
-import com.io7m.jtensors.parameterized.PVectorReadable3FType;
+import com.io7m.jtensors.QuaternionReadable4DType;
+import com.io7m.jtensors.VectorReadable3DType;
+import com.io7m.jtensors.parameterized.PMatrixReadable4x4DType;
+import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 
 /**
- * The type of evaluated bones with single-precision components.
+ * The type of evaluated joints with double-precision components.
  */
 
-public interface CaEvaluatedBoneFType extends CaEvaluatedBoneType
+public interface CaEvaluatedJointDType extends CaEvaluatedJointType
 {
   /**
-   * @return The absolute transform for the bone
+   * @return The absolute transform for the joint
    */
 
-  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceBoneAbsoluteType> absoluteTransform4x4F();
+  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4D();
 
   /**
-   * @return The parent-relative offset for the bone
+   * @return The parent-relative offset for the joint
    */
 
-  PVectorReadable3FType<CaSpaceBoneParentRelativeType> translation3F();
+  PVectorReadable3DType<CaSpaceJointParentRelativeType> translation3D();
 
   /**
-   * @return The parent-relative orientation of the bone
+   * @return The parent-relative orientation of the joint
    */
 
-  QuaternionReadable4FType orientation4F();
+  QuaternionReadable4DType orientation4D();
 
   /**
-   * @return The parent-relative scale of the bone
+   * @return The parent-relative scale of the joint
    */
 
-  VectorReadable3FType scale3F();
+  VectorReadable3DType scale3D();
 }

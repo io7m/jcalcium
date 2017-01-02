@@ -17,9 +17,9 @@
 package com.io7m.jcalcium.generators;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
@@ -50,18 +50,18 @@ public final class CaDefinitionSkeletonGenerator
   }
 
   private final CaSkeletonNameGenerator name_gen;
-  private final BoneTree tree;
+  private final JointTree tree;
   private final CaDefinitionActionGenerator act_gen;
   private final IntegerGenerator act_count_gen;
 
   /**
    * Construct a generator.
    *
-   * @param in_tree A bone tree
+   * @param in_tree A joint tree
    */
 
   public CaDefinitionSkeletonGenerator(
-    final BoneTree in_tree)
+    final JointTree in_tree)
   {
     this.name_gen = new CaSkeletonNameGenerator();
     this.act_gen = new CaDefinitionActionGenerator(in_tree);
@@ -72,18 +72,18 @@ public final class CaDefinitionSkeletonGenerator
   @Override
   public CaDefinitionSkeleton next()
   {
-    final Map<CaBoneName, CaDefinitionBone> bones = this.tree.nodes().map(
-      (bone_name, bone_node) -> Tuple.of(bone_name, bone_node.value()));
+    final Map<CaJointName, CaDefinitionJoint> joints = this.tree.nodes().map(
+      (joint_name, joint_node) -> Tuple.of(joint_name, joint_node.value()));
 
     final Map<CaActionName, CaDefinitionActionType> actions =
-      this.tree.nodes().map((bone_name, bone_node) -> {
+      this.tree.nodes().map((joint_name, joint_node) -> {
         final CaDefinitionActionType act = this.act_gen.next();
         return Tuple.of(act.name(), act);
       });
 
     final CaSkeletonName skeleton_name = this.name_gen.next();
     LOG.trace("generated skeleton: {}", skeleton_name.value());
-    LOG.trace("bones:   {}", Integer.valueOf(bones.size()));
+    LOG.trace("joints:   {}", Integer.valueOf(joints.size()));
 
     final AtomicInteger curve_count = new AtomicInteger(0);
     for (final CaActionName name : actions.keySet()) {
@@ -96,9 +96,9 @@ public final class CaDefinitionSkeletonGenerator
           curve_count.addAndGet(curves.size());
           curves.forEach(curve -> {
             LOG.trace(
-              "action: {} bone {} curve type {}",
+              "action: {} joint {} curve type {}",
               name.value(),
-              curve.bone().value(),
+              curve.joint().value(),
               curve.getClass().getSimpleName());
           });
         });
@@ -111,7 +111,7 @@ public final class CaDefinitionSkeletonGenerator
 
     final CaDefinitionSkeleton.Builder sb = CaDefinitionSkeleton.builder();
     sb.setName(skeleton_name);
-    sb.setBones(bones);
+    sb.setJoints(joints);
     sb.setActions(actions);
     return sb.build();
   }

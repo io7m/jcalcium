@@ -23,7 +23,7 @@ import com.beust.jcommander.Parameters;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
 import com.io7m.jcalcium.compiler.main.CaCompiler;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaFormatDescriptionType;
@@ -615,7 +615,7 @@ public final class Main implements Runnable
       LOG.debug(
         "parsed skeleton: {}, {} bones, {} actions",
         sk.name().value(),
-        Integer.valueOf(sk.bones().size()),
+        Integer.valueOf(sk.joints().size()),
         Integer.valueOf(sk.actions().size()));
     }
   }
@@ -708,13 +708,13 @@ public final class Main implements Runnable
         }
 
         final CaSkeleton compiled = compile_result.get();
-        compiled.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {
-          final CaBone bone = node.value();
+        compiled.joints().forEachBreadthFirst(unit(), (input, depth, node) -> {
+          final CaJoint bone = node.value();
 
-          final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
+          final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
             node.parentReadable();
           if (parent_opt.isPresent()) {
-            final JOTreeNodeReadableType<CaBone> parent = parent_opt.get();
+            final JOTreeNodeReadableType<CaJoint> parent = parent_opt.get();
             LOG.debug(
               "{}:{}:{}:{}",
               Integer.valueOf(depth),

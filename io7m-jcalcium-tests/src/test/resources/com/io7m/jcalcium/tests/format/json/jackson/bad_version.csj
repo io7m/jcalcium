@@ -2,7 +2,7 @@
   "version": "BAD VERSION",
   "skeleton": {
     "name": "empty",
-    "bones": [
+    "joints": [
     ],
     "actions": [
     ]

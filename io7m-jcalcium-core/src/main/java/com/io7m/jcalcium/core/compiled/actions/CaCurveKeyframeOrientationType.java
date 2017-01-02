@@ -23,7 +23,7 @@ import com.io7m.jtensors.QuaternionI4D;
 import org.immutables.value.Value;
 
 /**
- * A keyframe for a curve that affects the orientation of a bone.
+ * A keyframe for a curve that affects the orientation of a joint.
  */
 
 @CaImmutableStyleType

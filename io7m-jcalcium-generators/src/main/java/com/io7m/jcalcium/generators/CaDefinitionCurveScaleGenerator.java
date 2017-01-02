@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeScale;
@@ -35,7 +35,7 @@ import java.util.Collections;
 
 public final class CaDefinitionCurveScaleGenerator implements Generator<CaDefinitionCurveScale>
 {
-  private final BoneTree tree;
+  private final JointTree tree;
   private final Generator<CaCurveInterpolation> interp_gen;
   private final Generator<CaCurveEasing> easing_gen;
   private final VectorI3DGenerator vec_gen;
@@ -53,7 +53,7 @@ public final class CaDefinitionCurveScaleGenerator implements Generator<CaDefini
     final Generator<CaCurveInterpolation> in_interp_gen,
     final Generator<CaCurveEasing> in_easing_gen,
     final VectorI3DGenerator in_vec_gen,
-    final BoneTree in_tree)
+    final JointTree in_tree)
   {
     this.tree = NullCheck.notNull(in_tree, "Tree");
     this.vec_gen = NullCheck.notNull(in_vec_gen, "VectorI3DGenerator");
@@ -81,13 +81,13 @@ public final class CaDefinitionCurveScaleGenerator implements Generator<CaDefini
     final CaDefinitionCurveScale.Builder b =
       CaDefinitionCurveScale.builder();
 
-    final java.util.List<CaBoneName> names_mut =
+    final java.util.List<CaJointName> names_mut =
       List.ofAll(this.tree.nodes().keySet()).toJavaList();
     Collections.shuffle(names_mut);
-    final List<CaBoneName> names = List.ofAll(names_mut);
+    final List<CaJointName> names = List.ofAll(names_mut);
 
-    final CaBoneName bone_name = names.head();
-    b.setBone(bone_name);
+    final CaJointName joint_name = names.head();
+    b.setJoint(joint_name);
     b.setKeyframes(keyframes);
     return b.build();
   }

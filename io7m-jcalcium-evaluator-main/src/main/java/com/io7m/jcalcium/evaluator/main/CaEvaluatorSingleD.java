@@ -16,15 +16,15 @@
 
 package com.io7m.jcalcium.evaluator.main;
 
-import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.CaJointName;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedBoneDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
@@ -59,14 +59,14 @@ import static com.io7m.jfunctional.Unit.unit;
 
 public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
 {
-  private final JOTreeNodeType<BoneStateD> bone_states;
-  private final JOTreeNodeReadableType<CaEvaluatedBoneDType> bone_states_view;
+  private final JOTreeNodeType<JointStateD> joint_states;
+  private final JOTreeNodeReadableType<CaEvaluatedJointDType> joint_states_view;
   private final Matrix4x4DType m_translation;
   private final Matrix4x4DType m_orientation;
   private final Matrix4x4DType m_scale;
   private final Matrix4x4DType m_accumulated;
-  private final Int2ReferenceSortedMap<BoneStateD> bone_states_by_id;
-  private final Int2ReferenceSortedMap<CaEvaluatedBoneDType> bone_states_by_id_view;
+  private final Int2ReferenceSortedMap<JointStateD> joint_states_by_id;
+  private final Int2ReferenceSortedMap<CaEvaluatedJointDType> joint_states_by_id_view;
   private ActionKind kind;
   private CaActionEvaluatorCurvesDType eval_curves;
   private long frame_start;
@@ -81,35 +81,35 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     NullCheck.notNull(in_skeleton, "Skeleton");
     NullCheck.notNull(in_action, "Action");
 
-    this.bone_states_by_id =
+    this.joint_states_by_id =
       new Int2ReferenceRBTreeMap<>();
-    this.bone_states_by_id_view =
-      Int2ReferenceSortedMaps.unmodifiable(castMap(this.bone_states_by_id));
+    this.joint_states_by_id_view =
+      Int2ReferenceSortedMaps.unmodifiable(castMap(this.joint_states_by_id));
 
-    this.bone_states = in_skeleton.bones().mapBreadthFirst(
+    this.joint_states = in_skeleton.joints().mapBreadthFirst(
       unit(), (input, depth, node) -> {
-        final CaBone c_bone = node.value();
+        final CaJoint c_joint = node.value();
 
-        final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
+        final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
           node.parentReadable();
 
-        final OptionalInt c_bone_parent;
+        final OptionalInt c_joint_parent;
         if (parent_opt.isPresent()) {
-          c_bone_parent = OptionalInt.of(parent_opt.get().value().id());
+          c_joint_parent = OptionalInt.of(parent_opt.get().value().id());
         } else {
-          c_bone_parent = OptionalInt.empty();
+          c_joint_parent = OptionalInt.empty();
         }
 
-        final BoneStateD c_bone_state =
-          new BoneStateD(c_bone.name(), c_bone.id(), c_bone_parent);
-        this.bone_states_by_id.put(node.value().id(), c_bone_state);
-        return c_bone_state;
+        final JointStateD c_joint_state =
+          new JointStateD(c_joint.name(), c_joint.id(), c_joint_parent);
+        this.joint_states_by_id.put(node.value().id(), c_joint_state);
+        return c_joint_state;
       });
 
     @SuppressWarnings("unchecked")
-    final JOTreeNodeReadableType<CaEvaluatedBoneDType> view_typed =
-      (JOTreeNodeReadableType<CaEvaluatedBoneDType>) (Object) this.bone_states;
-    this.bone_states_view = view_typed;
+    final JOTreeNodeReadableType<CaEvaluatedJointDType> view_typed =
+      (JOTreeNodeReadableType<CaEvaluatedJointDType>) (Object) this.joint_states;
+    this.joint_states_view = view_typed;
 
     in_action.matchAction(this, (t, curves) -> {
       t.kind = ActionKind.ACTION_CURVES;
@@ -166,15 +166,15 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
   }
 
   @Override
-  public JOTreeNodeReadableType<CaEvaluatedBoneDType> evaluatedBonesD()
+  public JOTreeNodeReadableType<CaEvaluatedJointDType> evaluatedJointsD()
   {
-    return this.bone_states_view;
+    return this.joint_states_view;
   }
 
   @Override
-  public Int2ReferenceSortedMap<CaEvaluatedBoneDType> evaluatedBonesDByID()
+  public Int2ReferenceSortedMap<CaEvaluatedJointDType> evaluatedJointsDByID()
   {
-    return this.bone_states_by_id_view;
+    return this.joint_states_by_id_view;
   }
 
   private Unit evaluateCurves(
@@ -185,65 +185,65 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     this.frame_start = in_frame_start;
     this.frame_current = in_frame_current;
     this.time_scale = in_time_scale;
-    this.bone_states.forEachBreadthFirst(this, (t, depth, node) -> {
-      final BoneStateD bone = node.value();
+    this.joint_states.forEachBreadthFirst(this, (t, depth, node) -> {
+      final JointStateD joint = node.value();
 
       t.eval_curves.evaluateOrientation4DForGlobalFrame(
-        bone.bone_id,
+        joint.joint_id,
         t.frame_start,
         t.frame_current,
         t.time_scale,
-        bone.orientation);
+        joint.orientation);
 
       t.eval_curves.evaluateTranslation3DForGlobalFrame(
-        bone.bone_id,
+        joint.joint_id,
         t.frame_start,
         t.frame_current,
         t.time_scale,
-        bone.translation);
+        joint.translation);
 
       t.eval_curves.evaluateScale3DForGlobalFrame(
-        bone.bone_id,
+        joint.joint_id,
         t.frame_start,
         t.frame_current,
         t.time_scale,
-        bone.scale);
+        joint.scale);
 
-      final BoneStateD bone_parent = node.parentReadable().map(
+      final JointStateD joint_parent = node.parentReadable().map(
         JOTreeNodeReadableType::value).orElse(null);
 
-      t.makeTransform(bone_parent, bone);
+      t.makeTransform(joint_parent, joint);
     });
     return unit();
   }
 
   private void makeTransform(
-    final @Nullable BoneStateD bone_parent,
-    final BoneStateD bone)
+    final @Nullable JointStateD joint_parent,
+    final JointStateD joint)
   {
     MatrixM4x4D.makeTranslation3D(
-      bone.translation, this.m_translation);
+      joint.translation, this.m_translation);
 
     QuaternionM4D.makeRotationMatrix4x4(
-      bone.orientation, this.m_orientation);
+      joint.orientation, this.m_orientation);
 
     MatrixM4x4D.setIdentity(this.m_scale);
-    this.m_scale.setR0C0D(bone.scale.getXD());
-    this.m_scale.setR1C1D(bone.scale.getYD());
-    this.m_scale.setR2C2D(bone.scale.getZD());
+    this.m_scale.setR0C0D(joint.scale.getXD());
+    this.m_scale.setR1C1D(joint.scale.getYD());
+    this.m_scale.setR2C2D(joint.scale.getZD());
 
     MatrixM4x4D.multiply(
       this.m_translation, this.m_orientation, this.m_accumulated);
     MatrixM4x4D.multiply(
       this.m_accumulated, this.m_scale, this.m_accumulated);
 
-    if (bone_parent != null) {
+    if (joint_parent != null) {
       MatrixM4x4D.multiply(
-        bone_parent.absolute_transform,
+        joint_parent.absolute_transform,
         this.m_accumulated,
-        bone.absolute_transform);
+        joint.absolute_transform);
     } else {
-      MatrixM4x4D.copy(this.m_accumulated, bone.absolute_transform);
+      MatrixM4x4D.copy(this.m_accumulated, joint.absolute_transform);
     }
   }
 
@@ -252,24 +252,24 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     ACTION_CURVES
   }
 
-  private static final class BoneStateD implements CaEvaluatedBoneDType
+  private static final class JointStateD implements CaEvaluatedJointDType
   {
-    private final CaBoneName bone_name;
-    private final int bone_id;
+    private final CaJointName joint_name;
+    private final int joint_id;
     private final VectorM3D scale;
-    private final PVectorM3D<CaSpaceBoneParentRelativeType> translation;
+    private final PVectorM3D<CaSpaceJointParentRelativeType> translation;
     private final QuaternionM4D orientation;
-    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType> absolute_transform;
-    private final OptionalInt bone_parent;
+    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> absolute_transform;
+    private final OptionalInt joint_parent;
 
-    BoneStateD(
-      final CaBoneName in_bone_name,
-      final int in_bone_id,
-      final OptionalInt in_bone_parent)
+    JointStateD(
+      final CaJointName in_joint_name,
+      final int in_joint_id,
+      final OptionalInt in_joint_parent)
     {
-      this.bone_name = NullCheck.notNull(in_bone_name, "Bone name");
-      this.bone_parent = NullCheck.notNull(in_bone_parent, "Parent");
-      this.bone_id = in_bone_id;
+      this.joint_name = NullCheck.notNull(in_joint_name, "Bone name");
+      this.joint_parent = NullCheck.notNull(in_joint_parent, "Parent");
+      this.joint_id = in_joint_id;
       this.translation = new PVectorM3D<>();
       this.orientation = new QuaternionM4D();
       this.scale = new VectorM3D();
@@ -277,31 +277,31 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     }
 
     @Override
-    public CaBoneName name()
+    public CaJointName name()
     {
-      return this.bone_name;
+      return this.joint_name;
     }
 
     @Override
     public int id()
     {
-      return this.bone_id;
+      return this.joint_id;
     }
 
     @Override
     public OptionalInt parent()
     {
-      return this.bone_parent;
+      return this.joint_parent;
     }
 
     @Override
-    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType> transformAbsolute4x4D()
+    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4D()
     {
       return this.absolute_transform;
     }
 
     @Override
-    public PVectorReadable3DType<CaSpaceBoneParentRelativeType> translation3D()
+    public PVectorReadable3DType<CaSpaceJointParentRelativeType> translation3D()
     {
       return this.translation;
     }

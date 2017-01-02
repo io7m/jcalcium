@@ -26,8 +26,8 @@ import com.io7m.jorchard.core.JOTreeNodeReadableType;
 public interface CaEvaluatorSingleFType extends CaEvaluatorSingleType
 {
   /**
-   * @return The tree of evaluated bones
+   * @return The tree of evaluated joints
    */
 
-  JOTreeNodeReadableType<CaEvaluatedBoneFType> evaluatedBonesF();
+  JOTreeNodeReadableType<CaEvaluatedJointFType> evaluatedJointsF();
 }

@@ -17,12 +17,12 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 
 /**
- * A keyframe for a curve that affects the translation of a bone.
+ * A keyframe for a curve that affects the translation of a joint.
  */
 
 @CaImmutableStyleType
@@ -31,8 +31,8 @@ public interface CaDefinitionCurveKeyframeTranslationType extends
   CaDefinitionCurveKeyframeType
 {
   /**
-   * @return The translation of the bone at this keyframe
+   * @return The translation of the joint at this keyframe
    */
 
-  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
+  PVectorI3D<CaSpaceJointParentRelativeType> translation();
 }

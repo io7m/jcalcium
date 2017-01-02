@@ -27,16 +27,16 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
 public interface CaEvaluatorSingleDType extends CaEvaluatorSingleType
 {
   /**
-   * @return The tree of evaluated bones
+   * @return The tree of evaluated joints
    */
 
-  JOTreeNodeReadableType<CaEvaluatedBoneDType> evaluatedBonesD();
+  JOTreeNodeReadableType<CaEvaluatedJointDType> evaluatedJointsD();
 
   /**
-   * A read-only view of the evaluated bones organized by ID.
+   * A read-only view of the evaluated joints organized by ID.
    *
-   * @return The set of evaluated bones by ID
+   * @return The set of evaluated joints by ID
    */
 
-  Int2ReferenceSortedMap<CaEvaluatedBoneDType> evaluatedBonesDByID();
+  Int2ReferenceSortedMap<CaEvaluatedJointDType> evaluatedJointsDByID();
 }

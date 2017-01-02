@@ -17,11 +17,11 @@
 package com.io7m.jcalcium.format.protobuf3.v1;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -32,7 +32,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.format.protobuf3.CaLoaderCorruptedData;
 import com.io7m.jcalcium.format.protobuf3.CaLoaderIOException;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
@@ -74,7 +74,7 @@ final class CaV1Loader
     return new VectorI3D(v.getX(), v.getY(), v.getZ());
   }
 
-  private static PVectorI3D<CaSpaceBoneParentRelativeType> translation(
+  private static PVectorI3D<CaSpaceJointParentRelativeType> translation(
     final Skeleton.V1TranslationOrBuilder v)
   {
     return new PVectorI3D<>(v.getX(), v.getY(), v.getZ());
@@ -148,7 +148,7 @@ final class CaV1Loader
   {
     final CaCurveTranslation.Builder b = CaCurveTranslation.builder();
     b.setKeyframes(curveTranslationKeyframes(translation.getKeyframesMap()));
-    b.setBone(CaBoneName.of(translation.getBone()));
+    b.setJoint(CaJointName.of(translation.getJoint()));
     b.setAction(action);
     return b.build();
   }
@@ -180,7 +180,7 @@ final class CaV1Loader
   {
     final CaCurveScale.Builder b = CaCurveScale.builder();
     b.setKeyframes(curveScaleKeyframes(scale.getKeyframesMap()));
-    b.setBone(CaBoneName.of(scale.getBone()));
+    b.setJoint(CaJointName.of(scale.getJoint()));
     b.setAction(action);
     return b.build();
   }
@@ -213,7 +213,7 @@ final class CaV1Loader
   {
     final CaCurveOrientation.Builder b = CaCurveOrientation.builder();
     b.setKeyframes(curveOrientationKeyframes(orientation.getKeyframesMap()));
-    b.setBone(CaBoneName.of(orientation.getBone()));
+    b.setJoint(CaJointName.of(orientation.getJoint()));
     b.setAction(action);
     return b.build();
   }
@@ -235,11 +235,11 @@ final class CaV1Loader
     throw new UnreachableCodeException();
   }
 
-  private static CaBone bone(
-    final Skeleton.V1BoneOrBuilder v_bone)
+  private static CaJoint bone(
+    final Skeleton.V1JointOrBuilder v_bone)
   {
-    final CaBone.Builder bb = CaBone.builder();
-    bb.setName(CaBoneName.of(v_bone.getName()));
+    final CaJoint.Builder bb = CaJoint.builder();
+    bb.setName(CaJointName.of(v_bone.getName()));
     bb.setId(v_bone.getId());
     bb.setScale(scale(v_bone.getScale()));
     bb.setOrientation(quaternion(v_bone.getOrientation()));
@@ -278,19 +278,19 @@ final class CaV1Loader
     final CaActionCurves.Builder ab = CaActionCurves.builder();
     final CaActionName action_name = CaActionName.of(curves.getName());
     ab.setName(action_name);
-    ab.setCurves(actionCurvesByBone(action_name, curves.getCurvesMap()));
+    ab.setCurves(actionCurvesByJoint(action_name, curves.getCurvesMap()));
     ab.setFramesPerSecond(curves.getFramesPerSecond());
     return ab.build();
   }
 
-  private static SortedMap<CaBoneName, IndexedSeq<CaCurveType>> actionCurvesByBone(
+  private static SortedMap<CaJointName, IndexedSeq<CaCurveType>> actionCurvesByJoint(
     final CaActionName action,
     final Map<String, Skeleton.V1CurveList> curves)
   {
-    TreeMap<CaBoneName, IndexedSeq<CaCurveType>> results = TreeMap.empty();
+    TreeMap<CaJointName, IndexedSeq<CaCurveType>> results = TreeMap.empty();
     for (final String name : curves.keySet()) {
       results = results.put(
-        CaBoneName.of(name),
+        CaJointName.of(name),
         Array.ofAll(
           curves.get(name)
             .getCurvesList()
@@ -307,11 +307,11 @@ final class CaV1Loader
     try {
       final Skeleton.V1Skeleton sk =
         Skeleton.V1Skeleton.parseFrom(this.stream);
-      final JOTreeNodeType<CaBone> node =
-        this.bones(sk.getBonesMap());
+      final JOTreeNodeType<CaJoint> node =
+        this.bones(sk.getJointsMap());
 
       final CaSkeleton.Builder cb = CaSkeleton.builder();
-      cb.setBones(node);
+      cb.setJoints(node);
       cb.setName(CaSkeletonName.of(sk.getName()));
       cb.setActionsByName(actions(sk.getActionsMap()));
 
@@ -323,8 +323,8 @@ final class CaV1Loader
     }
   }
 
-  private JOTreeNodeType<CaBone> bones(
-    final Map<Integer, Skeleton.V1Bone> bones)
+  private JOTreeNodeType<CaJoint> bones(
+    final Map<Integer, Skeleton.V1Joint> bones)
     throws CaLoaderCorruptedData
   {
     /*
@@ -333,7 +333,7 @@ final class CaV1Loader
      * must be sorted by ID and then added to a tree sequentially.
      */
 
-    final java.util.List<Skeleton.V1Bone> bones_ordered =
+    final java.util.List<Skeleton.V1Joint> bones_ordered =
       new ArrayList<>(bones.size());
     for (final Integer bone_id : bones.keySet()) {
       bones_ordered.add(bones.get(bone_id));
@@ -346,23 +346,23 @@ final class CaV1Loader
       throw new CaLoaderCorruptedData(this.uri, "No parseable bones");
     }
 
-    final Skeleton.V1Bone root_current =
+    final Skeleton.V1Joint root_current =
       bones_ordered.get(0);
-    final CaBone root_bone =
+    final CaJoint root_bone =
       bone(root_current);
-    final JOTreeNodeType<CaBone> root_node =
+    final JOTreeNodeType<CaJoint> root_node =
       JOTreeNode.create(root_bone);
-    SortedMap<Integer, JOTreeNodeType<CaBone>> nodes_by_id =
+    SortedMap<Integer, JOTreeNodeType<CaJoint>> nodes_by_id =
       TreeMap.of(Integer.valueOf(0), root_node);
 
     for (int index = 1; index < bones_ordered.size(); ++index) {
-      final Skeleton.V1Bone bone =
+      final Skeleton.V1Joint bone =
         bones_ordered.get(index);
-      final JOTreeNodeType<CaBone> node_parent =
+      final JOTreeNodeType<CaJoint> node_parent =
         nodes_by_id.get(Integer.valueOf(bone.getParent())).get();
-      final CaBoneName node_name =
-        CaBoneName.of(bone.getName());
-      final JOTreeNodeType<CaBone> node = JOTreeNode.create(CaBone.of(
+      final CaJointName node_name =
+        CaJointName.of(bone.getName());
+      final JOTreeNodeType<CaJoint> node = JOTreeNode.create(CaJoint.of(
         node_name,
         bone.getId(),
         translation(bone.getTranslation()),

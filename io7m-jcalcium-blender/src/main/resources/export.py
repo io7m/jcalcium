@@ -114,10 +114,10 @@ class CalciumLogger:
 #endclass
 
 #
-# A single bone.
+# A single joint.
 #
 
-class CalciumBone:
+class CalciumJoint:
   def __init__(self, name, parent, translation, orientation, scale):
     assert type(name) == str
     assert type(translation) == mathutils.Vector
@@ -216,13 +216,13 @@ class CalciumKeyframe:
 #endclass
 
 #
-# A single curve that holds keyframes that affect a single property of a bone
+# A single curve that holds keyframes that affect a single property of a joint
 # (such as translation, scale, orientation, etc).
 #
 
 class CalciumCurve:
-  def __init__(self, bone, kind, keyframes):
-    assert type(bone) == str
+  def __init__(self, joint, kind, keyframes):
+    assert type(joint) == str
     assert type(kind) == str
     assert type(keyframes) == type({})
 
@@ -230,14 +230,14 @@ class CalciumCurve:
       assert type(keyframe) == CalciumKeyframe
     #endfor
 
-    self.bone = bone
+    self.joint = joint
     self.kind = kind
     self.keyframes = keyframes
   #endif
 
   def toJSON(self):
     data = {}
-    data['bone'] = self.bone
+    data['joint'] = self.joint
     data['type'] = self.kind
 
     keyframes_json = []
@@ -299,17 +299,17 @@ class CalciumAction:
 #endclass
 
 #
-# A skeleton that aggregates a set of bones and actions.
+# A skeleton that aggregates a set of joints and actions.
 #
 
 class CalciumSkeleton:
-  def __init__(self, name, bones, actions):
+  def __init__(self, name, joints, actions):
     assert type(name) == str
-    assert type(bones) == list
+    assert type(joints) == list
     assert type(actions) == list
 
-    for bone in bones:
-      assert type(bone) == CalciumBone
+    for joint in joints:
+      assert type(joint) == CalciumJoint
     #endfor
 
     for action in actions:
@@ -317,7 +317,7 @@ class CalciumSkeleton:
     #endfor
 
     self.name = name
-    self.bones = bones
+    self.joints = joints
     self.actions = actions
   #end
 
@@ -325,10 +325,10 @@ class CalciumSkeleton:
     data = {}
     data['name'] = self.name
 
-    data_bones = []
-    for bone in self.bones:
-      assert type(bone) == CalciumBone
-      data_bones.append(bone.toJSON())
+    data_joints = []
+    for joint in self.joints:
+      assert type(joint) == CalciumJoint
+      data_joints.append(joint.toJSON())
     #endfor
 
     data_actions = []
@@ -337,7 +337,7 @@ class CalciumSkeleton:
       data_actions.append(action.toJSON())
     #endfor
 
-    data['bones'] = data_bones
+    data['joints'] = data_joints
     data['actions'] = data_actions
     return data
   #end
@@ -965,7 +965,7 @@ class CalciumExporter:
     assert armature.type == 'ARMATURE'
     self.__logger.debug("__makeBones: %s" % armature.name)
 
-    calcium_bones = []
+    calcium_joints = []
     for pose_bone in armature.pose.bones:
       assert type(pose_bone) == bpy_types.PoseBone
       bone = pose_bone.bone
@@ -993,10 +993,10 @@ class CalciumExporter:
         bone_parent = bone.parent.name
       #endif
 
-      calcium_bones.append(CalciumBone(bone.name, bone_parent, bone_trans, bone_orient, bone_scale))
+      calcium_joints.append(CalciumJoint(bone.name, bone_parent, bone_trans, bone_orient, bone_scale))
     #end
 
-    return calcium_bones
+    return calcium_joints
   #end
 
   #

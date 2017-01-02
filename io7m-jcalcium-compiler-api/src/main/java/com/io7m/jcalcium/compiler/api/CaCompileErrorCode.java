@@ -23,31 +23,31 @@ package com.io7m.jcalcium.compiler.api;
 public enum CaCompileErrorCode
 {
   /**
-   * A bone specifies a nonexistent parent.
+   * A joint specifies a nonexistent parent.
    */
 
-  ERROR_BONE_NONEXISTENT_PARENT,
+  ERROR_JOINT_NONEXISTENT_PARENT,
 
   /**
-   * The skeleton does not have a root bone.
+   * The skeleton does not have a root joint.
    */
 
-  ERROR_BONE_NO_ROOT,
+  ERROR_JOINT_NO_ROOT,
 
   /**
-   * A cycle was detected in the bones of a skeleton.
+   * A cycle was detected in the joints of a skeleton.
    */
 
-  ERROR_BONE_CYCLE,
+  ERROR_JOINT_CYCLE,
 
   /**
-   * The skeleton has multiple root bones.
+   * The skeleton has multiple root joints.
    */
 
-  ERROR_BONE_MULTIPLE_ROOTS,
+  ERROR_MULTIPLE_ROOT_JOINTS,
 
   /**
-   * An action supplies a nonexistent bone.
+   * An action supplies a nonexistent joint.
    */
 
   ERROR_ACTION_INVALID_BONE,
@@ -59,7 +59,7 @@ public enum CaCompileErrorCode
   ERROR_ACTION_DUPLICATE_KEYFRAME,
 
   /**
-   * An action has multiple curves of the same type for a bone.
+   * An action has multiple curves of the same type for a joint.
    */
 
   ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,

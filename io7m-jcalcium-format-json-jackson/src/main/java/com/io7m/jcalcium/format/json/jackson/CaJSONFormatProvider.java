@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
@@ -240,7 +239,7 @@ public final class CaJSONFormatProvider implements
               LexicalPosition.of(
                 loc.getLineNr(),
                 loc.getColumnNr(),
-                Optional.of(Paths.get(uri))),
+                Optional.empty()),
               e.getMessage()
             ));
         return Validation.invalid(xs);
@@ -252,7 +251,7 @@ public final class CaJSONFormatProvider implements
               LexicalPosition.of(
                 loc.getLineNr(),
                 loc.getColumnNr(),
-                Optional.of(Paths.get(uri))),
+                Optional.empty()),
               e.getMessage()
             ));
         return Validation.invalid(xs);
@@ -263,7 +262,7 @@ public final class CaJSONFormatProvider implements
               LexicalPosition.of(
                 -1,
                 -1,
-                Optional.of(Paths.get(uri))),
+                Optional.empty()),
               e.getMessage()
             ));
         return Validation.invalid(xs);

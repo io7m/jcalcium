@@ -18,10 +18,10 @@ package com.io7m.jcalcium.evaluator.main;
 
 import com.io7m.jaffirm.core.Postconditions;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesScaling;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
@@ -29,7 +29,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation;
 import com.io7m.jnull.NullCheck;
@@ -64,7 +64,7 @@ public final class CaActionEvaluatorCurves
     LOG = LoggerFactory.getLogger(CaActionEvaluatorCurves.class);
   }
 
-  private final BoneTracks[] bone_tracks;
+  private final JointTracks[] joint_tracks;
 
   private CaActionEvaluatorCurves(
     final CaSkeleton in_skeleton,
@@ -79,24 +79,24 @@ public final class CaActionEvaluatorCurves
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(
-        "instantiating bone tracks for action {}",
+        "instantiating joint tracks for action {}",
         action_scaled.name().value());
     }
 
-    final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> by_id =
-      in_skeleton.bonesByID();
+    final SortedMap<Integer, JOTreeNodeReadableType<CaJoint>> by_id =
+      in_skeleton.jointsByID();
 
-    this.bone_tracks = new BoneTracks[by_id.size()];
-    for (final Integer bone_id : by_id.keySet()) {
-      final JOTreeNodeReadableType<CaBone> node = by_id.get(bone_id).get();
-      final CaBone bone = node.value();
-      final CaBoneName bone_name = bone.name();
+    this.joint_tracks = new JointTracks[by_id.size()];
+    for (final Integer joint_id : by_id.keySet()) {
+      final JOTreeNodeReadableType<CaJoint> node = by_id.get(joint_id).get();
+      final CaJoint joint = node.value();
+      final CaJointName joint_name = joint.name();
       final Option<IndexedSeq<CaCurveType>> curves_opt =
-        action_scaled.curves().get(bone_name);
+        action_scaled.curves().get(joint_name);
 
-      final BoneTracks current_tracks =
-        new BoneTracks(
-          bone,
+      final JointTracks current_tracks =
+        new JointTracks(
+          joint,
           new Int2ReferenceRBTreeMap<>(),
           new Int2ReferenceRBTreeMap<>(),
           new Int2ReferenceRBTreeMap<>());
@@ -107,29 +107,29 @@ public final class CaActionEvaluatorCurves
 
       if (LOG.isTraceEnabled()) {
         LOG.trace(
-          "bone [{}] {} keyframes translation",
-          bone_id,
+          "joint [{}] {} keyframes translation",
+          joint_id,
           Integer.valueOf(current_tracks.keyframes_translation.size()));
         LOG.trace(
-          "bone [{}] {} keyframes scale",
-          bone_id,
+          "joint [{}] {} keyframes scale",
+          joint_id,
           Integer.valueOf(current_tracks.keyframes_scale.size()));
         LOG.trace(
-          "bone [{}] {} keyframes orientation",
-          bone_id,
+          "joint [{}] {} keyframes orientation",
+          joint_id,
           Integer.valueOf(current_tracks.keyframes_orientation.size()));
       }
 
-      this.bone_tracks[bone_id.intValue()] = current_tracks;
+      this.joint_tracks[joint_id.intValue()] = current_tracks;
     }
 
     /*
-     * Check that all bone tracks exist. This can only fail if the compiler
-     * fails to assign monotonically increasing numbers to bones.
+     * Check that all joint tracks exist. This can only fail if the compiler
+     * fails to assign monotonically increasing numbers to joints.
      */
 
-    for (int index = 0; index < this.bone_tracks.length; ++index) {
-      NullCheck.notNull(this.bone_tracks[index], "this.bone_tracks[index]");
+    for (int index = 0; index < this.joint_tracks.length; ++index) {
+      NullCheck.notNull(this.joint_tracks[index], "this.joint_tracks[index]");
     }
   }
 
@@ -153,55 +153,55 @@ public final class CaActionEvaluatorCurves
 
   @Override
   public void evaluateTranslation3DForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,
-    final PVectorWritable3DType<CaSpaceBoneParentRelativeType> out)
+    final PVectorWritable3DType<CaSpaceJointParentRelativeType> out)
   {
-    this.bone_tracks[bone_id].evaluateTranslation3D(
+    this.joint_tracks[joint_id].evaluateTranslation3D(
       frame_start, frame_current, time_scale, out);
   }
 
   @Override
   public void evaluateScale3DForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,
     final VectorWritable3DType out)
   {
-    this.bone_tracks[bone_id].evaluateScale3D(
+    this.joint_tracks[joint_id].evaluateScale3D(
       frame_start, frame_current, time_scale, out);
   }
 
   @Override
   public void evaluateOrientation4DForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,
     final Quaternion4DType out)
   {
-    this.bone_tracks[bone_id].evaluateOrientation4D(
+    this.joint_tracks[joint_id].evaluateOrientation4D(
       frame_start, frame_current, time_scale, out);
   }
 
-  private static final class BoneTracks
+  private static final class JointTracks
   {
     private final Int2ReferenceRBTreeMap<CaCurveKeyframeTranslation> keyframes_translation;
     private final Int2ReferenceRBTreeMap<CaCurveKeyframeOrientation> keyframes_orientation;
     private final Int2ReferenceRBTreeMap<CaCurveKeyframeScale> keyframes_scale;
-    private final CaBone bone;
+    private final CaJoint joint;
     private int last_frame;
 
-    BoneTracks(
-      final CaBone in_bone,
+    JointTracks(
+      final CaJoint in_joint,
       final Int2ReferenceRBTreeMap<CaCurveKeyframeTranslation> in_keyframes_translation,
       final Int2ReferenceRBTreeMap<CaCurveKeyframeOrientation> in_keyframes_orientation,
       final Int2ReferenceRBTreeMap<CaCurveKeyframeScale> in_keyframes_scale)
     {
-      this.bone = in_bone;
+      this.joint = in_joint;
       this.keyframes_translation = in_keyframes_translation;
       this.keyframes_orientation = in_keyframes_orientation;
       this.keyframes_scale = in_keyframes_scale;
@@ -289,7 +289,7 @@ public final class CaActionEvaluatorCurves
       final long frame_start,
       final long frame_current,
       final double time_scale,
-      final PVectorWritable3DType<CaSpaceBoneParentRelativeType> out)
+      final PVectorWritable3DType<CaSpaceJointParentRelativeType> out)
     {
       final int bound = Math.addExact(this.last_frame, 1);
 
@@ -300,7 +300,7 @@ public final class CaActionEvaluatorCurves
       int key_frame_next = keyframeIndexNext(
         this.keyframes_translation.keySet(), (int) Math.floor(frame));
 
-      final PVectorReadable3DType<CaSpaceBoneParentRelativeType> trans_prev;
+      final PVectorReadable3DType<CaSpaceJointParentRelativeType> trans_prev;
       final CaCurveEasing easing;
       final CaCurveInterpolation interp;
       if (key_frame_prev >= 0) {
@@ -310,19 +310,19 @@ public final class CaActionEvaluatorCurves
         easing = kf.easing();
         interp = kf.interpolation();
       } else {
-        trans_prev = this.bone.translation();
+        trans_prev = this.joint.translation();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
         key_frame_prev = 0;
       }
 
-      final PVectorReadable3DType<CaSpaceBoneParentRelativeType> trans_next;
+      final PVectorReadable3DType<CaSpaceJointParentRelativeType> trans_next;
       if (key_frame_next >= 0) {
         final CaCurveKeyframeTranslation kf =
           this.keyframes_translation.get(key_frame_next);
         trans_next = kf.translation();
       } else {
-        trans_next = this.bone.translation();
+        trans_next = this.joint.translation();
         key_frame_next = bound;
       }
 
@@ -358,7 +358,7 @@ public final class CaActionEvaluatorCurves
         easing = kf.easing();
         interp = kf.interpolation();
       } else {
-        val_prev = this.bone.scale();
+        val_prev = this.joint.scale();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
         key_frame_prev = 0;
@@ -370,7 +370,7 @@ public final class CaActionEvaluatorCurves
           this.keyframes_scale.get(key_frame_next);
         val_next = kf.scale();
       } else {
-        val_next = this.bone.scale();
+        val_next = this.joint.scale();
         key_frame_next = bound;
       }
 
@@ -406,7 +406,7 @@ public final class CaActionEvaluatorCurves
         easing = kf.easing();
         interp = kf.interpolation();
       } else {
-        val_prev = this.bone.orientation();
+        val_prev = this.joint.orientation();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
         key_frame_prev = 0;
@@ -418,7 +418,7 @@ public final class CaActionEvaluatorCurves
           this.keyframes_orientation.get(key_frame_next);
         val_next = kf.orientation();
       } else {
-        val_next = this.bone.orientation();
+        val_next = this.joint.orientation();
         key_frame_next = bound;
       }
 

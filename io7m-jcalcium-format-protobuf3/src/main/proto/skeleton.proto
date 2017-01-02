@@ -82,19 +82,19 @@ message V1CurveKeyframeTranslation
 
 message V1CurveScale
 {
-  string                            bone      = 1;
+  string                            joint     = 1;
   map<uint32, V1CurveKeyframeScale> keyframes = 2;
 }
 
 message V1CurveOrientation
 {
-  string                                  bone      = 1;
+  string                                  joint     = 1;
   map<uint32, V1CurveKeyframeOrientation> keyframes = 2;
 }
 
 message V1CurveTranslation
 {
-  string                                  bone      = 1;
+  string                                  joint     = 1;
   map<uint32, V1CurveKeyframeTranslation> keyframes = 2;
 }
 
@@ -112,7 +112,7 @@ message V1CurveList
   repeated V1Curve curves = 1;
 }
 
-message V1Bone
+message V1Joint
 {
   uint32        id          = 1;
   uint32        parent      = 2;
@@ -139,6 +139,6 @@ message V1Action
 message V1Skeleton
 {
   string                name    = 1;
-  map<uint32, V1Bone>   bones   = 2;
+  map<uint32, V1Joint>  joints  = 2;
   map<string, V1Action> actions = 3;
 }

@@ -16,13 +16,13 @@
 
 package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslationType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.generators.parameterized.PVectorI3DGenerator;
 import javaslang.collection.List;
@@ -36,8 +36,8 @@ import java.util.Collections;
 
 public final class CaDefinitionCurveTranslationGenerator implements Generator<CaDefinitionCurveTranslation>
 {
-  private final BoneTree tree;
-  private final PVectorI3DGenerator<CaSpaceBoneParentRelativeType> pvec_gen;
+  private final JointTree tree;
+  private final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvec_gen;
   private final Generator<CaCurveInterpolation> interp_gen;
   private final Generator<CaCurveEasing> easing_gen;
 
@@ -53,8 +53,8 @@ public final class CaDefinitionCurveTranslationGenerator implements Generator<Ca
   public CaDefinitionCurveTranslationGenerator(
     final Generator<CaCurveInterpolation> in_interp_gen,
     final Generator<CaCurveEasing> in_easing_gen,
-    final PVectorI3DGenerator<CaSpaceBoneParentRelativeType> in_pvec_gen,
-    final BoneTree in_tree)
+    final PVectorI3DGenerator<CaSpaceJointParentRelativeType> in_pvec_gen,
+    final JointTree in_tree)
   {
     this.tree = NullCheck.notNull(in_tree, "Tree");
     this.pvec_gen = NullCheck.notNull(in_pvec_gen, "PVectorGenerator");
@@ -82,13 +82,13 @@ public final class CaDefinitionCurveTranslationGenerator implements Generator<Ca
     final CaDefinitionCurveTranslation.Builder b =
       CaDefinitionCurveTranslation.builder();
 
-    final java.util.List<CaBoneName> names_mut =
+    final java.util.List<CaJointName> names_mut =
       List.ofAll(this.tree.nodes().keySet()).toJavaList();
     Collections.shuffle(names_mut);
-    final List<CaBoneName> names = List.ofAll(names_mut);
+    final List<CaJointName> names = List.ofAll(names_mut);
 
-    final CaBoneName bone_name = names.head();
-    b.setBone(bone_name);
+    final CaJointName joint_name = names.head();
+    b.setJoint(joint_name);
     b.setKeyframes(keyframes);
     return b.build();
   }

@@ -1,9 +1,8 @@
 {
-  "name": "bone1",
-  "bones": [
+  "name": "joint0",
+  "joints": [
     {
-      "name": "bone.000",
-      "parent": "bone.001",
+      "name": "joint.000",
       "translation": [0.0, 1.0, 2.0],
       "scale": [3.0, 4.0, 5.0],
       "orientation-xyzw": [6.0, 7.0, 8.0, 9.0]

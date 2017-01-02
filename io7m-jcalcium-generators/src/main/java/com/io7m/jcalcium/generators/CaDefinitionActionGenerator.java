@@ -37,7 +37,7 @@ public final class CaDefinitionActionGenerator implements Generator<CaDefinition
    * @param bone_tree A bone tree
    */
 
-  public CaDefinitionActionGenerator(final BoneTree bone_tree)
+  public CaDefinitionActionGenerator(final JointTree bone_tree)
   {
     this.curve_gen = new CaDefinitionActionCurvesGenerator(bone_tree);
     this.which_gen = new IntegerGenerator(0, 0);

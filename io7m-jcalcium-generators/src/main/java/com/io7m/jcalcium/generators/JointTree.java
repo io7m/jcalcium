@@ -17,7 +17,8 @@
 package com.io7m.jcalcium.generators;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
@@ -26,24 +27,24 @@ import javaslang.collection.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A generated bone tree.
+ * A generated joint tree.
  */
 
-public final class BoneNameTree
+public final class JointTree
 {
-  private final JOTreeNodeType<CaBoneName> tree;
-  private final Map<CaBoneName, JOTreeNodeReadableType<CaBoneName>> nodes;
+  private final JOTreeNodeType<CaDefinitionJoint> tree;
+  private final Map<CaJointName, JOTreeNodeReadableType<CaDefinitionJoint>> nodes;
 
   /**
-   * Construct a bone tree.
+   * Construct a joint tree.
    *
    * @param in_tree  The tree
    * @param in_nodes The nodes
    */
 
-  public BoneNameTree(
-    final JOTreeNodeType<CaBoneName> in_tree,
-    final Map<CaBoneName, JOTreeNodeReadableType<CaBoneName>> in_nodes)
+  public JointTree(
+    final JOTreeNodeType<CaDefinitionJoint> in_tree,
+    final Map<CaJointName, JOTreeNodeReadableType<CaDefinitionJoint>> in_nodes)
   {
     this.tree = NullCheck.notNull(in_tree, "in_tree");
     this.nodes = NullCheck.notNull(in_nodes, "in_nodes");
@@ -64,7 +65,7 @@ public final class BoneNameTree
    * @return The node tree
    */
 
-  public JOTreeNodeType<CaBoneName> tree()
+  public JOTreeNodeType<CaDefinitionJoint> tree()
   {
     return this.tree;
   }
@@ -73,7 +74,7 @@ public final class BoneNameTree
    * @return The nodes by name
    */
 
-  public Map<CaBoneName, JOTreeNodeReadableType<CaBoneName>> nodes()
+  public Map<CaJointName, JOTreeNodeReadableType<CaDefinitionJoint>> nodes()
   {
     return this.nodes;
   }

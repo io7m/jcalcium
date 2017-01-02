@@ -18,7 +18,7 @@ package com.io7m.jcalcium.format.protobuf3.v1;
 
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -29,7 +29,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScaleType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jcalcium.serializer.api.CaCompiledSerializerType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.QuaternionI4D;
@@ -58,23 +58,23 @@ final class CaV1Serializer implements CaCompiledSerializerType
     b.setName(skeleton.name().value());
     skeleton.actionsByName().forEach(
       p -> b.putActions(p._1.value(), fromAction(p._2)));
-    skeleton.bonesByID().forEach(
-      p -> b.putBones(p._1.intValue(), fromBone(p._2)));
+    skeleton.jointsByID().forEach(
+      p -> b.putJoints(p._1.intValue(), fromJoint(p._2)));
     return b.build();
   }
 
-  private static Skeleton.V1Bone fromBone(
-    final JOTreeNodeReadableType<CaBone> bone_node)
+  private static Skeleton.V1Joint fromJoint(
+    final JOTreeNodeReadableType<CaJoint> bone_node)
   {
-    final CaBone bone = bone_node.value();
-    final Skeleton.V1Bone.Builder b = Skeleton.V1Bone.newBuilder();
+    final CaJoint bone = bone_node.value();
+    final Skeleton.V1Joint.Builder b = Skeleton.V1Joint.newBuilder();
     b.setName(bone.name().value());
     b.setId(bone.id());
 
-    final Optional<JOTreeNodeReadableType<CaBone>> parent_opt =
+    final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
       bone_node.parentReadable();
     if (parent_opt.isPresent()) {
-      final JOTreeNodeReadableType<CaBone> parent = parent_opt.get();
+      final JOTreeNodeReadableType<CaJoint> parent = parent_opt.get();
       b.setParent(parent.value().id());
     }
 
@@ -136,7 +136,7 @@ final class CaV1Serializer implements CaCompiledSerializerType
     final CaCurveScaleType c)
   {
     final Skeleton.V1CurveScale.Builder b = Skeleton.V1CurveScale.newBuilder();
-    b.setBone(c.bone().value());
+    b.setJoint(c.joint().value());
     c.keyframes().forEach(
       p -> b.putKeyframes(p._1.intValue(), fromCurveKeyframeScale(p._2)));
     return b.build();
@@ -171,7 +171,7 @@ final class CaV1Serializer implements CaCompiledSerializerType
   {
     final Skeleton.V1CurveTranslation.Builder b =
       Skeleton.V1CurveTranslation.newBuilder();
-    b.setBone(c.bone().value());
+    b.setJoint(c.joint().value());
     c.keyframes().forEach(
       p -> b.putKeyframes(p._1.intValue(), fromCurveKeyframeTranslation(p._2)));
     return b.build();
@@ -182,7 +182,7 @@ final class CaV1Serializer implements CaCompiledSerializerType
   {
     final Skeleton.V1CurveOrientation.Builder b =
       Skeleton.V1CurveOrientation.newBuilder();
-    b.setBone(c.bone().value());
+    b.setJoint(c.joint().value());
     c.keyframes().forEach(
       p -> b.putKeyframes(p._1.intValue(), fromCurveKeyframeOrientation(p._2)));
     return b.build();
@@ -211,7 +211,7 @@ final class CaV1Serializer implements CaCompiledSerializerType
   }
 
   private static Skeleton.V1Translation fromTranslation(
-    final PVectorI3D<CaSpaceBoneParentRelativeType> translation)
+    final PVectorI3D<CaSpaceJointParentRelativeType> translation)
   {
     final Skeleton.V1Translation.Builder b = Skeleton.V1Translation.newBuilder();
     b.setX(translation.getXD());

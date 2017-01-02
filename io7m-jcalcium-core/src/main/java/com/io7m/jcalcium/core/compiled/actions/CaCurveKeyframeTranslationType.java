@@ -19,12 +19,12 @@ package com.io7m.jcalcium.core.compiled.actions;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 
 /**
- * A keyframe for a curve that affects the translation of a bone.
+ * A keyframe for a curve that affects the translation of a joint.
  */
 
 @CaImmutableStyleType
@@ -44,9 +44,9 @@ public interface CaCurveKeyframeTranslationType extends CaCurveKeyframeType
   CaCurveEasing easing();
 
   /**
-   * @return The translation of the bone at this keyframe
+   * @return The translation of the joint at this keyframe
    */
 
   @Value.Parameter
-  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
+  PVectorI3D<CaSpaceJointParentRelativeType> translation();
 }

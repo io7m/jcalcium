@@ -14,10 +14,42 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.jcalcium.core;
+
+import com.io7m.jnull.NullCheck;
+import org.immutables.value.Value;
+
 /**
- * Trivial bone viewer.
+ * The type of joint names.
  */
 
-@com.io7m.jnull.NonNullByDefault
-package com.io7m.jcalcium.examples.jogl.boneview;
+@CaImmutableStyleType
+@Value.Immutable
+public interface CaJointNameType extends Comparable<CaJointNameType>
+{
+  @Override
+  default int compareTo(final CaJointNameType o)
+  {
+    return this.value().compareTo(NullCheck.notNull(o, "Other").value());
+  }
 
+  /**
+   * @return The name value
+   */
+
+  @Value.Parameter
+  String value();
+
+  /**
+   * Check preconditions for the type.
+   */
+
+  @Value.Check
+  default void checkPreconditions()
+  {
+    if (!CaJointNames.isValid(this.value())) {
+      throw new IllegalArgumentException(
+        "Joint name must match the pattern: " + CaJointNames.PATTERN.pattern());
+    }
+  }
+}

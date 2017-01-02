@@ -23,7 +23,7 @@ import com.io7m.jtensors.VectorI3D;
 import org.immutables.value.Value;
 
 /**
- * A keyframe for a curve that affects the scale of a bone.
+ * A keyframe for a curve that affects the scale of a joint.
  */
 
 @CaImmutableStyleType
@@ -43,7 +43,7 @@ public interface CaCurveKeyframeScaleType extends CaCurveKeyframeType
   CaCurveEasing easing();
 
   /**
-   * @return The scale of the bone at this keyframe
+   * @return The scale of the joint at this keyframe
    */
 
   @Value.Parameter

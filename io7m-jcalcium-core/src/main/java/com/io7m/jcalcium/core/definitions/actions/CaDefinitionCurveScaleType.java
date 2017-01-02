@@ -24,7 +24,7 @@ import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
- * A curve that affects the scale of a bone.
+ * A curve that affects the scale of a joint.
  */
 
 @CaImmutableStyleType

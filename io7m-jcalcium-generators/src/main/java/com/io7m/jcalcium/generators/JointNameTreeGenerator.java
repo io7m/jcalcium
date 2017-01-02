@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.generators;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jorchard.generators.JOTreeNodeGenerator;
@@ -26,34 +26,34 @@ import net.java.quickcheck.generator.support.IntegerGenerator;
 import java.util.HashMap;
 
 /**
- * A generator for bone trees.
+ * A generator for joint trees.
  */
 
-public final class BoneNameTreeGenerator implements Generator<BoneNameTree>
+public final class JointNameTreeGenerator implements Generator<JointNameTree>
 {
-  private final CaBoneNameGenerator names;
+  private final CaJointNameGenerator names;
   private final IntegerGenerator sizes;
-  private final Generator<JOTreeNodeType<CaBoneName>> tree_gen;
+  private final Generator<JOTreeNodeType<CaJointName>> tree_gen;
 
   /**
-   * Construct a bone tree generator.
+   * Construct a joint tree generator.
    */
 
-  public BoneNameTreeGenerator()
+  public JointNameTreeGenerator()
   {
-    this.names = new CaBoneNameGenerator();
+    this.names = new CaJointNameGenerator();
     this.sizes = new IntegerGenerator(1, 32);
     this.tree_gen = JOTreeNodeGenerator.create(this.sizes, this.names, 0.2);
   }
 
   @Override
-  public BoneNameTree next()
+  public JointNameTree next()
   {
-    final JOTreeNodeType<CaBoneName> tree = this.tree_gen.next();
-    final HashMap<CaBoneName, JOTreeNodeReadableType<CaBoneName>> map =
+    final JOTreeNodeType<CaJointName> tree = this.tree_gen.next();
+    final HashMap<CaJointName, JOTreeNodeReadableType<CaJointName>> map =
       new HashMap<>();
     tree.forEachDepthFirst(
       map, (input, depth, node) -> map.put(node.value(), node));
-    return new BoneNameTree(tree, javaslang.collection.HashMap.ofAll(map));
+    return new JointNameTree(tree, javaslang.collection.HashMap.ofAll(map));
   }
 }

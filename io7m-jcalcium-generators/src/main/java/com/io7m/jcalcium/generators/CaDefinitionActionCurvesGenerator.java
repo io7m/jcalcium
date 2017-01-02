@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.generators;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurves;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
 import com.io7m.jnull.NullCheck;
@@ -38,17 +38,17 @@ public final class CaDefinitionActionCurvesGenerator
 {
   private final Generator<CaActionName> act_name_gen;
   private final IntegerGenerator fps_gen;
-  private final BoneTree tree;
+  private final JointTree tree;
   private final CaDefinitionCurveGenerator curve_gen;
 
   /**
    * Construct a generator.
    *
-   * @param in_tree A bone tree
+   * @param in_tree A joint tree
    */
 
   public CaDefinitionActionCurvesGenerator(
-    final BoneTree in_tree)
+    final JointTree in_tree)
   {
     this.act_name_gen = new CaActionNameGenerator();
     this.fps_gen = new IntegerGenerator(1, 300);
@@ -64,18 +64,18 @@ public final class CaDefinitionActionCurvesGenerator
       curves = curves.append(this.curve_gen.next());
     }
 
-    Map<CaBoneName, List<CaDefinitionCurveType>> m = HashMap.empty();
+    Map<CaJointName, List<CaDefinitionCurveType>> m = HashMap.empty();
     for (final CaDefinitionCurveType curve : curves) {
-      final CaBoneName bone_name = curve.bone();
-      if (m.containsKey(bone_name)) {
-        final List<CaDefinitionCurveType> xs = m.get(bone_name).get();
+      final CaJointName joint_name = curve.joint();
+      if (m.containsKey(joint_name)) {
+        final List<CaDefinitionCurveType> xs = m.get(joint_name).get();
         if (xs.filter(c -> Objects.equals(
           c.getClass(),
           curve.getClass())).isEmpty()) {
-          m = m.put(bone_name, xs.append(curve));
+          m = m.put(joint_name, xs.append(curve));
         }
       } else {
-        m = m.put(bone_name, List.of(curve));
+        m = m.put(joint_name, List.of(curve));
       }
     }
 

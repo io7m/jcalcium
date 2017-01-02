@@ -14,47 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core;
+package com.io7m.jcalcium.generators;
 
-import com.io7m.jnull.NullCheck;
-import com.io7m.junreachable.UnreachableCodeException;
-
-import java.util.regex.Pattern;
+import com.io7m.jcalcium.core.CaJointName;
+import net.java.quickcheck.Generator;
+import net.java.quickcheck.generator.support.CharacterGenerator;
+import net.java.quickcheck.generator.support.IntegerGenerator;
+import net.java.quickcheck.generator.support.StringGenerator;
 
 /**
- * Validity checks for bone names.
+ * A generator for {@link CaJointName}.
  */
 
-public final class CaBoneNames
+public final class CaJointNameGenerator implements Generator<CaJointName>
 {
-  /**
-   * The pattern that defines a valid bone name.
-   */
-
-  public static final Pattern PATTERN;
-
-  private static final String PATTERN_TEXT;
-
-  static {
-    PATTERN_TEXT = "[\\p{IsAlphabetic}\\p{IsDigit}_\\-\\.:]+";
-    PATTERN = NullCheck.notNull(
-      Pattern.compile(PATTERN_TEXT, Pattern.UNICODE_CHARACTER_CLASS));
-  }
-
-  private CaBoneNames()
-  {
-    throw new UnreachableCodeException();
-  }
+  private final StringGenerator gen;
 
   /**
-   * @param text The text
-   *
-   * @return {@code true} iff the given text is a valid bone name
+   * Construct a generator.
    */
 
-  public static boolean isValid(
-    final CharSequence text)
+  public CaJointNameGenerator()
   {
-    return PATTERN.matcher(text).matches();
+    this.gen = new StringGenerator(
+      new IntegerGenerator(1, 32),
+      new CharacterGenerator('a', 'z'));
+  }
+
+  @Override
+  public CaJointName next()
+  {
+    return CaJointName.of(this.gen.next());
   }
 }

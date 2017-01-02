@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jtensors.Quaternion4FType;
 import com.io7m.jtensors.VectorWritable3FType;
 import com.io7m.jtensors.parameterized.PVectorWritable3FType;
@@ -30,11 +30,11 @@ public interface CaActionEvaluatorCurvesFType extends
   CaActionEvaluatorCurvesType
 {
   /**
-   * Evaluate the translation of the bone with ID {@code bone_id} at global
+   * Evaluate the translation of the joint with ID {@code joint_id} at global
    * frame {@code frame}, writing the resulting value to {@code out}. The
    * action is assumed to have started at {@code frame_start}.
    *
-   * @param bone_id       The bone ID
+   * @param joint_id      The joint ID
    * @param frame_start   The global frame at which the action is assumed to
    *                      have started
    * @param frame_current The current global frame
@@ -43,18 +43,18 @@ public interface CaActionEvaluatorCurvesFType extends
    */
 
   void evaluateTranslation3FForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,
-    final PVectorWritable3FType<CaSpaceBoneParentRelativeType> out);
+    final PVectorWritable3FType<CaSpaceJointParentRelativeType> out);
 
   /**
-   * Evaluate the scale of the bone with ID {@code bone_id} at frame
+   * Evaluate the scale of the joint with ID {@code joint_id} at frame
    * {@code frame}, writing the resulting value to {@code out}. The
    * action is assumed to have started at {@code frame_start}.
    *
-   * @param bone_id       The bone ID
+   * @param joint_id      The joint ID
    * @param frame_start   The global frame at which the action is assumed to
    *                      have started
    * @param frame_current The current global frame
@@ -63,17 +63,17 @@ public interface CaActionEvaluatorCurvesFType extends
    */
 
   void evaluateScale3FForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,
     final VectorWritable3FType out);
 
   /**
-   * Evaluate the orientation of the bone with ID {@code bone_id} at global
+   * Evaluate the orientation of the joint with ID {@code joint_id} at global
    * frame {@code frame}, writing the resulting value to {@code out}.
    *
-   * @param bone_id       The bone ID
+   * @param joint_id      The joint ID
    * @param frame_start   The global frame at which the action is assumed to
    *                      have started
    * @param frame_current The current global frame
@@ -82,7 +82,7 @@ public interface CaActionEvaluatorCurvesFType extends
    */
 
   void evaluateOrientation4FForGlobalFrame(
-    final int bone_id,
+    final int joint_id,
     final long frame_start,
     final long frame_current,
     final double time_scale,

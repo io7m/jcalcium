@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.tests.core.compiled.actions;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
@@ -72,9 +72,9 @@ public final class CaActionCurvesScalingTest
       (long) action_scaled.curves().size());
 
     final IndexedSeq<CaCurveType> curves =
-      action.curves().get(CaBoneName.of("bone0")).get();
+      action.curves().get(CaJointName.of("joint0")).get();
     final IndexedSeq<CaCurveType> curves_scaled =
-      action_scaled.curves().get(CaBoneName.of("bone0")).get();
+      action_scaled.curves().get(CaJointName.of("joint0")).get();
 
     final CaCurveTranslation curve_scaled_trans =
       (CaCurveTranslation) curves_scaled.get(0);
@@ -82,7 +82,7 @@ public final class CaActionCurvesScalingTest
       (CaCurveTranslation) curves.get(0);
 
     Assert.assertEquals(curve_trans.action(), curve_scaled_trans.action());
-    Assert.assertEquals(curve_trans.bone(), curve_scaled_trans.bone());
+    Assert.assertEquals(curve_trans.joint(), curve_scaled_trans.joint());
 
     {
       {
@@ -128,7 +128,7 @@ public final class CaActionCurvesScalingTest
       (CaCurveOrientation) curves.get(1);
 
     Assert.assertEquals(curve_orient.action(), curve_scaled_orient.action());
-    Assert.assertEquals(curve_orient.bone(), curve_scaled_orient.bone());
+    Assert.assertEquals(curve_orient.joint(), curve_scaled_orient.joint());
 
     {
       {
@@ -174,7 +174,7 @@ public final class CaActionCurvesScalingTest
       (CaCurveScale) curves.get(2);
 
     Assert.assertEquals(curve_scale.action(), curve_scaled_scale.action());
-    Assert.assertEquals(curve_scale.bone(), curve_scaled_scale.bone());
+    Assert.assertEquals(curve_scale.joint(), curve_scaled_scale.joint());
 
     {
       {
@@ -245,7 +245,7 @@ public final class CaActionCurvesScalingTest
     final CaCurveTranslation curve_trans =
       CaCurveTranslation.builder()
         .setAction(CaActionName.of("action"))
-        .setBone(CaBoneName.of("bone0"))
+        .setJoint(CaJointName.of("joint0"))
         .setJavaMapKeyframes(curve_trans_keyframes)
         .build();
 
@@ -276,7 +276,7 @@ public final class CaActionCurvesScalingTest
     final CaCurveOrientation curve_orient =
       CaCurveOrientation.builder()
         .setAction(CaActionName.of("action"))
-        .setBone(CaBoneName.of("bone0"))
+        .setJoint(CaJointName.of("joint0"))
         .setJavaMapKeyframes(curve_orient_keyframes)
         .build();
 
@@ -307,12 +307,12 @@ public final class CaActionCurvesScalingTest
     final CaCurveScale curve_scale =
       CaCurveScale.builder()
         .setAction(CaActionName.of("action"))
-        .setBone(CaBoneName.of("bone0"))
+        .setJoint(CaJointName.of("joint0"))
         .setJavaMapKeyframes(curve_scale_keyframes)
         .build();
 
-    final Map<CaBoneName, IndexedSeq<CaCurveType>> curves = new HashMap<>(1);
-    curves.put(CaBoneName.of("bone0"), Vector.of(
+    final Map<CaJointName, IndexedSeq<CaCurveType>> curves = new HashMap<>(1);
+    curves.put(CaJointName.of("joint0"), Vector.of(
       curve_trans,
       curve_orient,
       curve_scale));

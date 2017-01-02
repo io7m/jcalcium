@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jtensors.parameterized.PMatrixReadable4x4DType;
 
@@ -30,15 +30,15 @@ import java.util.NoSuchElementException;
 public interface CaSkeletonRestPoseDType
 {
   /**
-   * @param bone_id A bone ID
+   * @param joint_id A joint ID
    *
-   * @return The absolute transform for the given bone
+   * @return The absolute transform for the given joint
    *
-   * @throws NoSuchElementException If the bone does not exist
+   * @throws NoSuchElementException If the joint does not exist
    */
 
-  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType>
+  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType>
   transformAbsolute4x4D(
-    final int bone_id)
+    final int joint_id)
     throws NoSuchElementException;
 }

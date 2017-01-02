@@ -21,9 +21,9 @@ import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaBone;
+import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
@@ -34,7 +34,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.definitions.CaDefinitionBone;
+import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionCurvesType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
@@ -67,9 +67,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_BONE_MULTIPLE_ROOTS;
-import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_BONE_NONEXISTENT_PARENT;
-import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_BONE_NO_ROOT;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_MULTIPLE_ROOT_JOINTS;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NONEXISTENT_PARENT;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NO_ROOT;
 import static javaslang.control.Validation.invalid;
 import static javaslang.control.Validation.valid;
 
@@ -93,47 +93,47 @@ final class CaCompileTask
     return List.of(CaCompileError.of(code, message));
   }
 
-  private static Validation<List<CaCompileError>, JOTreeNodeType<CaDefinitionBone>>
+  private static Validation<List<CaCompileError>, JOTreeNodeType<CaDefinitionJoint>>
   buildDefinitionTreeAddNode(
-    final Map<CaBoneName, CaDefinitionBone> bones,
-    final HashMap<CaBoneName, JOTreeNodeType<CaDefinitionBone>> nodes,
-    final CaDefinitionBone bone)
+    final Map<CaJointName, CaDefinitionJoint> joints,
+    final HashMap<CaJointName, JOTreeNodeType<CaDefinitionJoint>> nodes,
+    final CaDefinitionJoint joint)
   {
-    if (nodes.containsKey(bone.name())) {
-      return valid(nodes.get(bone.name()));
+    if (nodes.containsKey(joint.name())) {
+      return valid(nodes.get(joint.name()));
     }
 
-    final JOTreeNodeType<CaDefinitionBone> node = JOTreeNode.create(bone);
-    nodes.put(bone.name(), node);
+    final JOTreeNodeType<CaDefinitionJoint> node = JOTreeNode.create(joint);
+    nodes.put(joint.name(), node);
 
-    final Optional<CaBoneName> parent_opt = bone.parent();
+    final Optional<CaJointName> parent_opt = joint.parent();
     if (parent_opt.isPresent()) {
-      final CaBoneName parent_name = parent_opt.get();
-      if (!bones.containsKey(parent_name)) {
+      final CaJointName parent_name = parent_opt.get();
+      if (!joints.containsKey(parent_name)) {
         final StringBuilder sb = new StringBuilder(128);
-        sb.append("Nonexistent parent bone specified.");
+        sb.append("Nonexistent parent joint specified.");
         sb.append(System.lineSeparator());
-        sb.append("  Bone:               ");
-        sb.append(bone.name().value());
+        sb.append("  Joint:               ");
+        sb.append(joint.name().value());
         sb.append(System.lineSeparator());
         sb.append("  Nonexistent parent: ");
         sb.append(parent_name.value());
         sb.append(System.lineSeparator());
         return invalid(errorsFor(
-          ERROR_BONE_NONEXISTENT_PARENT,
+          ERROR_JOINT_NONEXISTENT_PARENT,
           sb.toString()));
       }
 
       try {
         if (nodes.containsKey(parent_name)) {
-          final JOTreeNodeType<CaDefinitionBone> parent_node = nodes.get(
+          final JOTreeNodeType<CaDefinitionJoint> parent_node = nodes.get(
             parent_name);
           parent_node.childAdd(node);
         } else {
           return buildDefinitionTreeAddNode(
-            bones,
+            joints,
             nodes,
-            bones.get(parent_name).get()).flatMap(parent -> {
+            joints.get(parent_name).get()).flatMap(parent -> {
             parent.childAdd(node);
             return valid(node);
           });
@@ -142,14 +142,14 @@ final class CaCompileTask
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Graph cycle detected in skeleton input.");
         sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(bone.name().value());
+        sb.append("  Joint:   ");
+        sb.append(joint.name().value());
         sb.append(System.lineSeparator());
         sb.append("  Parent: ");
         sb.append(parent_name.value());
         sb.append(System.lineSeparator());
         return invalid(
-          errorsFor(CaCompileErrorCode.ERROR_BONE_CYCLE, sb.toString()));
+          errorsFor(CaCompileErrorCode.ERROR_JOINT_CYCLE, sb.toString()));
       }
     }
 
@@ -157,86 +157,86 @@ final class CaCompileTask
   }
 
   /**
-   * Attempt to construct a tree from the given set of bone definitions.
+   * Attempt to construct a tree from the given set of joint definitions.
    *
-   * @param bone_defs The bone definitions
-   * @param root      The root bone
+   * @param joint_defs The joint definitions
+   * @param root      The root joint
    *
-   * @return A tree, or a list of reasons why the bones do not form a tree
+   * @return A tree, or a list of reasons why the joints do not form a tree
    */
 
   private static Validation<
-    List<CaCompileError>, JOTreeNodeType<CaDefinitionBone>>
+    List<CaCompileError>, JOTreeNodeType<CaDefinitionJoint>>
   compileBuildDefinitionTree(
-    final Map<CaBoneName, CaDefinitionBone> bone_defs,
-    final CaDefinitionBone root)
+    final Map<CaJointName, CaDefinitionJoint> joint_defs,
+    final CaDefinitionJoint root)
   {
-    final JOTreeNodeType<CaDefinitionBone> tree_root =
+    final JOTreeNodeType<CaDefinitionJoint> tree_root =
       JOTreeNode.create(root);
-    final HashMap<CaBoneName, JOTreeNodeType<CaDefinitionBone>> nodes =
-      new HashMap<>(bone_defs.size());
+    final HashMap<CaJointName, JOTreeNodeType<CaDefinitionJoint>> nodes =
+      new HashMap<>(joint_defs.size());
     nodes.put(root.name(), tree_root);
 
     return Validation.sequence(
-      bone_defs.values().map(
-        bone -> buildDefinitionTreeAddNode(bone_defs, nodes, bone)))
-      .flatMap(bones -> {
+      joint_defs.values().map(
+        joint -> buildDefinitionTreeAddNode(joint_defs, nodes, joint)))
+      .flatMap(joints -> {
         Invariants.checkInvariant(
-          bones.size() == bone_defs.size(),
-          "Compiled skeleton bone count must match");
+          joints.size() == joint_defs.size(),
+          "Compiled skeleton joint count must match");
         return valid(tree_root);
       });
   }
 
   /**
-   * Attempt to find a root bone in the given set of bones.
+   * Attempt to find a root joint in the given set of joints.
    *
-   * @param bones The bones
+   * @param joints The joints
    *
-   * @return The root bone, or a list of reasons why there are too few or too
-   * many root bones
+   * @return The root joint, or a list of reasons why there are too few or too
+   * many root joints
    */
 
-  private static Validation<List<CaCompileError>, CaDefinitionBone>
-  compileFindRootBone(
-    final Map<CaBoneName, CaDefinitionBone> bones)
+  private static Validation<List<CaCompileError>, CaDefinitionJoint>
+  compileFindRootJoint(
+    final Map<CaJointName, CaDefinitionJoint> joints)
   {
-    final Map<CaBoneName, CaDefinitionBone> roots =
-      bones.filter(p -> !p._2.parent().isPresent());
+    final Map<CaJointName, CaDefinitionJoint> roots =
+      joints.filter(p -> !p._2.parent().isPresent());
 
     if (roots.isEmpty()) {
       final StringBuilder sb = new StringBuilder(128);
-      sb.append("No root bone defined in skeleton.");
+      sb.append("No root joint defined in skeleton.");
       sb.append(System.lineSeparator());
-      sb.append("  Possible solution: Add a bone without a parent.");
+      sb.append("  Possible solution: Add a joint without a parent.");
       sb.append(System.lineSeparator());
-      return invalid(errorsFor(ERROR_BONE_NO_ROOT, sb.toString()));
+      return invalid(errorsFor(ERROR_JOINT_NO_ROOT, sb.toString()));
     }
 
     if (roots.size() > 1) {
       final StringBuilder sb = new StringBuilder(128);
-      sb.append("Multiple root bones defined in skeleton.");
+      sb.append("Multiple root joints defined in skeleton.");
       sb.append(System.lineSeparator());
       sb.append("  Roots:");
       sb.append(System.lineSeparator());
-      for (final CaBoneName root : roots.keySet()) {
+      for (final CaJointName root : roots.keySet()) {
         sb.append("    ");
         sb.append(root.value());
         sb.append(System.lineSeparator());
       }
 
       sb.append(
-        "  Possible solution: Make sure only one bone exists without a parent.");
+        "  Possible solution: Make sure only one joint exists without a parent.");
       sb.append(System.lineSeparator());
-      return invalid(errorsFor(ERROR_BONE_MULTIPLE_ROOTS, sb.toString()));
+      return invalid(errorsFor(ERROR_MULTIPLE_ROOT_JOINTS, sb.toString()));
     }
 
     return valid(roots.values().apply(Integer.valueOf(0)));
   }
 
-  private static Validation<List<CaCompileError>, JOTreeNodeType<CaBone>>
-  compileBonesAssignIdentifiers(
-    final JOTreeNodeReadableType<CaDefinitionBone> root)
+  private static Validation<List<CaCompileError>, JOTreeNodeType<CaJoint>>
+  compileJointsAssignIdentifiers(
+    final JOTreeNodeReadableType<CaDefinitionJoint> root)
   {
     /*
      * First, insert all nodes into a linked list, ordered first by depth
@@ -258,35 +258,35 @@ final class CaCompileTask
     });
 
     /*
-     * Now, compile each bone and build a new bone tree.
+     * Now, compile each joint and build a new joint tree.
      */
 
-    final java.util.Map<CaBoneName, JOTreeNodeType<CaBone>> processed =
+    final java.util.Map<CaJointName, JOTreeNodeType<CaJoint>> processed =
       new HashMap<>(nodes.size());
     final AtomicInteger id_pool = new AtomicInteger(0);
-    JOTreeNodeType<CaBone> compiled_root = null;
+    JOTreeNodeType<CaJoint> compiled_root = null;
 
     for (final NodeByDepth node : nodes) {
-      final CaDefinitionBone bone = node.node.value();
-      final CaBone compiled = CaBone.of(
-        bone.name(),
+      final CaDefinitionJoint joint = node.node.value();
+      final CaJoint compiled = CaJoint.of(
+        joint.name(),
         id_pool.getAndIncrement(),
-        bone.translation(),
-        bone.orientation(),
-        bone.scale());
+        joint.translation(),
+        joint.orientation(),
+        joint.scale());
 
-      final JOTreeNodeType<CaBone> compiled_node =
+      final JOTreeNodeType<CaJoint> compiled_node =
         JOTreeNode.create(compiled);
 
-      final Optional<CaBoneName> parent_opt = bone.parent();
+      final Optional<CaJointName> parent_opt = joint.parent();
       if (parent_opt.isPresent()) {
-        final CaBoneName parent_name = parent_opt.get();
+        final CaJointName parent_name = parent_opt.get();
 
         Invariants.checkInvariant(
           processed.containsKey(parent_name),
           "Parent node must have been processed");
 
-        final JOTreeNodeType<CaBone> parent =
+        final JOTreeNodeType<CaJoint> parent =
           processed.get(parent_name);
         compiled_node.setParent(parent);
       } else {
@@ -299,7 +299,7 @@ final class CaCompileTask
         compiled_root = compiled_node;
       }
 
-      processed.put(bone.name(), compiled_node);
+      processed.put(joint.name(), compiled_node);
     }
 
     Invariants.checkInvariant(
@@ -308,32 +308,32 @@ final class CaCompileTask
     return valid(NullCheck.notNull(compiled_root, "Root"));
   }
 
-  private static Validation<List<CaCompileError>, BoneIndex>
-  compileBonesCreateIndex(
-    final JOTreeNodeType<CaBone> root)
+  private static Validation<List<CaCompileError>, JointIndex>
+  compileJointsCreateIndex(
+    final JOTreeNodeType<CaJoint> root)
   {
-    final java.util.Map<CaBoneName, JOTreeNodeType<CaBone>> by_name =
+    final java.util.Map<CaJointName, JOTreeNodeType<CaJoint>> by_name =
       new HashMap<>(16);
-    final java.util.Map<Integer, JOTreeNodeType<CaBone>> by_id =
+    final java.util.Map<Integer, JOTreeNodeType<CaJoint>> by_id =
       new HashMap<>(16);
 
     root.forEachDepthFirst(Unit.unit(), (ignored, depth, node) -> {
-      final CaBone bone = node.value();
-      final Integer bone_id = Integer.valueOf(bone.id());
-      final CaBoneName bone_name = bone.name();
+      final CaJoint joint = node.value();
+      final Integer joint_id = Integer.valueOf(joint.id());
+      final CaJointName joint_name = joint.name();
 
       Invariants.checkInvariant(
-        !by_name.containsKey(bone_name),
+        !by_name.containsKey(joint_name),
         "Name must not be duplicated");
       Invariants.checkInvariant(
-        !by_id.containsKey(bone_id),
+        !by_id.containsKey(joint_id),
         "ID must not be duplicated");
 
-      by_name.put(bone_name, (JOTreeNodeType<CaBone>) node);
-      by_id.put(bone_id, (JOTreeNodeType<CaBone>) node);
+      by_name.put(joint_name, (JOTreeNodeType<CaJoint>) node);
+      by_id.put(joint_id, (JOTreeNodeType<CaJoint>) node);
     });
 
-    return valid(new BoneIndex(
+    return valid(new JointIndex(
       root, TreeMap.ofAll(by_name), TreeMap.ofAll(by_id)));
   }
 
@@ -343,11 +343,11 @@ final class CaCompileTask
 
   private static Validation<List<CaCompileError>, SortedMap<CaActionName, CaActionType>>
   compileActions(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final Map<CaActionName, CaDefinitionActionType> in_actions)
   {
     return Validation.sequence(
-      in_actions.values().map(action -> compileAction(bone_index, action)))
+      in_actions.values().map(action -> compileAction(joint_index, action)))
       .flatMap(actions -> valid(sortedMapOf(actions)));
   }
 
@@ -362,51 +362,51 @@ final class CaCompileTask
 
   private static Validation<List<CaCompileError>, CaActionType>
   compileAction(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaDefinitionActionType action)
   {
-    return action.matchAction(bone_index, CaCompileTask::compileActionCurves);
+    return action.matchAction(joint_index, CaCompileTask::compileActionCurves);
   }
 
   private static Validation<List<CaCompileError>, CaActionType>
   compileActionCurves(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaDefinitionActionCurvesType action)
   {
-    final Map<CaBoneName, List<CaDefinitionCurveType>> curves =
+    final Map<CaJointName, List<CaDefinitionCurveType>> curves =
       action.curves();
 
     List<CaCompileError> errors = List.empty();
-    SortedMap<CaBoneName, IndexedSeq<CaCurveType>> results =
+    SortedMap<CaJointName, IndexedSeq<CaCurveType>> results =
       javaslang.collection.TreeMap.empty();
 
-    for (final CaBoneName bone : curves.keySet()) {
-      final Validation<List<CaCompileError>, CaBone> v_bone =
-        compileActionBoneName(bone_index, action.name(), bone);
+    for (final CaJointName joint : curves.keySet()) {
+      final Validation<List<CaCompileError>, CaJoint> v_joint =
+        compileActionJointName(joint_index, action.name(), joint);
 
-      if (v_bone.isInvalid()) {
-        errors = errors.appendAll(v_bone.getError());
+      if (v_joint.isInvalid()) {
+        errors = errors.appendAll(v_joint.getError());
         continue;
       }
 
-      final List<CaDefinitionCurveType> curves_for_bone =
-        curves.get(bone).get();
+      final List<CaDefinitionCurveType> curves_for_joint =
+        curves.get(joint).get();
 
       IndexedSeq<CaCurveType> curves_ok = Array.empty();
 
       final CurveTypeCounter counter = new CurveTypeCounter(
-        bone,
+        joint,
         action.name());
-      for (final CaDefinitionCurveType curve : curves_for_bone) {
+      for (final CaDefinitionCurveType curve : curves_for_joint) {
         final Validation<List<CaCompileError>, CaCurveType> r = curve.matchCurve(
           counter,
           CurveTypeCounter::onCurveTranslation,
           CurveTypeCounter::onCurveOrientation,
           CurveTypeCounter::onCurveScale).flatMap(
           ignored -> compileActionCurve(
-            bone_index,
+            joint_index,
             action.name(),
-            bone,
+            joint,
             curve));
 
         if (r.isValid()) {
@@ -416,14 +416,14 @@ final class CaCompileTask
         }
       }
 
-      results = results.put(bone, curves_ok);
+      results = results.put(joint, curves_ok);
     }
 
     final Validation<List<CaCompileError>, Integer> v_fps =
       compileActionFPS(action.name(), action.framesPerSecond());
 
     if (errors.isEmpty()) {
-      final SortedMap<CaBoneName, IndexedSeq<CaCurveType>> r_results = results;
+      final SortedMap<CaJointName, IndexedSeq<CaCurveType>> r_results = results;
       return v_fps.flatMap(fps -> {
         final CaActionCurves.Builder b = CaActionCurves.builder();
         b.setName(action.name());
@@ -441,43 +441,43 @@ final class CaCompileTask
 
   private static Validation<List<CaCompileError>, CaCurveType>
   compileActionCurve(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveType curve)
   {
     Invariants.checkInvariant(
-      Objects.equals(curve.bone(), bone_name),
+      Objects.equals(curve.joint(), joint_name),
       () -> String.format(
-        "Curve bone %s must match bone %s",
-        curve.bone().value(),
-        bone_name.value()));
+        "Curve joint %s must match joint %s",
+        curve.joint().value(),
+        joint_name.value()));
 
-    return compileActionBoneName(bone_index, action_name, bone_name)
+    return compileActionJointName(joint_index, action_name, joint_name)
       .flatMap(ignored -> curve.matchCurve(
-        bone_index,
-        (in_bone_index, curve_translation) ->
+        joint_index,
+        (in_joint_index, curve_translation) ->
           compileActionCurveTranslation(
-            in_bone_index, action_name, bone_name, curve_translation),
-        (in_bone_index, curve_orientation) ->
+            in_joint_index, action_name, joint_name, curve_translation),
+        (in_joint_index, curve_orientation) ->
           compileActionCurveOrientation(
-            in_bone_index, action_name, bone_name, curve_orientation),
-        (in_bone_index, curve_scale) ->
+            in_joint_index, action_name, joint_name, curve_orientation),
+        (in_joint_index, curve_scale) ->
           compileActionCurveScale(
-            in_bone_index, action_name, bone_name, curve_scale)));
+            in_joint_index, action_name, joint_name, curve_scale)));
   }
 
   private static <E, T> Validation<List<E>, T> flatten(
     final Validation<List<List<E>>, T> v)
   {
-    return v.leftMap(xs -> xs.fold(List.empty(), List::appendAll));
+    return v.mapError(xs -> xs.fold(List.empty(), List::appendAll));
   }
 
   private static Validation<List<CaCompileError>, CaCurveKeyframeTranslation>
   compileActionCurveKeyframeTranslation(
     final java.util.Map<Integer, CaCurveKeyframeTranslation> frames,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveKeyframeTranslationType keyframe)
   {
     final Integer keyframe_index = Integer.valueOf(keyframe.index());
@@ -489,8 +489,8 @@ final class CaCompileTask
       sb.append("  Action: ");
       sb.append(action_name.value());
       sb.append(System.lineSeparator());
-      sb.append("  Bone:   ");
-      sb.append(bone_name.value());
+      sb.append("  Joint:   ");
+      sb.append(joint_name.value());
       sb.append(System.lineSeparator());
       sb.append("  Index:  ");
       sb.append(keyframe.index());
@@ -519,7 +519,7 @@ final class CaCompileTask
   compileActionCurveKeyframeOrientation(
     final java.util.Map<Integer, CaCurveKeyframeOrientation> frames,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveKeyframeOrientationType keyframe)
   {
     final Integer keyframe_index = Integer.valueOf(keyframe.index());
@@ -531,8 +531,8 @@ final class CaCompileTask
       sb.append("  Action: ");
       sb.append(action_name.value());
       sb.append(System.lineSeparator());
-      sb.append("  Bone:   ");
-      sb.append(bone_name.value());
+      sb.append("  Joint:   ");
+      sb.append(joint_name.value());
       sb.append(System.lineSeparator());
       sb.append("  Index:  ");
       sb.append(keyframe.index());
@@ -561,7 +561,7 @@ final class CaCompileTask
   compileActionCurveKeyframeScale(
     final java.util.Map<Integer, CaCurveKeyframeScale> frames,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveKeyframeScaleType keyframe)
   {
     final Integer keyframe_index = Integer.valueOf(keyframe.index());
@@ -573,8 +573,8 @@ final class CaCompileTask
       sb.append("  Action: ");
       sb.append(action_name.value());
       sb.append(System.lineSeparator());
-      sb.append("  Bone:   ");
-      sb.append(bone_name.value());
+      sb.append("  Joint:   ");
+      sb.append(joint_name.value());
       sb.append(System.lineSeparator());
       sb.append("  Index:  ");
       sb.append(keyframe.index());
@@ -599,23 +599,23 @@ final class CaCompileTask
     return valid(result_keyframe);
   }
 
-  private static Validation<List<CaCompileError>, CaBone> compileActionBoneName(
-    final BoneIndex index,
+  private static Validation<List<CaCompileError>, CaJoint> compileActionJointName(
+    final JointIndex index,
     final CaActionName action_name,
-    final CaBoneName bone_name)
+    final CaJointName joint_name)
   {
-    if (index.bones_by_name.containsKey(bone_name)) {
-      return valid(index.bones_by_name.get(bone_name).get().value());
+    if (index.joints_by_name.containsKey(joint_name)) {
+      return valid(index.joints_by_name.get(joint_name).get().value());
     }
 
     final StringBuilder sb = new StringBuilder(128);
-    sb.append("Action specifies a nonexistent bone.");
+    sb.append("Action specifies a nonexistent joint.");
     sb.append(System.lineSeparator());
     sb.append("  Action: ");
     sb.append(action_name.value());
     sb.append(System.lineSeparator());
-    sb.append("  Bone:   ");
-    sb.append(bone_name.value());
+    sb.append("  Joint:   ");
+    sb.append(joint_name.value());
     sb.append(System.lineSeparator());
     return invalid(errorsFor(
       CaCompileErrorCode.ERROR_ACTION_INVALID_BONE, sb.toString()));
@@ -623,14 +623,14 @@ final class CaCompileTask
 
   private static Validation<List<CaCompileError>, CaCurveType>
   compileActionCurveTranslation(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveTranslationType curve_translation)
   {
     Preconditions.checkPrecondition(
-      bone_index.bones_by_name.containsKey(bone_name),
-      "Bone must exist");
+      joint_index.joints_by_name.containsKey(joint_name),
+      "Joint must exist");
 
     final java.util.Map<Integer, CaCurveKeyframeTranslation> frames =
       new java.util.TreeMap<>();
@@ -638,32 +638,32 @@ final class CaCompileTask
     final Validation<List<CaCompileError>, Seq<CaCurveKeyframeTranslation>> v_frames =
       Validation.sequence(curve_translation.keyframes().map(
         keyframe -> compileActionCurveKeyframeTranslation(
-          frames, action_name, bone_name, keyframe)));
+          frames, action_name, joint_name, keyframe)));
 
-    final Validation<List<CaCompileError>, CaBone> v_name =
-      compileActionBoneName(bone_index, action_name, bone_name);
+    final Validation<List<CaCompileError>, CaJoint> v_name =
+      compileActionJointName(joint_index, action_name, joint_name);
 
     return flatten(
       Validation.combine(v_frames, v_name)
-        .ap((c_frames, c_bone) -> {
+        .ap((c_frames, c_joint) -> {
           final CaCurveTranslation.Builder cb = CaCurveTranslation.builder();
           cb.setKeyframes(TreeMap.ofAll(frames));
           cb.setAction(action_name);
-          cb.setBone(c_bone.name());
+          cb.setJoint(c_joint.name());
           return cb.build();
         }));
   }
 
   private static Validation<List<CaCompileError>, CaCurveType>
   compileActionCurveScale(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveScaleType curve_scale)
   {
     Preconditions.checkPrecondition(
-      bone_index.bones_by_name.containsKey(bone_name),
-      "Bone must exist");
+      joint_index.joints_by_name.containsKey(joint_name),
+      "Joint must exist");
 
     final java.util.Map<Integer, CaCurveKeyframeScale> frames =
       new java.util.TreeMap<>();
@@ -671,32 +671,32 @@ final class CaCompileTask
     final Validation<List<CaCompileError>, Seq<CaCurveKeyframeScale>> v_frames =
       Validation.sequence(curve_scale.keyframes().map(
         keyframe -> compileActionCurveKeyframeScale(
-          frames, action_name, bone_name, keyframe)));
+          frames, action_name, joint_name, keyframe)));
 
-    final Validation<List<CaCompileError>, CaBone> v_name =
-      compileActionBoneName(bone_index, action_name, bone_name);
+    final Validation<List<CaCompileError>, CaJoint> v_name =
+      compileActionJointName(joint_index, action_name, joint_name);
 
     return flatten(
       Validation.combine(v_frames, v_name)
-        .ap((c_frames, c_bone) -> {
+        .ap((c_frames, c_joint) -> {
           final CaCurveScale.Builder cb = CaCurveScale.builder();
           cb.setKeyframes(TreeMap.ofAll(frames));
           cb.setAction(action_name);
-          cb.setBone(c_bone.name());
+          cb.setJoint(c_joint.name());
           return cb.build();
         }));
   }
 
   private static Validation<List<CaCompileError>, CaCurveType>
   compileActionCurveOrientation(
-    final BoneIndex bone_index,
+    final JointIndex joint_index,
     final CaActionName action_name,
-    final CaBoneName bone_name,
+    final CaJointName joint_name,
     final CaDefinitionCurveOrientationType curve_orientation)
   {
     Preconditions.checkPrecondition(
-      bone_index.bones_by_name.containsKey(bone_name),
-      "Bone must exist");
+      joint_index.joints_by_name.containsKey(joint_name),
+      "Joint must exist");
 
     final java.util.Map<Integer, CaCurveKeyframeOrientation> frames =
       new java.util.TreeMap<>();
@@ -704,18 +704,18 @@ final class CaCompileTask
     final Validation<List<CaCompileError>, Seq<CaCurveKeyframeOrientation>> v_frames =
       Validation.sequence(curve_orientation.keyframes().map(
         keyframe -> compileActionCurveKeyframeOrientation(
-          frames, action_name, bone_name, keyframe)));
+          frames, action_name, joint_name, keyframe)));
 
-    final Validation<List<CaCompileError>, CaBone> v_name =
-      compileActionBoneName(bone_index, action_name, bone_name);
+    final Validation<List<CaCompileError>, CaJoint> v_name =
+      compileActionJointName(joint_index, action_name, joint_name);
 
     return flatten(
       Validation.combine(v_frames, v_name)
-        .ap((c_frames, c_bone) -> {
+        .ap((c_frames, c_joint) -> {
           final CaCurveOrientation.Builder cb = CaCurveOrientation.builder();
           cb.setKeyframes(TreeMap.ofAll(frames));
           cb.setAction(action_name);
-          cb.setBone(c_bone.name());
+          cb.setJoint(c_joint.name());
           return cb.build();
         }));
   }
@@ -747,56 +747,56 @@ final class CaCompileTask
 
   private static CaSkeleton make(
     final CaSkeletonName name,
-    final BoneIndex index,
+    final JointIndex index,
     final SortedMap<CaActionName, CaActionType> actions)
   {
     final CaSkeleton.Builder b = CaSkeleton.builder();
     b.setActionsByName(actions);
-    b.setBones(index.bones);
+    b.setJoints(index.joints);
     b.setName(name);
     return b.build();
   }
 
   Validation<List<CaCompileError>, CaSkeleton> run()
   {
-    final Map<CaBoneName, CaDefinitionBone> in_bones = this.input.bones();
+    final Map<CaJointName, CaDefinitionJoint> in_joints = this.input.joints();
     final Map<CaActionName, CaDefinitionActionType> in_actions = this.input.actions();
 
-    return compileFindRootBone(in_bones)
-      .flatMap(root -> compileBuildDefinitionTree(in_bones, root))
-      .flatMap(CaCompileTask::compileBonesAssignIdentifiers)
-      .flatMap(CaCompileTask::compileBonesCreateIndex)
+    return compileFindRootJoint(in_joints)
+      .flatMap(root -> compileBuildDefinitionTree(in_joints, root))
+      .flatMap(CaCompileTask::compileJointsAssignIdentifiers)
+      .flatMap(CaCompileTask::compileJointsCreateIndex)
       .flatMap(index -> compileActions(index, in_actions).flatMap(
         actions -> valid(make(this.input.name(), index, actions))));
   }
 
   private static final class CurveTypeCounter
   {
-    private final BitSet bone_type_received;
-    private final CaBoneName bone_name;
+    private final BitSet joint_type_received;
+    private final CaJointName joint_name;
     private final CaActionName action_name;
 
     CurveTypeCounter(
-      final CaBoneName in_bone_name,
+      final CaJointName in_joint_name,
       final CaActionName in_action_name)
     {
-      this.bone_type_received = new BitSet(3);
-      this.bone_name = NullCheck.notNull(in_bone_name, "Bone name");
+      this.joint_type_received = new BitSet(3);
+      this.joint_name = NullCheck.notNull(in_joint_name, "Joint name");
       this.action_name = NullCheck.notNull(in_action_name, "Action name");
     }
 
     public Validation<List<CaCompileError>, Unit> onCurveTranslation(
       final CaDefinitionCurveTranslationType translation)
     {
-      if (this.bone_type_received.get(0)) {
+      if (this.joint_type_received.get(0)) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Multiple curves of the same type for an action.");
         sb.append(System.lineSeparator());
         sb.append("  Action: ");
         sb.append(this.action_name.value());
         sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
+        sb.append("  Joint:   ");
+        sb.append(this.joint_name.value());
         sb.append(System.lineSeparator());
         sb.append("  Type:   translation");
         sb.append(System.lineSeparator());
@@ -804,22 +804,22 @@ final class CaCompileTask
           CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
-      this.bone_type_received.set(0, true);
+      this.joint_type_received.set(0, true);
       return valid(Unit.unit());
     }
 
     public Validation<List<CaCompileError>, Unit> onCurveOrientation(
       final CaDefinitionCurveOrientationType orientation)
     {
-      if (this.bone_type_received.get(1)) {
+      if (this.joint_type_received.get(1)) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Multiple curves of the same type for an action.");
         sb.append(System.lineSeparator());
         sb.append("  Action: ");
         sb.append(this.action_name.value());
         sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
+        sb.append("  Joint:   ");
+        sb.append(this.joint_name.value());
         sb.append(System.lineSeparator());
         sb.append("  Type:   orientation");
         sb.append(System.lineSeparator());
@@ -827,22 +827,22 @@ final class CaCompileTask
           CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
-      this.bone_type_received.set(1, true);
+      this.joint_type_received.set(1, true);
       return valid(Unit.unit());
     }
 
     public Validation<List<CaCompileError>, Unit> onCurveScale(
       final CaDefinitionCurveScaleType orientation)
     {
-      if (this.bone_type_received.get(2)) {
+      if (this.joint_type_received.get(2)) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Multiple curves of the same type for an action.");
         sb.append(System.lineSeparator());
         sb.append("  Action: ");
         sb.append(this.action_name.value());
         sb.append(System.lineSeparator());
-        sb.append("  Bone:   ");
-        sb.append(this.bone_name.value());
+        sb.append("  Joint:   ");
+        sb.append(this.joint_name.value());
         sb.append(System.lineSeparator());
         sb.append("  Type:   scale");
         sb.append(System.lineSeparator());
@@ -850,18 +850,18 @@ final class CaCompileTask
           CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
-      this.bone_type_received.set(2, true);
+      this.joint_type_received.set(2, true);
       return valid(Unit.unit());
     }
   }
 
   private static final class NodeByDepth
   {
-    private final JOTreeNodeReadableType<CaDefinitionBone> node;
+    private final JOTreeNodeReadableType<CaDefinitionJoint> node;
     private final int depth;
 
     NodeByDepth(
-      final JOTreeNodeReadableType<CaDefinitionBone> in_node,
+      final JOTreeNodeReadableType<CaDefinitionJoint> in_node,
       final int in_depth)
     {
       this.node = NullCheck.notNull(in_node, "Node");
@@ -869,23 +869,23 @@ final class CaCompileTask
     }
   }
 
-  private static final class BoneIndex
+  private static final class JointIndex
   {
-    private final JOTreeNodeType<CaBone> bones;
-    private final SortedMap<CaBoneName, JOTreeNodeType<CaBone>> bones_by_name;
-    private final SortedMap<Integer, JOTreeNodeType<CaBone>> bones_by_id;
+    private final JOTreeNodeType<CaJoint> joints;
+    private final SortedMap<CaJointName, JOTreeNodeType<CaJoint>> joints_by_name;
+    private final SortedMap<Integer, JOTreeNodeType<CaJoint>> joints_by_id;
 
-    BoneIndex(
-      final JOTreeNodeType<CaBone> in_bones,
-      final SortedMap<CaBoneName, JOTreeNodeType<CaBone>> in_bones_by_name,
-      final SortedMap<Integer, JOTreeNodeType<CaBone>> in_bones_by_id)
+    JointIndex(
+      final JOTreeNodeType<CaJoint> in_joints,
+      final SortedMap<CaJointName, JOTreeNodeType<CaJoint>> in_joints_by_name,
+      final SortedMap<Integer, JOTreeNodeType<CaJoint>> in_joints_by_id)
     {
-      this.bones =
-        NullCheck.notNull(in_bones, "Bones");
-      this.bones_by_name =
-        NullCheck.notNull(in_bones_by_name, "Bones by name");
-      this.bones_by_id =
-        NullCheck.notNull(in_bones_by_id, "Bones by id");
+      this.joints =
+        NullCheck.notNull(in_joints, "Joints");
+      this.joints_by_name =
+        NullCheck.notNull(in_joints_by_name, "Joints by name");
+      this.joints_by_id =
+        NullCheck.notNull(in_joints_by_id, "Joints by id");
     }
   }
 

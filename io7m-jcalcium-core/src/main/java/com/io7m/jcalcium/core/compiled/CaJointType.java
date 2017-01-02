@@ -14,56 +14,54 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.definitions;
+package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
 /**
- * A bone definition for a skeleton.
+ * The type of compiled joints.
  */
 
-@CaImmutableStyleType
 @Value.Immutable
-public interface CaDefinitionBoneType
+@CaImmutableStyleType
+public interface CaJointType
 {
   /**
-   * @return The bone name
+   * @return The joint name
    */
 
   @Value.Parameter
-  CaBoneName name();
+  CaJointName name();
 
   /**
-   * @return The name of the bone's parent
+   * @return The joint ID
    */
 
   @Value.Parameter
-  Optional<CaBoneName> parent();
+  int id();
 
   /**
-   * @return The parent-relative offset for the bone
+   * @return The parent-relative offset for the joint
    */
 
   @Value.Parameter
-  PVectorI3D<CaSpaceBoneParentRelativeType> translation();
+  PVectorI3D<CaSpaceJointParentRelativeType> translation();
 
   /**
-   * @return The parent-relative orientation of the bone
+   * @return The parent-relative orientation of the joint
    */
 
   @Value.Parameter
   QuaternionI4D orientation();
 
   /**
-   * @return The parent-relative scale of the bone
+   * @return The parent-relative scale of the joint
    */
 
   @Value.Parameter
