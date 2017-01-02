@@ -2,14 +2,13 @@ package com.io7m.jcalcium.tests;
 
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonTransforms;
-import com.io7m.jcalcium.core.compiled.CaSkeletonTransformsDType;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
 import com.io7m.jcalcium.loader.api.CaLoaderType;
-import com.io7m.jtensors.Matrix4x4DType;
 import com.io7m.jtensors.MatrixM4x4D;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorM4D;
@@ -80,8 +79,8 @@ public final class EvaluateRestPose
     try (final InputStream is = Files.newInputStream(path)) {
       final CaSkeleton skel =
         loader.loadCompiledSkeletonFromStream(is, path.toUri());
-      final CaSkeletonTransformsDType transforms =
-        CaSkeletonTransforms.createD(skel);
+      final CaSkeletonRestPoseDType transforms =
+        CaSkeletonRestPose.createD(skel);
 
       final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
       skel.bones().forEachBreadthFirst(unit(), (input, depth, node) -> {

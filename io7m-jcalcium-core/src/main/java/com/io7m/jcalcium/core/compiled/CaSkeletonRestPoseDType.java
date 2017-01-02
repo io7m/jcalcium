@@ -18,16 +18,16 @@ package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneAbsoluteType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
-import com.io7m.jtensors.parameterized.PMatrixReadable4x4FType;
+import com.io7m.jtensors.parameterized.PMatrixReadable4x4DType;
 
 import java.util.NoSuchElementException;
 
 /**
- * Transform matrices for the rest pose of a skeleton, with single-precision
- * elements.
+ * <p>Transform matrices for the rest pose of a skeleton, with double-precision
+ * elements.</p>
  */
 
-public interface CaSkeletonTransformsFType
+public interface CaSkeletonRestPoseDType
 {
   /**
    * @param bone_id A bone ID
@@ -37,8 +37,8 @@ public interface CaSkeletonTransformsFType
    * @throws NoSuchElementException If the bone does not exist
    */
 
-  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceBoneAbsoluteType>
-  transformAbsolute4x4F(
+  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType>
+  transformAbsolute4x4D(
     final int bone_id)
     throws NoSuchElementException;
 }

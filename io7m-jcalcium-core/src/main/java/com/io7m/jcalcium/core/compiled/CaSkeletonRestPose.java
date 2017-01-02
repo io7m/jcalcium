@@ -51,9 +51,9 @@ import java.util.Optional;
  * Functions for calculating rest pose transforms.
  */
 
-public final class CaSkeletonTransforms
+public final class CaSkeletonRestPose
 {
-  private CaSkeletonTransforms()
+  private CaSkeletonRestPose()
   {
     throw new UnreachableCodeException();
   }
@@ -63,10 +63,10 @@ public final class CaSkeletonTransforms
    *
    * @param skeleton The skeleton
    *
-   * @return A set of transforms
+   * @return A set of rest pose transforms
    */
 
-  public static CaSkeletonTransformsDType createD(
+  public static CaSkeletonRestPoseDType createD(
     final CaSkeleton skeleton)
   {
     NullCheck.notNull(skeleton, "Skeleton");
@@ -78,10 +78,10 @@ public final class CaSkeletonTransforms
    *
    * @param skeleton The skeleton
    *
-   * @return A set of transforms
+   * @return A set of rest pose transforms
    */
 
-  public static CaSkeletonTransformsFType createF(
+  public static CaSkeletonRestPoseFType createF(
     final CaSkeleton skeleton)
   {
     NullCheck.notNull(skeleton, "Skeleton");
@@ -141,7 +141,7 @@ public final class CaSkeletonTransforms
       this.transforms.put(bone.id(), transform);
     }
 
-    CaSkeletonTransformsDType build()
+    CaSkeletonRestPoseDType build()
     {
       this.skeleton.bones().forEachBreadthFirst(this, (t, depth, node) -> {
         final CaBone bone = node.value();
@@ -163,7 +163,7 @@ public final class CaSkeletonTransforms
     }
   }
 
-  private static final class BuiltD implements CaSkeletonTransformsDType
+  private static final class BuiltD implements CaSkeletonRestPoseDType
   {
     private final Int2ReferenceOpenHashMap<PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceBoneAbsoluteType>> transforms;
 
@@ -258,7 +258,7 @@ public final class CaSkeletonTransforms
       this.transforms.put(bone.id(), transform);
     }
 
-    CaSkeletonTransformsFType build()
+    CaSkeletonRestPoseFType build()
     {
       this.skeleton.bones().forEachBreadthFirst(this, (t, depth, node) -> {
         final CaBone bone = node.value();
@@ -280,7 +280,7 @@ public final class CaSkeletonTransforms
     }
   }
 
-  private static final class BuiltF implements CaSkeletonTransformsFType
+  private static final class BuiltF implements CaSkeletonRestPoseFType
   {
     private final Int2ReferenceOpenHashMap<PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceBoneAbsoluteType>> transforms;
 
