@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.definitions;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
@@ -30,7 +30,7 @@ import java.util.Optional;
  * A bone definition for a skeleton.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaDefinitionBoneType
 {

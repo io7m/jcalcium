@@ -18,6 +18,7 @@ package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jfunctional.PartialBiFunctionType;
+import org.immutables.value.Value;
 
 /**
  * A definition of an action.
@@ -49,11 +50,16 @@ public interface CaActionType
    * @return The name of the action
    */
 
+  @Value.Parameter
   CaActionName name();
 
   /**
+   * A specification of the number of frames per second the action expects. Must
+   * be {@code > 0}.
+   *
    * @return The number of frames per second the action uses
    */
 
+  @Value.Parameter
   int framesPerSecond();
 }

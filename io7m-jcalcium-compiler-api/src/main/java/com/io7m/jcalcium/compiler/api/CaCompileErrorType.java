@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.compiler.api;
 
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import org.immutables.value.Value;
 
 /**
@@ -23,7 +24,7 @@ import org.immutables.value.Value;
  */
 
 @Value.Immutable
-@com.io7m.jcalcium.core.ImmutableStyleType
+@CaImmutableStyleType
 public interface CaCompileErrorType
 {
   /**

@@ -16,10 +16,6 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.actions.CaActionType;
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
-
 /**
  * The type of evaluators that evaluate a single action for a single skeleton.
  */
@@ -27,28 +23,16 @@ import com.io7m.jorchard.core.JOTreeNodeReadableType;
 public interface CaEvaluatorSingleType
 {
   /**
-   * @return The skeleton targeted by the evaluator
-   */
-
-  CaSkeleton skeleton();
-
-  /**
-   * @return The action being evaluated
-   */
-
-  CaActionType action();
-
-  /**
-   * @return The tree of evaluated bones
-   */
-
-  JOTreeNodeReadableType<CaEvaluatedBoneType> evaluatedBones();
-
-  /**
-   * Evaluate the action at time {@code time}.
+   * Evaluate the action at global frame {@code frame}.
    *
-   * @param time The current time
+   * @param frame_start   The global frame at which the action is assumed to
+   *                      have started
+   * @param frame_current The current global frame
+   * @param time_scale    The animation time scale
    */
 
-  void evaluate(double time);
+  void evaluateForGlobalFrame(
+    long frame_start,
+    long frame_current,
+    double time_scale);
 }

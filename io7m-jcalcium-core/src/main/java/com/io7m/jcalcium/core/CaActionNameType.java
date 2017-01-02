@@ -23,7 +23,7 @@ import org.immutables.value.Value;
  * The type of action names.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaActionNameType extends Comparable<CaActionNameType>
 {

@@ -14,13 +14,35 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.core.spaces;
+package com.io7m.jcalcium.core;
+
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
+import org.immutables.value.Value;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * The skeleton coordinate space for bones.
+ * The {@code immutables.org} style for the project.
  */
 
-public interface CaSpaceSkeletonType extends CaSpaceType
+@Target({ElementType.PACKAGE, ElementType.TYPE})
+@Retention(RetentionPolicy.CLASS)
+@JavaslangEncodingEnabled
+@Value.Style(
+  get = {"is*", "get*"},
+  init = "set*",
+  typeAbstract = {"Abstract*", "*Type"},
+  typeImmutable = "*",
+  typeModifiable = "*Mutable",
+  builder = "builder",
+  build = "build",
+  visibility = Value.Style.ImplementationVisibility.PUBLIC,
+  defaults = @Value.Immutable(copy = true))
+public @interface CaImmutableStyleType
 {
-  // No extra methods
+
 }
+

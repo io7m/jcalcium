@@ -23,7 +23,7 @@ import org.immutables.value.Value;
  * The type of bone names.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaBoneNameType extends Comparable<CaBoneNameType>
 {

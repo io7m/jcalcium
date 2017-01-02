@@ -16,70 +16,11 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jtensors.Quaternion4DType;
-import com.io7m.jtensors.VectorWritable3DType;
-import com.io7m.jtensors.parameterized.PVectorWritable3DType;
-
 /**
  * An evaluator for a single curve-based action.
  */
 
-public interface CaActionEvaluatorCurvesType
+public interface CaActionEvaluatorCurvesType extends CaActionEvaluatorType
 {
-  /**
-   * @return The skeleton targeted by the evaluator
-   */
 
-  CaSkeleton skeleton();
-
-  /**
-   * @return The action being evaluated
-   */
-
-  CaActionCurvesType action();
-
-  /**
-   * Evaluate the translation of the bone with ID {@code bone_id} at time
-   * {@code time}, writing the resulting value to {@code out}.
-   *
-   * @param bone_id The bone ID
-   * @param time    The current time
-   * @param out     The output value
-   */
-
-  void evaluateTranslation(
-    int bone_id,
-    double time,
-    PVectorWritable3DType<CaSpaceBoneParentRelativeType> out);
-
-  /**
-   * Evaluate the scale of the bone with ID {@code bone_id} at time
-   * {@code time}, writing the resulting value to {@code out}.
-   *
-   * @param bone_id The bone ID
-   * @param time    The current time
-   * @param out     The output value
-   */
-
-  void evaluateScale(
-    int bone_id,
-    double time,
-    VectorWritable3DType out);
-
-  /**
-   * Evaluate the orientation of the bone with ID {@code bone_id} at time
-   * {@code time}, writing the resulting value to {@code out}.
-   *
-   * @param bone_id The bone ID
-   * @param time    The current time
-   * @param out     The output value
-   */
-
-  void evaluateOrientation(
-    int bone_id,
-    double time,
-    Quaternion4DType out);
 }

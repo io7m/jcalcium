@@ -17,14 +17,14 @@
 package com.io7m.jcalcium.evaluator.api;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import org.immutables.value.Value;
 
 /**
  * An action along with a defined weight.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaEvaluatorWeightedActionType
 {

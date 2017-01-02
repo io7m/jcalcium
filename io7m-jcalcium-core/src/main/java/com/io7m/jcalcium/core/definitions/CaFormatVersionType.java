@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.core.definitions;
 
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jnull.NullCheck;
 import org.immutables.value.Value;
 
@@ -26,7 +26,7 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @Value.Modifiable
-@ImmutableStyleType
+@CaImmutableStyleType
 public interface CaFormatVersionType extends Comparable<CaFormatVersionType>
 {
   /**

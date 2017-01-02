@@ -17,18 +17,20 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.Map;
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
  * An action that is constructed from a set of keyframe curves.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
+@JavaslangEncodingEnabled
 @Value.Immutable
 public interface CaDefinitionActionCurvesType extends CaDefinitionActionType
 {

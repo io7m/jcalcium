@@ -16,17 +16,20 @@
 
 package com.io7m.jcalcium.core.compiled.actions;
 
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jaffirm.core.Preconditions;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.SortedMap;
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
  * A curve that affects the orientation of a bone.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
+@JavaslangEncodingEnabled
 @Value.Immutable
 public interface CaCurveOrientationType extends CaCurveType
 {
@@ -47,4 +50,19 @@ public interface CaCurveOrientationType extends CaCurveType
    */
 
   SortedMap<Integer, CaCurveKeyframeOrientation> keyframes();
+
+  /**
+   * Check preconditions for the type.
+   */
+
+  @Value.Check
+  default void checkPreconditions()
+  {
+    this.keyframes().forEach(
+      (index, keyframe) ->
+        Preconditions.checkPreconditionI(
+          index.intValue(),
+          index.intValue() == keyframe.index(),
+          i -> "Orientation keyframe index must be " + keyframe.index()));
+  }
 }

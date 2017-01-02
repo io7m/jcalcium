@@ -19,13 +19,17 @@ package com.io7m.jcalcium.core.compiled;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import javaslang.collection.SortedMap;
+import javaslang.collection.TreeMap;
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.jfunctional.Unit.unit;
@@ -34,8 +38,9 @@ import static com.io7m.jfunctional.Unit.unit;
  * The type of compiled skeletons.
  */
 
+@CaImmutableStyleType
+@JavaslangEncodingEnabled
 @Value.Immutable
-@ImmutableStyleType
 public interface CaSkeletonType
 {
   /**
@@ -63,15 +68,41 @@ public interface CaSkeletonType
    * @return A map of bone nodes by name
    */
 
-  @Value.Parameter
-  SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName();
+  @Value.Derived
+  default SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> bonesByName()
+  {
+    final Map<CaBoneName, JOTreeNodeReadableType<CaBone>> hm = new HashMap<>();
+    this.bones().forEachBreadthFirst(
+      hm, (t, depth, node) -> {
+        final CaBone bone = node.value();
+        Preconditions.checkPrecondition(
+          bone.name(),
+          !t.containsKey(bone.name()),
+          name -> "Bone name must be unique");
+        t.put(bone.name(), node);
+      });
+    return TreeMap.ofAll(hm);
+  }
 
   /**
    * @return A map of bone nodes by ID
    */
 
-  @Value.Parameter
-  SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID();
+  @Value.Derived
+  default SortedMap<Integer, JOTreeNodeReadableType<CaBone>> bonesByID()
+  {
+    final Map<Integer, JOTreeNodeReadableType<CaBone>> hm = new HashMap<>();
+    this.bones().forEachBreadthFirst(
+      hm, (t, depth, node) -> {
+        final CaBone bone = node.value();
+        Preconditions.checkPreconditionI(
+          bone.id(),
+          !t.containsKey(Integer.valueOf(bone.id())),
+          id -> "Bone ID must be unique");
+        t.put(Integer.valueOf(bone.id()), node);
+      });
+    return TreeMap.ofAll(hm);
+  }
 
   /**
    * Check preconditions for the type.

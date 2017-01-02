@@ -16,17 +16,19 @@
 
 package com.io7m.jcalcium.core.definitions.actions;
 
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
  * A curve that affects the scale of a bone.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
+@JavaslangEncodingEnabled
 @Value.Immutable
 public interface CaDefinitionCurveScaleType extends CaDefinitionCurveType
 {

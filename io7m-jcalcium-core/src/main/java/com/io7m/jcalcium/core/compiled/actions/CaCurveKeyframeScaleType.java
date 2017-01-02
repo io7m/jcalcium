@@ -16,7 +16,9 @@
 
 package com.io7m.jcalcium.core.compiled.actions;
 
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaCurveEasing;
+import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jtensors.VectorI3D;
 import org.immutables.value.Value;
 
@@ -24,13 +26,26 @@ import org.immutables.value.Value;
  * A keyframe for a curve that affects the scale of a bone.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaCurveKeyframeScaleType extends CaCurveKeyframeType
 {
+  @Value.Parameter
+  @Override
+  int index();
+
+  @Value.Parameter
+  @Override
+  CaCurveInterpolation interpolation();
+
+  @Value.Parameter
+  @Override
+  CaCurveEasing easing();
+
   /**
    * @return The scale of the bone at this keyframe
    */
 
+  @Value.Parameter
   VectorI3D scale();
 }

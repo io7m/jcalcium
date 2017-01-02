@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>boneview.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>boneview.%d{yyyy-MM-dd}.log</fileNamePattern>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %logger{0}: %level: %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender
+    name="STDERR"
+    class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>boneview: %logger{0}: %level: %msg%n</pattern>
+    </encoder>
+    <target>System.err</target>
+  </appender>
+
+  <logger
+    name="com.io7m.jcalcium.evaluator.main.CaActionEvaluatorCurves"
+    level="TRACE">
+  </logger>
+
+  <root level="DEBUG">
+    <appender-ref ref="STDERR"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</configuration>

@@ -38,14 +38,11 @@ import com.io7m.jcalcium.format.protobuf3.CaLoaderIOException;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNode;
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import com.io7m.junreachable.UnreachableCodeException;
-import javaslang.Tuple;
-import javaslang.Tuple3;
 import javaslang.collection.Array;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
@@ -310,16 +307,11 @@ final class CaV1Loader
     try {
       final Skeleton.V1Skeleton sk =
         Skeleton.V1Skeleton.parseFrom(this.stream);
-
-      final Tuple3<
-        SortedMap<Integer, JOTreeNodeReadableType<CaBone>>,
-        SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>>,
-        JOTreeNodeType<CaBone>> pair = this.bones(sk.getBonesMap());
+      final JOTreeNodeType<CaBone> node =
+        this.bones(sk.getBonesMap());
 
       final CaSkeleton.Builder cb = CaSkeleton.builder();
-      cb.setBonesByID(pair._1);
-      cb.setBonesByName(pair._2);
-      cb.setBones(pair._3);
+      cb.setBones(node);
       cb.setName(CaSkeletonName.of(sk.getName()));
       cb.setActionsByName(actions(sk.getActionsMap()));
 
@@ -331,10 +323,7 @@ final class CaV1Loader
     }
   }
 
-  private Tuple3<
-    SortedMap<Integer, JOTreeNodeReadableType<CaBone>>,
-    SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>>,
-    JOTreeNodeType<CaBone>> bones(
+  private JOTreeNodeType<CaBone> bones(
     final Map<Integer, Skeleton.V1Bone> bones)
     throws CaLoaderCorruptedData
   {
@@ -357,17 +346,14 @@ final class CaV1Loader
       throw new CaLoaderCorruptedData(this.uri, "No parseable bones");
     }
 
-    final Skeleton.V1Bone root_current = bones_ordered.get(0);
-    SortedMap<Integer, JOTreeNodeType<CaBone>> nodes_by_id = TreeMap.empty();
-    SortedMap<CaBoneName, JOTreeNodeType<CaBone>> nodes_by_name = TreeMap.empty();
-
+    final Skeleton.V1Bone root_current =
+      bones_ordered.get(0);
+    final CaBone root_bone =
+      bone(root_current);
     final JOTreeNodeType<CaBone> root_node =
-      JOTreeNode.create(bone(root_current));
-
-    nodes_by_id =
-      nodes_by_id.put(Integer.valueOf(root_current.getId()), root_node);
-    nodes_by_name =
-      nodes_by_name.put(root_node.value().name(), root_node);
+      JOTreeNode.create(root_bone);
+    SortedMap<Integer, JOTreeNodeType<CaBone>> nodes_by_id =
+      TreeMap.of(Integer.valueOf(0), root_node);
 
     for (int index = 1; index < bones_ordered.size(); ++index) {
       final Skeleton.V1Bone bone =
@@ -384,15 +370,8 @@ final class CaV1Loader
         scale(bone.getScale())));
       node_parent.childAdd(node);
       nodes_by_id = nodes_by_id.put(Integer.valueOf(bone.getId()), node);
-      nodes_by_name = nodes_by_name.put(node_name, node);
     }
 
-    @SuppressWarnings("unchecked")
-    final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> r_nodes_by_id =
-      (SortedMap<Integer, JOTreeNodeReadableType<CaBone>>) (Object) nodes_by_id;
-    @SuppressWarnings("unchecked")
-    final SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>> r_nodes_by_name =
-      (SortedMap<CaBoneName, JOTreeNodeReadableType<CaBone>>) (Object) nodes_by_name;
-    return Tuple.of(r_nodes_by_id, r_nodes_by_name, root_node);
+    return root_node;
   }
 }

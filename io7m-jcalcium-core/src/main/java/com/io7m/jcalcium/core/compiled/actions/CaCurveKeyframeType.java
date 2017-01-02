@@ -18,6 +18,7 @@ package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import org.immutables.value.Value;
 
 /**
  * The base type of keyframes.
@@ -30,17 +31,20 @@ public interface CaCurveKeyframeType
    * Integer.MAX_VALUE]}
    */
 
+  @Value.Parameter
   int index();
 
   /**
    * @return The interpolation type for the keyframe
    */
 
+  @Value.Parameter
   CaCurveInterpolation interpolation();
 
   /**
    * @return The easing type for the keyframe
    */
 
+  @Value.Parameter
   CaCurveEasing easing();
 }

@@ -52,6 +52,11 @@
       <artifactId>value</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.immutables.javaslang</groupId>
+      <artifactId>javaslang-encodings</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>

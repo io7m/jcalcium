@@ -19,16 +19,18 @@ package com.io7m.jcalcium.core.definitions;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionActionType;
 import javaslang.collection.Map;
+import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 /**
  * A skeleton definition.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
+@JavaslangEncodingEnabled
 @Value.Immutable
 public interface CaDefinitionSkeletonType
 {

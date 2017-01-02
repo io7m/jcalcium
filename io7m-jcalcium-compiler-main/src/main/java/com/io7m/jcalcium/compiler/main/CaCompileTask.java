@@ -752,8 +752,6 @@ final class CaCompileTask
   {
     final CaSkeleton.Builder b = CaSkeleton.builder();
     b.setActionsByName(actions);
-    b.setBonesByID(index.bones_by_id.mapValues(x -> x));
-    b.setBonesByName(index.bones_by_name.mapValues(x -> x));
     b.setBones(index.bones);
     b.setName(name);
     return b.build();

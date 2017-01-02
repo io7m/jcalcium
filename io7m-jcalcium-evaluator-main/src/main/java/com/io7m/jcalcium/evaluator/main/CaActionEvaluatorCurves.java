@@ -16,45 +16,46 @@
 
 package com.io7m.jcalcium.evaluator.main;
 
-import com.io7m.jaffirm.core.Invariants;
+import com.io7m.jaffirm.core.Postconditions;
+import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaBoneName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.compiled.CaBone;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesScaling;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesType;
+import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.Quaternion4DType;
-import com.io7m.jtensors.QuaternionReadable4DType;
-import com.io7m.jtensors.VectorReadable3DType;
+import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.VectorWritable3DType;
 import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 import com.io7m.jtensors.parameterized.PVectorWritable3DType;
-import it.unimi.dsi.fastutil.doubles.Double2ReferenceRBTreeMap;
-import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceRBTreeMap;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
 import javaslang.control.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation.interpolateVector3D;
 import static com.io7m.jfunctional.Unit.unit;
 
 /**
- * The default implementation of the {@link CaActionEvaluatorCurvesType}.
+ * The default implementation of the {@link CaActionEvaluatorCurvesDType}.
  */
 
 public final class CaActionEvaluatorCurves
-  implements CaActionEvaluatorCurvesType
+  implements CaActionEvaluatorCurvesDType
 {
   private static final Logger LOG;
 
@@ -62,26 +63,27 @@ public final class CaActionEvaluatorCurves
     LOG = LoggerFactory.getLogger(CaActionEvaluatorCurves.class);
   }
 
-  private final CaSkeleton skeleton;
-  private final CaActionCurvesType action;
   private final BoneTracks[] bone_tracks;
-  private double eval_time;
 
   private CaActionEvaluatorCurves(
     final CaSkeleton in_skeleton,
-    final CaActionCurvesType in_action)
+    final CaActionCurvesType in_action,
+    final int global_fps)
   {
-    this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
-    this.action = NullCheck.notNull(in_action, "Action");
+    NullCheck.notNull(in_skeleton, "Skeleton");
+    NullCheck.notNull(in_action, "Action");
+
+    final CaActionCurvesType action_scaled =
+      CaActionCurvesScaling.scale(in_action, global_fps);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(
         "instantiating bone tracks for action {}",
-        in_action.name().value());
+        action_scaled.name().value());
     }
 
     final SortedMap<Integer, JOTreeNodeReadableType<CaBone>> by_id =
-      this.skeleton.bonesByID();
+      in_skeleton.bonesByID();
 
     this.bone_tracks = new BoneTracks[by_id.size()];
     for (final Integer bone_id : by_id.keySet()) {
@@ -89,14 +91,14 @@ public final class CaActionEvaluatorCurves
       final CaBone bone = node.value();
       final CaBoneName bone_name = bone.name();
       final Option<IndexedSeq<CaCurveType>> curves_opt =
-        this.action.curves().get(bone_name);
+        action_scaled.curves().get(bone_name);
 
       final BoneTracks current_tracks =
         new BoneTracks(
           bone,
-          new Double2ReferenceRBTreeMap<>(),
-          new Double2ReferenceRBTreeMap<>(),
-          new Double2ReferenceRBTreeMap<>());
+          new Int2ReferenceRBTreeMap<>(),
+          new Int2ReferenceRBTreeMap<>(),
+          new Int2ReferenceRBTreeMap<>());
 
       if (curves_opt.isDefined()) {
         current_tracks.populate(curves_opt.get());
@@ -135,106 +137,172 @@ public final class CaActionEvaluatorCurves
    *
    * @param in_skeleton The skeleton
    * @param in_action   The action
+   * @param global_fps  The global FPS rate
    *
    * @return A new evaluator
    */
 
-  public static CaActionEvaluatorCurvesType create(
+  public static CaActionEvaluatorCurvesDType createD(
     final CaSkeleton in_skeleton,
-    final CaActionCurvesType in_action)
+    final CaActionCurvesType in_action,
+    final int global_fps)
   {
-    return new CaActionEvaluatorCurves(in_skeleton, in_action);
+    return new CaActionEvaluatorCurves(in_skeleton, in_action, global_fps);
   }
 
   @Override
-  public CaSkeleton skeleton()
-  {
-    return this.skeleton;
-  }
-
-  @Override
-  public CaActionCurvesType action()
-  {
-    return this.action;
-  }
-
-  @Override
-  public void evaluateTranslation(
+  public void evaluateTranslation3DForGlobalFrame(
     final int bone_id,
-    final double time,
+    final long frame_start,
+    final long frame_current,
+    final double time_scale,
     final PVectorWritable3DType<CaSpaceBoneParentRelativeType> out)
   {
-    this.bone_tracks[bone_id].evaluateTranslation(time, out);
+    this.bone_tracks[bone_id].evaluateTranslation3D(
+      frame_start, frame_current, time_scale, out);
   }
 
   @Override
-  public void evaluateScale(
+  public void evaluateScale3DForGlobalFrame(
     final int bone_id,
-    final double time,
+    final long frame_start,
+    final long frame_current,
+    final double time_scale,
     final VectorWritable3DType out)
   {
-    this.bone_tracks[bone_id].evaluateScale(time, out);
+    this.bone_tracks[bone_id].evaluateScale3D(
+      frame_start, frame_current, time_scale, out);
   }
 
   @Override
-  public void evaluateOrientation(
+  public void evaluateOrientation4DForGlobalFrame(
     final int bone_id,
-    final double time,
+    final long frame_start,
+    final long frame_current,
+    final double time_scale,
     final Quaternion4DType out)
   {
-    this.bone_tracks[bone_id].evaluateOrientation(time, out);
+    this.bone_tracks[bone_id].evaluateOrientation4D(
+      frame_start, frame_current, time_scale, out);
   }
 
   private static final class BoneTracks
   {
-    private final Double2ReferenceRBTreeMap<CaCurveKeyframeTranslation> keyframes_translation;
-    private final Double2ReferenceRBTreeMap<CaCurveKeyframeOrientation> keyframes_orientation;
-    private final Double2ReferenceRBTreeMap<CaCurveKeyframeScale> keyframes_scale;
+    private final Int2ReferenceRBTreeMap<CaCurveKeyframeTranslation> keyframes_translation;
+    private final Int2ReferenceRBTreeMap<CaCurveKeyframeOrientation> keyframes_orientation;
+    private final Int2ReferenceRBTreeMap<CaCurveKeyframeScale> keyframes_scale;
     private final CaBone bone;
-    private double last_frame;
+    private int last_frame;
 
     BoneTracks(
       final CaBone in_bone,
-      final Double2ReferenceRBTreeMap<CaCurveKeyframeTranslation> in_keyframes_translation,
-      final Double2ReferenceRBTreeMap<CaCurveKeyframeOrientation> in_keyframes_orientation,
-      final Double2ReferenceRBTreeMap<CaCurveKeyframeScale> in_keyframes_scale)
+      final Int2ReferenceRBTreeMap<CaCurveKeyframeTranslation> in_keyframes_translation,
+      final Int2ReferenceRBTreeMap<CaCurveKeyframeOrientation> in_keyframes_orientation,
+      final Int2ReferenceRBTreeMap<CaCurveKeyframeScale> in_keyframes_scale)
     {
       this.bone = in_bone;
       this.keyframes_translation = in_keyframes_translation;
       this.keyframes_orientation = in_keyframes_orientation;
       this.keyframes_scale = in_keyframes_scale;
+      this.last_frame = 0;
     }
 
-    private static double mod(
-      final double x,
-      final double y)
+    private static int keyframeIndexNext(
+      final IntSortedSet keys,
+      final int frame)
     {
-      final double result = x % y;
-      return result < 0.0 ? result + y : result;
+      final IntSortedSet tails = keys.tailSet(Math.addExact(frame, 1));
+      if (tails.isEmpty()) {
+        return -1;
+      }
+
+      final int result = tails.firstInt();
+      Postconditions.checkPostconditionI(
+        result,
+        frame < result,
+        i -> "Keyframe index + " + i + " must be >= current index");
+      return result;
     }
 
-    private void evaluateTranslation(
-      final double time,
+    private static int keyframeIndexCurrent(
+      final IntSortedSet keys,
+      final int frame)
+    {
+      final IntSortedSet heads = keys.headSet(Math.addExact(frame, 1));
+      if (heads.isEmpty()) {
+        return -1;
+      }
+
+      final int result = heads.lastInt();
+      Postconditions.checkPostconditionI(
+        result,
+        frame >= result,
+        i -> "Keyframe index " + i + " must be < current index");
+      return result;
+    }
+
+    private static double calculateMix(
+      final double curr,
+      final double prev,
+      final double next)
+    {
+      Preconditions.checkPreconditionD(
+        curr,
+        curr >= prev,
+        i -> "Index " + i + " must be after or on the current keyframe");
+      Preconditions.checkPreconditionD(
+        curr,
+        curr < next,
+        i -> "Index " + i + " must be before the next keyframe");
+
+      final double mix =
+        (curr - prev) / (next - prev);
+
+      Postconditions.checkPostconditionD(
+        mix,
+        mix >= 0.0,
+        x -> "Index " + x + " must be in the range [0, 1]");
+      Postconditions.checkPostconditionD(
+        mix,
+        mix <= 1.0,
+        x -> "Index " + x + " must be in the range [0, 1]");
+
+      return mix;
+    }
+
+    private static int wrapFrame(
+      final long frame_start,
+      final long frame_current,
+      final long bound)
+    {
+      final long sum = Math.addExact(frame_start, frame_current);
+      final long mod = sum % bound;
+      return Math.toIntExact(mod < 0L ? mod + bound : mod);
+    }
+
+    private void evaluateTranslation3D(
+      final long frame_start,
+      final long frame_current,
+      final double time_scale,
       final PVectorWritable3DType<CaSpaceBoneParentRelativeType> out)
     {
-      final double index = mod(time, this.last_frame + 1.0);
-      final DoubleSortedSet keys = this.keyframes_translation.keySet();
+      final int bound =
+        Math.addExact(this.last_frame, 1);
 
-      /*
-       * Determine the set of frames that are strictly "less than the next"
-       * index, and then pick the last one. The picked index is the current
-       * index.
-       */
+      final int frame_bounded =
+        wrapFrame(frame_start, frame_current, (long) bound);
 
-      final DoubleSortedSet keys_curr = keys.headSet(index + 1.0);
+      int key_frame_prev = keyframeIndexCurrent(
+        this.keyframes_translation.keySet(), frame_bounded);
+      int key_frame_next = keyframeIndexNext(
+        this.keyframes_translation.keySet(), frame_bounded);
+
       final PVectorReadable3DType<CaSpaceBoneParentRelativeType> trans_curr;
-      final double index_curr;
       final CaCurveEasing easing;
       final CaCurveInterpolation interp;
-      if (!keys_curr.isEmpty()) {
-        index_curr = keys_curr.lastDouble();
+      if (key_frame_prev >= 0) {
         final CaCurveKeyframeTranslation keyf_curr =
-          this.keyframes_translation.get(index_curr);
+          this.keyframes_translation.get(key_frame_prev);
         trans_curr = keyf_curr.translation();
         easing = keyf_curr.easing();
         interp = keyf_curr.interpolation();
@@ -242,176 +310,135 @@ public final class CaActionEvaluatorCurves
         trans_curr = this.bone.translation();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
-        index_curr = 0.0;
+        key_frame_prev = 0;
       }
 
-      /*
-       * Determine the set of frames that are strictly greater than the
-       * current index, and then pick the first. The picked index is the
-       * next index.
-       */
-
-      final DoubleSortedSet keys_next = keys.tailSet(index + 1.0);
       final PVectorReadable3DType<CaSpaceBoneParentRelativeType> trans_next;
-      final double index_next;
-      if (!keys_next.isEmpty()) {
-        index_next = keys_next.firstDouble();
+      if (key_frame_next >= 0) {
         final CaCurveKeyframeTranslation keyf_next =
-          this.keyframes_translation.get(index_next);
+          this.keyframes_translation.get(key_frame_next);
         trans_next = keyf_next.translation();
       } else {
         trans_next = this.bone.translation();
-        index_next = this.last_frame + 1.0;
+        key_frame_next = Math.addExact(this.last_frame, 1);
       }
 
-      final double index_norm =
-        (index - index_curr) / (index_next - index_curr);
+      final double mix =
+        calculateMix(
+          (double) frame_bounded,
+          (double) key_frame_prev,
+          (double) key_frame_next);
 
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm >= 0.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm <= 1.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
-
-      interpolateVector3D(
-        easing, interp, index_norm, trans_curr, trans_next, out);
+      CaEvaluatorInterpolation.interpolateVector3D(
+        easing, interp, mix, trans_curr, trans_next, out);
     }
 
-    private void evaluateScale(
-      final double time,
+    private void evaluateScale3D(
+      final long frame_start,
+      final long frame_current,
+      final double time_scale,
       final VectorWritable3DType out)
     {
-      final double index = mod(time, this.last_frame + 1.0);
-      final DoubleSortedSet keys = this.keyframes_scale.keySet();
+      final int bound =
+        Math.addExact(this.last_frame, 1);
 
-      /*
-       * Determine the set of frames that are strictly "less than the next"
-       * index, and then pick the last one. The picked index is the current
-       * index.
-       */
+      final int frame_bounded =
+        wrapFrame(frame_start, frame_current, (long) bound);
 
-      final DoubleSortedSet keys_curr = keys.headSet(index + 1.0);
-      final VectorReadable3DType trans_curr;
-      final double index_curr;
+      int key_frame_prev = keyframeIndexCurrent(
+        this.keyframes_scale.keySet(), frame_bounded);
+      int key_frame_next = keyframeIndexNext(
+        this.keyframes_scale.keySet(), frame_bounded);
+
+      final VectorI3D val_curr;
       final CaCurveEasing easing;
       final CaCurveInterpolation interp;
-      if (!keys_curr.isEmpty()) {
-        index_curr = keys_curr.lastDouble();
+
+      if (key_frame_prev >= 0) {
         final CaCurveKeyframeScale keyf_curr =
-          this.keyframes_scale.get(index_curr);
-        trans_curr = keyf_curr.scale();
+          this.keyframes_scale.get(key_frame_prev);
+        val_curr = keyf_curr.scale();
         easing = keyf_curr.easing();
         interp = keyf_curr.interpolation();
       } else {
-        trans_curr = this.bone.scale();
+        val_curr = this.bone.scale();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
-        index_curr = 0.0;
+        key_frame_prev = 0;
       }
 
-      /*
-       * Determine the set of frames that are strictly greater than the
-       * current index, and then pick the first. The picked index is the
-       * next index.
-       */
-
-      final DoubleSortedSet keys_next = keys.tailSet(index + 1.0);
-      final VectorReadable3DType trans_next;
-      final double index_next;
-      if (!keys_next.isEmpty()) {
-        index_next = keys_next.firstDouble();
+      final VectorI3D val_next;
+      if (key_frame_next >= 0) {
         final CaCurveKeyframeScale keyf_next =
-          this.keyframes_scale.get(index_next);
-        trans_next = keyf_next.scale();
+          this.keyframes_scale.get(key_frame_next);
+        val_next = keyf_next.scale();
       } else {
-        trans_next = this.bone.scale();
-        index_next = this.last_frame + 1.0;
+        val_next = this.bone.scale();
+        key_frame_next = Math.addExact(this.last_frame, 1);
       }
 
-      final double index_norm =
-        (index - index_curr) / (index_next - index_curr);
+      final double mix =
+        calculateMix(
+          (double) frame_bounded,
+          (double) key_frame_prev,
+          (double) key_frame_next);
 
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm >= 0.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm <= 1.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
-
-      interpolateVector3D(
-        easing, interp, index_norm, trans_curr, trans_next, out);
+      CaEvaluatorInterpolation.interpolateVector3D(
+        easing, interp, mix, val_curr, val_next, out);
     }
 
-    private void evaluateOrientation(
-      final double time,
+    private void evaluateOrientation4D(
+      final long frame_start,
+      final long frame_current,
+      final double time_scale,
       final Quaternion4DType out)
     {
-      final double index = mod(time, this.last_frame + 1.0);
-      final DoubleSortedSet keys = this.keyframes_orientation.keySet();
+      final int bound =
+        Math.addExact(this.last_frame, 1);
 
-      /*
-       * Determine the set of frames that are strictly "less than the next"
-       * index, and then pick the last one. The picked index is the current
-       * index.
-       */
+      final int frame_bounded =
+        wrapFrame(frame_start, frame_current, (long) bound);
 
-      final DoubleSortedSet keys_curr = keys.headSet(index + 1.0);
-      final QuaternionReadable4DType quat_curr;
-      final double index_curr;
+      int key_frame_prev = keyframeIndexCurrent(
+        this.keyframes_orientation.keySet(), frame_bounded);
+      int key_frame_next = keyframeIndexNext(
+        this.keyframes_orientation.keySet(), frame_bounded);
+
+      final QuaternionI4D val_curr;
       final CaCurveEasing easing;
       final CaCurveInterpolation interp;
-      if (!keys_curr.isEmpty()) {
-        index_curr = keys_curr.lastDouble();
-        final CaCurveKeyframeOrientation keyf_curr =
-          this.keyframes_orientation.get(index_curr);
-        quat_curr = keyf_curr.orientation();
-        easing = keyf_curr.easing();
-        interp = keyf_curr.interpolation();
+
+      if (key_frame_prev >= 0) {
+        final CaCurveKeyframeOrientation kf =
+          this.keyframes_orientation.get(key_frame_prev);
+        val_curr = kf.orientation();
+        easing = kf.easing();
+        interp = kf.interpolation();
       } else {
-        quat_curr = this.bone.orientation();
+        val_curr = this.bone.orientation();
         easing = CaCurveEasing.CURVE_EASING_IN_OUT;
         interp = CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR;
-        index_curr = 0.0;
+        key_frame_prev = 0;
       }
 
-      /*
-       * Determine the set of frames that are strictly greater than the
-       * current index, and then pick the first. The picked index is the
-       * next index.
-       */
-
-      final DoubleSortedSet keys_next = keys.tailSet(index + 1.0);
-      final QuaternionReadable4DType quat_next;
-      final double index_next;
-      if (!keys_next.isEmpty()) {
-        index_next = keys_next.firstDouble();
-        final CaCurveKeyframeOrientation keyf_next =
-          this.keyframes_orientation.get(index_next);
-        quat_next = keyf_next.orientation();
+      final QuaternionI4D val_next;
+      if (key_frame_next >= 0) {
+        final CaCurveKeyframeOrientation kf =
+          this.keyframes_orientation.get(key_frame_next);
+        val_next = kf.orientation();
       } else {
-        quat_next = this.bone.orientation();
-        index_next = this.last_frame + 1.0;
+        val_next = this.bone.orientation();
+        key_frame_next = bound;
       }
 
-      final double index_norm =
-        (index - index_curr) / (index_next - index_curr);
-
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm >= 0.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
-      Invariants.checkInvariantD(
-        index_norm,
-        index_norm <= 1.0,
-        x -> "Index " + x + " must be in the range [0, 1]");
+      final double mix =
+        calculateMix(
+          (double) frame_bounded,
+          (double) key_frame_prev,
+          (double) key_frame_next);
 
       CaEvaluatorInterpolation.interpolateQuaternion4D(
-        easing, interp, index_norm, quat_curr, quat_next, out);
+        easing, interp, mix, val_curr, val_next, out);
     }
 
     private void populate(
@@ -427,33 +454,33 @@ public final class CaActionEvaluatorCurves
           this,
           (t, translation) -> {
             translation.keyframes().forEach(
-              p -> t.keyframes_translation.put(p._1.doubleValue(), p._2));
+              p -> t.keyframes_translation.put(p._1.intValue(), p._2));
             return unit();
           },
           (t, orientation) -> {
             orientation.keyframes().forEach(
-              p -> t.keyframes_orientation.put(p._1.doubleValue(), p._2));
+              p -> t.keyframes_orientation.put(p._1.intValue(), p._2));
             return unit();
           },
           (t, scale) -> {
             scale.keyframes().forEach(
-              p -> t.keyframes_scale.put(p._1.doubleValue(), p._2));
+              p -> t.keyframes_scale.put(p._1.intValue(), p._2));
             return unit();
           });
       }
 
-      this.last_frame = 0.0;
+      this.last_frame = 0;
       if (!this.keyframes_translation.isEmpty()) {
         this.last_frame = Math.max(
-          this.keyframes_translation.lastDoubleKey(), this.last_frame);
+          this.keyframes_translation.lastIntKey(), this.last_frame);
       }
       if (!this.keyframes_orientation.isEmpty()) {
         this.last_frame = Math.max(
-          this.keyframes_orientation.lastDoubleKey(), this.last_frame);
+          this.keyframes_orientation.lastIntKey(), this.last_frame);
       }
       if (!this.keyframes_scale.isEmpty()) {
         this.last_frame = Math.max(
-          this.keyframes_scale.lastDoubleKey(), this.last_frame);
+          this.keyframes_scale.lastIntKey(), this.last_frame);
       }
     }
   }

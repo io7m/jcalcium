@@ -1,6 +1,7 @@
-*.blend.caj
-*.blend.caj.log
-*.blend.caj.tmp
+*.blend.csj
+*.blend.csj.log
+*.blend.csj.tmp
+*.blend1
 *.iml
 *.ipr
 *.iws

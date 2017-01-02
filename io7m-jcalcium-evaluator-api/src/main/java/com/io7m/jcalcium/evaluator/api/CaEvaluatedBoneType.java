@@ -17,11 +17,8 @@
 package com.io7m.jcalcium.evaluator.api;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
-import com.io7m.jtensors.QuaternionReadable4DType;
-import com.io7m.jtensors.VectorReadable3DType;
-import com.io7m.jtensors.parameterized.PVectorReadable3DType;
-import org.immutables.value.Value;
+
+import java.util.OptionalInt;
 
 /**
  * The type of evaluated bones.
@@ -33,34 +30,17 @@ public interface CaEvaluatedBoneType
    * @return The bone name
    */
 
-  @Value.Parameter
   CaBoneName name();
 
   /**
    * @return The bone ID
    */
 
-  @Value.Parameter
   int id();
 
   /**
-   * @return The parent-relative offset for the bone
+   * @return The ID of the parent, if any
    */
 
-  @Value.Parameter
-  PVectorReadable3DType<CaSpaceBoneParentRelativeType> translation();
-
-  /**
-   * @return The parent-relative orientation of the bone
-   */
-
-  @Value.Parameter
-  QuaternionReadable4DType orientation();
-
-  /**
-   * @return The parent-relative scale of the bone
-   */
-
-  @Value.Parameter
-  VectorReadable3DType scale();
+  OptionalInt parent();
 }

@@ -23,7 +23,7 @@ import org.immutables.value.Value;
  * The type of skeleton names.
  */
 
-@ImmutableStyleType
+@CaImmutableStyleType
 @Value.Immutable
 public interface CaSkeletonNameType extends Comparable<CaSkeletonNameType>
 {

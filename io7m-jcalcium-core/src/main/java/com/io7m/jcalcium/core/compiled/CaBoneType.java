@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jcalcium.core.CaBoneName;
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.core.spaces.CaSpaceBoneParentRelativeType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
@@ -29,7 +29,7 @@ import org.immutables.value.Value;
  */
 
 @Value.Immutable
-@ImmutableStyleType
+@CaImmutableStyleType
 public interface CaBoneType
 {
   /**

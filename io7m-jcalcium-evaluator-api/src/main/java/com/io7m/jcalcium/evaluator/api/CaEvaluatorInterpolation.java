@@ -55,7 +55,7 @@ public final class CaEvaluatorInterpolation
    * @return An interpolated value
    */
 
-  public static double interpolateScalar(
+  public static double interpolateScalarD(
     final CaCurveEasing easing,
     final CaCurveInterpolation interp,
     final double alpha,

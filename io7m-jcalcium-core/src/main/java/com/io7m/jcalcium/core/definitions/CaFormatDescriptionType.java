@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.core.definitions;
 
-import com.io7m.jcalcium.core.ImmutableStyleType;
+import com.io7m.jcalcium.core.CaImmutableStyleType;
 import org.immutables.value.Value;
 
 /**
@@ -24,7 +24,7 @@ import org.immutables.value.Value;
  */
 
 @Value.Immutable
-@ImmutableStyleType
+@CaImmutableStyleType
 public interface CaFormatDescriptionType
 {
   /**
