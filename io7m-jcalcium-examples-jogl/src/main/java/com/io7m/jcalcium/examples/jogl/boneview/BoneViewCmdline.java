@@ -164,6 +164,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.io7m.jfunctional.Unit.unit;
@@ -223,7 +224,8 @@ public final class BoneViewCmdline implements Runnable, KeyListener
   private Map<CaActionName, CaEvaluatorSingleDType> actions;
   private long time_then;
   private final AtomicReference<Double> time_scale;
-  private long frame;
+  private volatile long frame;
+  private volatile long frame_start;
   private double time_accum;
   private JCameraSphericalSnapshot snap_curr;
   private JCameraSphericalSnapshot snap_prev;
@@ -254,6 +256,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
     this.time_scale = new AtomicReference<>(Double.valueOf(1.0));
     this.time_then = System.nanoTime();
     this.frame = 0L;
+    this.frame_start = 0L;
   }
 
   public static void main(
@@ -467,7 +470,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
 
       this.renderInit();
       while (this.window.isVisible()) {
-        this.render(this.frame);
+        this.render();
         this.window.display();
 
         try {
@@ -713,8 +716,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
       || this.window.getHeight() != this.window_area.getRangeY().getInterval();
   }
 
-  private void render(
-    final long frame_current)
+  private void render()
   {
     if (this.windowSizeChanged()) {
       LOG.trace("window size changed: {}");
@@ -724,11 +726,10 @@ public final class BoneViewCmdline implements Runnable, KeyListener
     }
 
     this.renderCamera();
-    this.renderSkeleton(frame_current, this.time_scale.get().doubleValue());
+    this.renderSkeleton(this.time_scale.get().doubleValue());
   }
 
   private void renderSkeleton(
-    final long frame_current,
     final double time_scale)
   {
     Preconditions.checkPreconditionI(
@@ -738,7 +739,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
 
     final CaEvaluatorSingleDType eval =
       this.actions.get(this.actions_ordered.get(this.actions_index));
-    eval.evaluateForGlobalFrame(0L, frame_current, time_scale);
+    eval.evaluateForGlobalFrame(this.frame_start, this.frame, time_scale);
 
     final Int2ReferenceSortedMap<CaEvaluatedBoneDType> bones =
       eval.evaluatedBonesDByID();
@@ -1032,7 +1033,7 @@ public final class BoneViewCmdline implements Runnable, KeyListener
     }
 
     switch (e.getKeyCode()) {
-      case KeyEvent.VK_ADD: {
+      case KeyEvent.VK_PLUS: {
         this.time_scale.updateAndGet(x -> {
           final Double next = Double.valueOf(x.doubleValue() + 0.01);
           LOG.debug("time scale: {}", next);
@@ -1046,6 +1047,11 @@ public final class BoneViewCmdline implements Runnable, KeyListener
           LOG.debug("time scale: {}", next);
           return next;
         });
+        break;
+      }
+
+      case KeyEvent.VK_R: {
+        this.frame_start = this.frame;
         break;
       }
 

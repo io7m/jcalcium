@@ -134,6 +134,126 @@ public final class CaActionEvaluatorCurvesTest
   }
 
   @Test
+  public void testSingleTranslateLinearScaled0_5()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-translate-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final PVector3DType<CaSpaceBoneParentRelativeType> t_out =
+      new PVectorM3D<>();
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 0L, 0.5, t_out);
+    Assert.assertEquals(0.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 5L, 0.5, t_out);
+    Assert.assertEquals(0.25, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.25, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.25, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 10L, 0.5, t_out);
+    Assert.assertEquals(0.5, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.5, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.5, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 15L, 0.5, t_out);
+    Assert.assertEquals(0.75, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.75, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.75, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 20L, 0.5, t_out);
+    Assert.assertEquals(1.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.0, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 25L, 0.5, t_out);
+    Assert.assertEquals(1.25, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.25, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.25, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 30L, 0.5, t_out);
+    Assert.assertEquals(1.5, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.5, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.5, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 35L, 0.5, t_out);
+    Assert.assertEquals(1.75, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.75, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.75, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 40L, 0.5, t_out);
+    Assert.assertEquals(2.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(2.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(2.0, t_out.getZD(), 0.0);
+  }
+
+  @Test
+  public void testSingleTranslateLinearScaled2_0()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-translate-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final PVector3DType<CaSpaceBoneParentRelativeType> t_out =
+      new PVectorM3D<>();
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 0L, 2.0, t_out);
+    Assert.assertEquals(0.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 5L, 2.0, t_out);
+    Assert.assertEquals(1.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.0, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 10L, 2.0, t_out);
+    Assert.assertEquals(2.0, t_out.getXD(), 0.0);
+    Assert.assertEquals(2.0, t_out.getYD(), 0.0);
+    Assert.assertEquals(2.0, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 15L, 2.0, t_out);
+    Assert.assertEquals(0.9, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.9, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.9, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 20L, 2.0, t_out);
+    Assert.assertEquals(1.9, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.9, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.9, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 25L, 2.0, t_out);
+    Assert.assertEquals(0.8, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.8, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.8, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 30L, 2.0, t_out);
+    Assert.assertEquals(1.8, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.8, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.8, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 35L, 2.0, t_out);
+    Assert.assertEquals(0.7, t_out.getXD(), 0.0);
+    Assert.assertEquals(0.7, t_out.getYD(), 0.0);
+    Assert.assertEquals(0.7, t_out.getZD(), 0.0);
+
+    eval.evaluateTranslation3DForGlobalFrame(0, 0L, 40L, 2.0, t_out);
+    Assert.assertEquals(1.7, t_out.getXD(), 0.0);
+    Assert.assertEquals(1.7, t_out.getYD(), 0.0);
+    Assert.assertEquals(1.7, t_out.getZD(), 0.0);
+  }
+
+  @Test
   public void testSingleScaleLinear()
     throws IOException
   {
@@ -188,6 +308,126 @@ public final class CaActionEvaluatorCurvesTest
   }
 
   @Test
+  public void testSingleScaleLinearScaled0_5()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-scale-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final Vector3DType s_out =
+      new VectorM3D();
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 0L, 0.5, s_out);
+    Assert.assertEquals(0.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 5L, 0.5, s_out);
+    Assert.assertEquals(0.25, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.25, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.25, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 10L, 0.5, s_out);
+    Assert.assertEquals(0.5, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.5, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.5, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 15L, 0.5, s_out);
+    Assert.assertEquals(0.75, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.75, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.75, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 20L, 0.5, s_out);
+    Assert.assertEquals(1.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.0, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 25L, 0.5, s_out);
+    Assert.assertEquals(1.25, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.25, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.25, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 30L, 0.5, s_out);
+    Assert.assertEquals(1.5, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.5, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.5, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 35L, 0.5, s_out);
+    Assert.assertEquals(1.75, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.75, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.75, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 40L, 0.5, s_out);
+    Assert.assertEquals(2.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(2.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(2.0, s_out.getZD(), 0.0);
+  }
+
+  @Test
+  public void testSingleScaleLinearScaled2_0()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-scale-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final Vector3DType s_out =
+      new VectorM3D();
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 0L, 2.0, s_out);
+    Assert.assertEquals(0.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 5L, 2.0, s_out);
+    Assert.assertEquals(1.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.0, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 10L, 2.0, s_out);
+    Assert.assertEquals(2.0, s_out.getXD(), 0.0);
+    Assert.assertEquals(2.0, s_out.getYD(), 0.0);
+    Assert.assertEquals(2.0, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 15L, 2.0, s_out);
+    Assert.assertEquals(0.9, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.9, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.9, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 20L, 2.0, s_out);
+    Assert.assertEquals(1.9, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.9, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.9, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 25L, 2.0, s_out);
+    Assert.assertEquals(0.8, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.8, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.8, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 30L, 2.0, s_out);
+    Assert.assertEquals(1.8, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.8, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.8, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 35L, 2.0, s_out);
+    Assert.assertEquals(0.7, s_out.getXD(), 0.0);
+    Assert.assertEquals(0.7, s_out.getYD(), 0.0);
+    Assert.assertEquals(0.7, s_out.getZD(), 0.0);
+
+    eval.evaluateScale3DForGlobalFrame(0, 0L, 40L, 2.0, s_out);
+    Assert.assertEquals(1.7, s_out.getXD(), 0.0);
+    Assert.assertEquals(1.7, s_out.getYD(), 0.0);
+    Assert.assertEquals(1.7, s_out.getZD(), 0.0);
+  }
+
+  @Test
   public void testSingleOrientLinear()
     throws IOException
   {
@@ -227,6 +467,78 @@ public final class CaActionEvaluatorCurvesTest
     Assert.assertEquals(0.707, q_out.getWD(), 0.0);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 20L, 1.0, q_out);
+    Assert.assertEquals(1.0, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getWD(), 0.0);
+  }
+
+  @Test
+  public void testSingleOrientLinearScaled0_5()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-orient-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final Quaternion4DType q_out =
+      new QuaternionM4D();
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 0L, 0.5, q_out);
+    Assert.assertEquals(0.0, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(1.0, q_out.getWD(), 0.0);
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 10L, 0.5, q_out);
+    Assert.assertEquals(0.3535, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(0.85349, q_out.getWD(), 0.00001);
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 20L, 0.5, q_out);
+    Assert.assertEquals(0.707, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(0.707, q_out.getWD(), 0.0);
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 40L, 0.5, q_out);
+    Assert.assertEquals(1.0, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getWD(), 0.0);
+  }
+
+  @Test
+  public void testSingleOrientLinearScaled2_0()
+    throws IOException
+  {
+    final CaSkeleton skel =
+      this.compile("single-orient-linear.csj");
+    final CaActionCurves act =
+      (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
+    final CaActionEvaluatorCurvesDType eval =
+      CaActionEvaluatorCurves.createD(skel, act, 60);
+
+    final Quaternion4DType q_out =
+      new QuaternionM4D();
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 0L, 2.0, q_out);
+    Assert.assertEquals(0.0, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(1.0, q_out.getWD(), 0.0);
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 5L, 2.0, q_out);
+    Assert.assertEquals(0.707, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getYD(), 0.0);
+    Assert.assertEquals(0.0, q_out.getZD(), 0.0);
+    Assert.assertEquals(0.707, q_out.getWD(), 0.0);
+
+    eval.evaluateOrientation4DForGlobalFrame(0, 0L, 10L, 2.0, q_out);
     Assert.assertEquals(1.0, q_out.getXD(), 0.0);
     Assert.assertEquals(0.0, q_out.getYD(), 0.0);
     Assert.assertEquals(0.0, q_out.getZD(), 0.0);
