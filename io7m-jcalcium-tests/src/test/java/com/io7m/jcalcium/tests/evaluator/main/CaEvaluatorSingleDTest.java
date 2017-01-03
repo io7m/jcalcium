@@ -17,12 +17,14 @@
 package com.io7m.jcalcium.tests.evaluator.main;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -142,9 +144,13 @@ public final class CaEvaluatorSingleDTest
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
+    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final CaSkeleton skeleton = cb.build();
+    final CaSkeletonRestPoseDType rest_pose =
+      CaSkeletonRestPose.createD(context, skeleton);
+
     final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(skeleton, act, 60);
+      CaEvaluatorSingleD.create(rest_pose, act, 60);
 
     eval.evaluateForGlobalFrame(0L, 0L, 1.0);
 
@@ -167,12 +173,11 @@ public final class CaEvaluatorSingleDTest
       eval_node_2.childrenReadable().iterator().next();
     final CaEvaluatedJointDType eval_joint_3 = eval_node_3.value();
 
-    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final VectorM4D output = new VectorM4D();
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_0.transformAbsolute4x4D(),
+      eval_joint_0.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -182,7 +187,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_1.transformAbsolute4x4D(),
+      eval_joint_1.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -192,7 +197,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_2.transformAbsolute4x4D(),
+      eval_joint_2.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(2.0, output.getXD(), DELTA);
@@ -202,7 +207,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_3.transformAbsolute4x4D(),
+      eval_joint_3.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(3.0, output.getXD(), DELTA);
@@ -305,9 +310,14 @@ public final class CaEvaluatorSingleDTest
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
+    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
+
     final CaSkeleton skeleton = cb.build();
+    final CaSkeletonRestPoseDType rest_pose =
+      CaSkeletonRestPose.createD(context, skeleton);
+
     final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(skeleton, act, 60);
+      CaEvaluatorSingleD.create(rest_pose, act, 60);
 
     final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
       eval.evaluatedJointsD();
@@ -324,14 +334,12 @@ public final class CaEvaluatorSingleDTest
     final CaEvaluatedJointDType eval_joint_2 =
       eval_node_2.value();
 
-    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final VectorM4D output = new VectorM4D();
-
     eval.evaluateForGlobalFrame(0L, 0L, 1.0);
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_0.transformAbsolute4x4D(),
+      eval_joint_0.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -341,7 +349,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_1.transformAbsolute4x4D(),
+      eval_joint_1.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -351,7 +359,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_2.transformAbsolute4x4D(),
+      eval_joint_2.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -363,7 +371,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_0.transformAbsolute4x4D(),
+      eval_joint_0.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -373,7 +381,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_1.transformAbsolute4x4D(),
+      eval_joint_1.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -383,7 +391,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_2.transformAbsolute4x4D(),
+      eval_joint_2.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(1.0, output.getXD(), DELTA);
@@ -499,9 +507,14 @@ public final class CaEvaluatorSingleDTest
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
 
+    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
+
     final CaSkeleton skeleton = cb.build();
+    final CaSkeletonRestPoseDType rest_pose =
+      CaSkeletonRestPose.createD(context, skeleton);
+
     final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(skeleton, act, 60);
+      CaEvaluatorSingleD.create(rest_pose, act, 60);
 
     final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
       eval.evaluatedJointsD();
@@ -518,14 +531,13 @@ public final class CaEvaluatorSingleDTest
     final CaEvaluatedJointDType eval_joint_2 =
       eval_node_2.value();
 
-    final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final VectorM4D output = new VectorM4D();
 
     eval.evaluateForGlobalFrame(0L, 0L, 1.0);
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_0.transformAbsolute4x4D(),
+      eval_joint_0.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -535,7 +547,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_1.transformAbsolute4x4D(),
+      eval_joint_1.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -545,7 +557,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_2.transformAbsolute4x4D(),
+      eval_joint_2.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -557,7 +569,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_0.transformAbsolute4x4D(),
+      eval_joint_0.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(0.0, output.getXD(), DELTA);
@@ -567,7 +579,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_1.transformAbsolute4x4D(),
+      eval_joint_1.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(-1.0, output.getXD(), DELTA);
@@ -577,7 +589,7 @@ public final class CaEvaluatorSingleDTest
 
     MatrixM4x4D.multiplyVector4D(
       context,
-      eval_joint_2.transformAbsolute4x4D(),
+      eval_joint_2.transformJointObject4x4D(),
       new VectorI4D(0.0, 0.0, 0.0, 1.0),
       output);
     Assert.assertEquals(-2.0, output.getXD(), DELTA);

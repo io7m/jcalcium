@@ -19,8 +19,10 @@ package com.io7m.jcalcium.evaluator.main;
 import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
+import com.io7m.jcalcium.core.spaces.CaSpaceObjectDeformedType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
@@ -66,6 +68,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
   private final Matrix4x4DType m_accumulated;
   private final Int2ReferenceSortedMap<JointStateD> joint_states_by_id;
   private final Int2ReferenceSortedMap<CaEvaluatedJointDType> joint_states_by_id_view;
+  private final CaSkeletonRestPoseDType rest_pose;
   private ActionKind kind;
   private CaActionEvaluatorCurvesDType eval_curves;
   private long frame_start;
@@ -73,11 +76,11 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
   private double time_scale;
 
   private CaEvaluatorSingleD(
-    final CaSkeleton in_skeleton,
+    final CaSkeletonRestPoseDType in_rest_pose,
     final CaActionType in_action,
     final int global_fps)
   {
-    NullCheck.notNull(in_skeleton, "Skeleton");
+    this.rest_pose = NullCheck.notNull(in_rest_pose, "Rest pose");
     NullCheck.notNull(in_action, "Action");
 
     this.joint_states_by_id =
@@ -85,7 +88,8 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     this.joint_states_by_id_view =
       Int2ReferenceSortedMaps.unmodifiable(castMap(this.joint_states_by_id));
 
-    this.joint_states = in_skeleton.joints().mapBreadthFirst(
+    final CaSkeleton skeleton = in_rest_pose.skeleton();
+    this.joint_states = skeleton.joints().mapBreadthFirst(
       unit(), (input, depth, node) -> {
         final CaJoint c_joint = node.value();
 
@@ -113,7 +117,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     in_action.matchAction(this, (t, curves) -> {
       t.kind = ActionKind.ACTION_CURVES;
       t.eval_curves =
-        CaActionEvaluatorCurves.createD(in_skeleton, curves, global_fps);
+        CaActionEvaluatorCurves.createD(skeleton, curves, global_fps);
       return unit();
     });
 
@@ -133,19 +137,19 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
   /**
    * Create a new single-action evaluator.
    *
-   * @param in_skeleton The skeleton
-   * @param in_action   The action
-   * @param global_fps  The global FPS rate
+   * @param in_rest_pose The skeleton rest pose transforms
+   * @param in_action    The action
+   * @param global_fps   The global FPS rate
    *
    * @return An evaluator
    */
 
   public static CaEvaluatorSingleDType create(
-    final CaSkeleton in_skeleton,
+    final CaSkeletonRestPoseDType in_rest_pose,
     final CaActionType in_action,
     final int global_fps)
   {
-    return new CaEvaluatorSingleD(in_skeleton, in_action, global_fps);
+    return new CaEvaluatorSingleD(in_rest_pose, in_action, global_fps);
   }
 
   @Override
@@ -238,12 +242,17 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
 
     if (joint_parent != null) {
       MatrixM4x4D.multiply(
-        joint_parent.absolute_transform,
+        joint_parent.transform_joint_object,
         this.m_accumulated,
-        joint.absolute_transform);
+        joint.transform_joint_object);
     } else {
-      MatrixM4x4D.copy(this.m_accumulated, joint.absolute_transform);
+      MatrixM4x4D.copy(this.m_accumulated, joint.transform_joint_object);
     }
+
+    MatrixM4x4D.multiply(
+      joint.transform_joint_object,
+      this.rest_pose.transformInverseRest4x4D(joint.joint_id),
+      joint.transform_deform);
   }
 
   private enum ActionKind
@@ -258,7 +267,8 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     private final VectorM3D scale;
     private final PVectorM3D<CaSpaceJointType> translation;
     private final QuaternionM4D orientation;
-    private final PMatrix4x4DType<CaSpaceJointType, CaSpaceObjectType> absolute_transform;
+    private final PMatrix4x4DType<CaSpaceJointType, CaSpaceObjectType> transform_joint_object;
+    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> transform_deform;
     private final OptionalInt joint_parent;
 
     JointStateD(
@@ -272,7 +282,8 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
       this.translation = new PVectorM3D<>();
       this.orientation = new QuaternionM4D();
       this.scale = new VectorM3D();
-      this.absolute_transform = PMatrixHeapArrayM4x4D.newMatrix();
+      this.transform_joint_object = PMatrixHeapArrayM4x4D.newMatrix();
+      this.transform_deform = PMatrixHeapArrayM4x4D.newMatrix();
     }
 
     @Override
@@ -294,9 +305,15 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     }
 
     @Override
-    public PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> transformAbsolute4x4D()
+    public PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> transformJointObject4x4D()
     {
-      return this.absolute_transform;
+      return this.transform_joint_object;
+    }
+
+    @Override
+    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> transformDeform4x4D()
+    {
+      return this.transform_deform;
     }
 
     @Override

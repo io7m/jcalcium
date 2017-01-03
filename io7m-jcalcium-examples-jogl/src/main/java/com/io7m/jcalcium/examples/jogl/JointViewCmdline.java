@@ -26,6 +26,8 @@ import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -759,7 +761,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
       final CaEvaluatedJointDType joint_current = joints.get(index);
       MatrixM4x4D.multiplyVector4D(
         this.matrix_context4x4d,
-        joint_current.transformAbsolute4x4D(),
+        joint_current.transformJointObject4x4D(),
         new VectorI4D(0.0, 0.0, 0.0, 1.0),
         out_current);
 
@@ -777,7 +779,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
         MatrixM4x4D.multiplyVector4D(
           this.matrix_context4x4d,
-          joint_parent.transformAbsolute4x4D(),
+          joint_parent.transformJointObject4x4D(),
           new VectorI4D(0.0, 0.0, 0.0, 1.0),
           out_parent);
         final PVectorI3F<R2SpaceWorldType> position_parent =
@@ -950,13 +952,17 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private void loadActions(
     final CaSkeleton skeleton)
   {
+    final MatrixM4x4D.ContextMM4D c = new MatrixM4x4D.ContextMM4D();
+    final CaSkeletonRestPoseDType rest_pose =
+      CaSkeletonRestPose.createD(c, skeleton);
+
     final Iterator<Tuple2<CaActionName, CaActionType>> iter =
       skeleton.actionsByName().iterator();
     while (iter.hasNext()) {
       final Tuple2<CaActionName, CaActionType> pair = iter.next();
       this.actions.put(
         pair._1,
-        CaEvaluatorSingleD.create(skeleton, pair._2, 60));
+        CaEvaluatorSingleD.create(rest_pose, pair._2, 60));
       this.actions_ordered = this.actions_ordered.append(pair._1);
       this.actions_index = this.actions_ordered.size() - 1;
     }

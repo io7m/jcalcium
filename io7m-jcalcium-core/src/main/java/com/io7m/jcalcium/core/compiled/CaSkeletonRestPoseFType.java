@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
  * elements.</p>
  */
 
-public interface CaSkeletonRestPoseFType
+public interface CaSkeletonRestPoseFType extends CaSkeletonRestPoseType
 {
   /**
    * A specification of the inverse rest pose matrix for a given joint. This

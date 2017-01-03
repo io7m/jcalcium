@@ -172,17 +172,20 @@ public final class CaSkeletonRestPose
         MatrixM4x4D.invertInPlace(c, v);
       }
 
-      return new BuiltD(this.transforms);
+      return new BuiltD(this.skeleton, this.transforms);
     }
   }
 
   private static final class BuiltD implements CaSkeletonRestPoseDType
   {
     private final Int2ReferenceOpenHashMap<PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType>> transforms;
+    private final CaSkeleton skeleton;
 
     private BuiltD(
+      final CaSkeleton in_skeleton,
       final Int2ReferenceOpenHashMap<PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType>> in_transforms)
     {
+      this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
       this.transforms = NullCheck.notNull(in_transforms, "transforms");
     }
 
@@ -196,6 +199,12 @@ public final class CaSkeletonRestPose
         return this.transforms.get(joint_id);
       }
       throw new NoSuchElementException("No such joint: " + joint_id);
+    }
+
+    @Override
+    public CaSkeleton skeleton()
+    {
+      return this.skeleton;
     }
   }
 
@@ -297,17 +306,20 @@ public final class CaSkeletonRestPose
         MatrixM4x4F.invertInPlace(c, v);
       }
 
-      return new BuiltF(this.transforms);
+      return new BuiltF(this.skeleton, this.transforms);
     }
   }
 
   private static final class BuiltF implements CaSkeletonRestPoseFType
   {
     private final Int2ReferenceOpenHashMap<PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType>> transforms;
+    private final CaSkeleton skeleton;
 
     private BuiltF(
+      final CaSkeleton in_skeleton,
       final Int2ReferenceOpenHashMap<PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType>> in_transforms)
     {
+      this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
       this.transforms = NullCheck.notNull(in_transforms, "transforms");
     }
 
@@ -321,6 +333,12 @@ public final class CaSkeletonRestPose
         return this.transforms.get(joint_id);
       }
       throw new NoSuchElementException("No such joint: " + joint_id);
+    }
+
+    @Override
+    public CaSkeleton skeleton()
+    {
+      return this.skeleton;
     }
   }
 }

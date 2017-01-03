@@ -2,6 +2,8 @@ package com.io7m.jcalcium.tests;
 
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
@@ -80,18 +82,21 @@ public final class EvaluatePoseAtKeyframe
     final int keyframe = Integer.parseInt(args[2]);
 
     try (final InputStream is = Files.newInputStream(path)) {
-      final CaSkeleton skel =
-        loader.loadCompiledSkeletonFromStream(is, path.toUri());
-      final CaEvaluatorSingleDType eval =
-        CaEvaluatorSingleD.create(skel, skel.actionsByName().get(act).get(), 60);
       final MatrixM4x4D.ContextMM4D context =
         new MatrixM4x4D.ContextMM4D();
+      final CaSkeleton skeleton =
+        loader.loadCompiledSkeletonFromStream(is, path.toUri());
+      final CaSkeletonRestPoseDType rest_pose =
+        CaSkeletonRestPose.createD(context, skeleton);
+      final CaEvaluatorSingleDType eval =
+        CaEvaluatorSingleD.create(
+          rest_pose, skeleton.actionsByName().get(act).get(), 60);
 
       eval.evaluateForGlobalFrame(0L, keyframe, 1.0);
       eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
         final CaEvaluatedJointDType joint = node.value();
         final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
-          joint.transformAbsolute4x4D();
+          joint.transformJointObject4x4D();
         final VectorM4D out = new VectorM4D();
         MatrixM4x4D.multiplyVector4D(
           context,

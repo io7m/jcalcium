@@ -2,6 +2,8 @@ package com.io7m.jcalcium.tests;
 
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
+import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
@@ -81,14 +83,16 @@ public final class EvaluatePoseAtAllKeyframes
     final int keyframe_max = Integer.parseInt(args[2]);
 
     try (final InputStream is = Files.newInputStream(path)) {
-      final CaSkeleton skel =
-        loader.loadCompiledSkeletonFromStream(is, path.toUri());
-      final CaActionType action =
-        skel.actionsByName().get(act_name).get();
-      final CaEvaluatorSingleDType eval =
-        CaEvaluatorSingleD.create(skel, action, 60);
       final MatrixM4x4D.ContextMM4D context =
         new MatrixM4x4D.ContextMM4D();
+      final CaSkeleton skeleton =
+        loader.loadCompiledSkeletonFromStream(is, path.toUri());
+      final CaSkeletonRestPoseDType rest_pose =
+        CaSkeletonRestPose.createD(context, skeleton);
+      final CaActionType action =
+        skeleton.actionsByName().get(act_name).get();
+      final CaEvaluatorSingleDType eval =
+        CaEvaluatorSingleD.create(rest_pose, action, 60);
 
       for (int index = 0; index < keyframe_max; ++index) {
         eval.evaluateForGlobalFrame(0L, index, 1.0);
@@ -97,7 +101,7 @@ public final class EvaluatePoseAtAllKeyframes
         eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
           final CaEvaluatedJointDType joint = node.value();
           final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
-            joint.transformAbsolute4x4D();
+            joint.transformJointObject4x4D();
           final VectorM4D out = new VectorM4D();
           MatrixM4x4D.multiplyVector4D(
             context,
