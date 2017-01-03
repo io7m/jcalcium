@@ -4,7 +4,7 @@
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>boneview.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>boneview.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>jointview.%d{yyyy-MM-dd}.log</fileNamePattern>
     </rollingPolicy>
 
     <encoder>
@@ -16,7 +16,7 @@
     name="STDERR"
     class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>boneview: %logger{0}: %level: %msg%n</pattern>
+      <pattern>jointview: %logger{0}: %level: %msg%n</pattern>
     </encoder>
     <target>System.err</target>
   </appender>
