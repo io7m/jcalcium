@@ -258,7 +258,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     private final VectorM3D scale;
     private final PVectorM3D<CaSpaceJointType> translation;
     private final QuaternionM4D orientation;
-    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectType> absolute_transform;
+    private final PMatrix4x4DType<CaSpaceJointType, CaSpaceObjectType> absolute_transform;
     private final OptionalInt joint_parent;
 
     JointStateD(
@@ -294,7 +294,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     }
 
     @Override
-    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectType> transformAbsolute4x4D()
+    public PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> transformAbsolute4x4D()
     {
       return this.absolute_transform;
     }

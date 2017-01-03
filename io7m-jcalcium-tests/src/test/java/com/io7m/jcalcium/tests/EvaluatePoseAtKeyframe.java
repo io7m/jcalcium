@@ -2,6 +2,7 @@ package com.io7m.jcalcium.tests;
 
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
@@ -89,7 +90,7 @@ public final class EvaluatePoseAtKeyframe
       eval.evaluateForGlobalFrame(0L, keyframe, 1.0);
       eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
         final CaEvaluatedJointDType joint = node.value();
-        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectType> m =
+        final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
           joint.transformAbsolute4x4D();
         final VectorM4D out = new VectorM4D();
         MatrixM4x4D.multiplyVector4D(

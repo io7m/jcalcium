@@ -39,7 +39,7 @@ public interface CaEvaluatedJointDType extends CaEvaluatedJointType
    * @return The absolute transform for the joint
    */
 
-  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectType> transformAbsolute4x4D();
+  PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> transformAbsolute4x4D();
 
   /**
    * @return The parent-relative offset for the joint
