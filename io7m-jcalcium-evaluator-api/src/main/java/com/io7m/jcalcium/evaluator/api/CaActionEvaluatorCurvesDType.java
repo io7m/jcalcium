@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jtensors.Quaternion4DType;
 import com.io7m.jtensors.VectorWritable3DType;
 import com.io7m.jtensors.parameterized.PVectorWritable3DType;
@@ -47,7 +47,7 @@ public interface CaActionEvaluatorCurvesDType extends
     final long frame_start,
     final long frame_current,
     final double time_scale,
-    final PVectorWritable3DType<CaSpaceJointParentRelativeType> out);
+    final PVectorWritable3DType<CaSpaceJointType> out);
 
   /**
    * Evaluate the scale of the joint with ID {@code joint_id} at frame

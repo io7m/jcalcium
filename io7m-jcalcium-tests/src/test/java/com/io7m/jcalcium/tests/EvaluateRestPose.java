@@ -4,11 +4,13 @@ import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
 import com.io7m.jcalcium.loader.api.CaLoaderType;
+import com.io7m.jtensors.Matrix4x4DType;
+import com.io7m.jtensors.MatrixHeapArrayM4x4D;
 import com.io7m.jtensors.MatrixM4x4D;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorM4D;
@@ -79,14 +81,20 @@ public final class EvaluateRestPose
     try (final InputStream is = Files.newInputStream(path)) {
       final CaSkeleton skel =
         loader.loadCompiledSkeletonFromStream(is, path.toUri());
+      final MatrixM4x4D.ContextMM4D c =
+        new MatrixM4x4D.ContextMM4D();
       final CaSkeletonRestPoseDType transforms =
-        CaSkeletonRestPose.createD(skel);
+        CaSkeletonRestPose.createD(c, skel);
 
       final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
+      final Matrix4x4DType m = MatrixHeapArrayM4x4D.newMatrix();
+
       skel.joints().forEachBreadthFirst(unit(), (input, depth, node) -> {
         final CaJoint joint = node.value();
-        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> m =
-          transforms.transformAbsolute4x4D(joint.id());
+        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointType> m_inv =
+          transforms.transformInverseRest4x4D(joint.id());
+
+        MatrixM4x4D.invert(c, m_inv, m);
         final VectorM4D out = new VectorM4D();
         MatrixM4x4D.multiplyVector4D(
           context,

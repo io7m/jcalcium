@@ -17,10 +17,10 @@
 package com.io7m.jcalcium.core.spaces;
 
 /**
- * The parent-relative coordinate space for joints.
+ * The coordinate space with a joint as the origin.
  */
 
-public interface CaSpaceJointParentRelativeType extends CaSpaceType
+public interface CaSpaceJointType extends CaSpaceType
 {
   // No extra methods
 }

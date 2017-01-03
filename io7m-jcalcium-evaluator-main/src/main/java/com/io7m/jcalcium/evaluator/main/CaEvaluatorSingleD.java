@@ -20,8 +20,7 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
@@ -257,9 +256,9 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     private final CaJointName joint_name;
     private final int joint_id;
     private final VectorM3D scale;
-    private final PVectorM3D<CaSpaceJointParentRelativeType> translation;
+    private final PVectorM3D<CaSpaceJointType> translation;
     private final QuaternionM4D orientation;
-    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> absolute_transform;
+    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectType> absolute_transform;
     private final OptionalInt joint_parent;
 
     JointStateD(
@@ -295,13 +294,13 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     }
 
     @Override
-    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4D()
+    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectType> transformAbsolute4x4D()
     {
       return this.absolute_transform;
     }
 
     @Override
-    public PVectorReadable3DType<CaSpaceJointParentRelativeType> translation3D()
+    public PVectorReadable3DType<CaSpaceJointType> translation3D()
     {
       return this.translation;
     }

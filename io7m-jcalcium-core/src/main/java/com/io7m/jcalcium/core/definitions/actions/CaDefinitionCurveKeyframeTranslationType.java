@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.definitions.actions;
 
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import org.immutables.value.Value;
 
@@ -34,5 +34,5 @@ public interface CaDefinitionCurveKeyframeTranslationType extends
    * @return The translation of the joint at this keyframe
    */
 
-  PVectorI3D<CaSpaceJointParentRelativeType> translation();
+  PVectorI3D<CaSpaceJointType> translation();
 }

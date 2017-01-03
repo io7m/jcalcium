@@ -16,8 +16,7 @@
 
 package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jnull.Nullable;
@@ -61,31 +60,37 @@ public final class CaSkeletonRestPose
   /**
    * Calculate a set of rest pose transforms for the given skeleton.
    *
+   * @param c        Preallocated storage for processing matrices without extra
+   *                 allocations
    * @param skeleton The skeleton
    *
    * @return A set of rest pose transforms
    */
 
   public static CaSkeletonRestPoseDType createD(
+    final MatrixM4x4D.ContextMM4D c,
     final CaSkeleton skeleton)
   {
     NullCheck.notNull(skeleton, "Skeleton");
-    return new BuildD(skeleton).build();
+    return new BuildD(skeleton).build(c);
   }
 
   /**
    * Calculate a set of rest pose transforms for the given skeleton.
    *
+   * @param c        Preallocated storage for processing matrices without extra
+   *                 allocations
    * @param skeleton The skeleton
    *
    * @return A set of rest pose transforms
    */
 
   public static CaSkeletonRestPoseFType createF(
+    final MatrixM4x4F.ContextMM4F c,
     final CaSkeleton skeleton)
   {
     NullCheck.notNull(skeleton, "Skeleton");
-    return new BuildF(skeleton).build();
+    return new BuildF(skeleton).build(c);
   }
 
   private static final class BuildD
@@ -94,7 +99,7 @@ public final class CaSkeletonRestPose
     private final Matrix4x4DType m_orientation;
     private final Matrix4x4DType m_scale;
     private final Matrix4x4DType m_accumulated;
-    private final Int2ReferenceOpenHashMap<PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> transforms;
+    private final Int2ReferenceOpenHashMap<PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType>> transforms;
     private final CaSkeleton skeleton;
 
     BuildD(
@@ -109,7 +114,7 @@ public final class CaSkeletonRestPose
     }
 
     private void makeTransform(
-      final @Nullable PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> joint_parent_transform,
+      final @Nullable PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointType> joint_parent_transform,
       final CaJointType joint)
     {
       MatrixM4x4D.makeTranslation3D(
@@ -128,12 +133,11 @@ public final class CaSkeletonRestPose
       MatrixM4x4D.multiply(
         this.m_accumulated, this.m_scale, this.m_accumulated);
 
-      final PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transform = PMatrixHeapArrayM4x4D.newMatrix();
+      final PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType> transform =
+        PMatrixHeapArrayM4x4D.newMatrix();
       if (joint_parent_transform != null) {
         MatrixM4x4D.multiply(
-          joint_parent_transform,
-          this.m_accumulated,
-          transform);
+          joint_parent_transform, this.m_accumulated, transform);
       } else {
         MatrixM4x4D.copy(this.m_accumulated, transform);
       }
@@ -141,14 +145,15 @@ public final class CaSkeletonRestPose
       this.transforms.put(joint.id(), transform);
     }
 
-    CaSkeletonRestPoseDType build()
+    CaSkeletonRestPoseDType build(
+      final MatrixM4x4D.ContextMM4D c)
     {
       this.skeleton.joints().forEachBreadthFirst(this, (t, depth, node) -> {
         final CaJoint joint = node.value();
 
         final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
           node.parentReadable();
-        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> parent_transform;
+        final PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointType> parent_transform;
         if (parent_opt.isPresent()) {
           final CaJoint parent = parent_opt.get().value();
           parent_transform = t.transforms.get(parent.id());
@@ -159,22 +164,31 @@ public final class CaSkeletonRestPose
         t.makeTransform(parent_transform, joint);
       });
 
+      /*
+       * Invert all transform matrices.
+       */
+
+      for (final PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType> v : this.transforms.values()) {
+        MatrixM4x4D.invertInPlace(c, v);
+      }
+
       return new BuiltD(this.transforms);
     }
   }
 
   private static final class BuiltD implements CaSkeletonRestPoseDType
   {
-    private final Int2ReferenceOpenHashMap<PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> transforms;
+    private final Int2ReferenceOpenHashMap<PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType>> transforms;
 
     private BuiltD(
-      final Int2ReferenceOpenHashMap<PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> in_transforms)
+      final Int2ReferenceOpenHashMap<PMatrix4x4DType<CaSpaceObjectType, CaSpaceJointType>> in_transforms)
     {
       this.transforms = NullCheck.notNull(in_transforms, "transforms");
     }
 
     @Override
-    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4D(
+    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointType>
+    transformInverseRest4x4D(
       final int joint_id)
       throws NoSuchElementException
     {
@@ -191,7 +205,7 @@ public final class CaSkeletonRestPose
     private final Matrix4x4FType m_orientation;
     private final Matrix4x4FType m_scale;
     private final Matrix4x4FType m_accumulated;
-    private final Int2ReferenceOpenHashMap<PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> transforms;
+    private final Int2ReferenceOpenHashMap<PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType>> transforms;
     private final CaSkeleton skeleton;
 
     BuildF(
@@ -209,7 +223,7 @@ public final class CaSkeletonRestPose
       final @Nullable MatrixReadable4x4FType joint_parent_transform,
       final CaJointType joint)
     {
-      final PVectorI3D<CaSpaceJointParentRelativeType> translation =
+      final PVectorI3D<CaSpaceJointType> translation =
         joint.translation();
 
       final VectorI3F translation_f = new VectorI3F(
@@ -243,14 +257,12 @@ public final class CaSkeletonRestPose
       MatrixM4x4F.multiply(
         this.m_accumulated, this.m_scale, this.m_accumulated);
 
-      final PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transform =
+      final PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType> transform =
         PMatrixHeapArrayM4x4F.newMatrix();
 
       if (joint_parent_transform != null) {
         MatrixM4x4F.multiply(
-          joint_parent_transform,
-          this.m_accumulated,
-          transform);
+          joint_parent_transform, this.m_accumulated, transform);
       } else {
         MatrixM4x4F.copy(this.m_accumulated, transform);
       }
@@ -258,14 +270,15 @@ public final class CaSkeletonRestPose
       this.transforms.put(joint.id(), transform);
     }
 
-    CaSkeletonRestPoseFType build()
+    CaSkeletonRestPoseFType build(
+      final MatrixM4x4F.ContextMM4F c)
     {
       this.skeleton.joints().forEachBreadthFirst(this, (t, depth, node) -> {
         final CaJoint joint = node.value();
 
         final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
           node.parentReadable();
-        final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType> parent_transform;
+        final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointType> parent_transform;
         if (parent_opt.isPresent()) {
           final CaJoint parent = parent_opt.get().value();
           parent_transform = t.transforms.get(parent.id());
@@ -276,22 +289,31 @@ public final class CaSkeletonRestPose
         t.makeTransform(parent_transform, joint);
       });
 
+      /*
+       * Invert all transform matrices.
+       */
+
+      for (final PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType> v : this.transforms.values()) {
+        MatrixM4x4F.invertInPlace(c, v);
+      }
+
       return new BuiltF(this.transforms);
     }
   }
 
   private static final class BuiltF implements CaSkeletonRestPoseFType
   {
-    private final Int2ReferenceOpenHashMap<PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> transforms;
+    private final Int2ReferenceOpenHashMap<PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType>> transforms;
 
     private BuiltF(
-      final Int2ReferenceOpenHashMap<PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType>> in_transforms)
+      final Int2ReferenceOpenHashMap<PMatrix4x4FType<CaSpaceObjectType, CaSpaceJointType>> in_transforms)
     {
       this.transforms = NullCheck.notNull(in_transforms, "transforms");
     }
 
     @Override
-    public PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4F(
+    public PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointType>
+    transformInverseRest4x4F(
       final int joint_id)
       throws NoSuchElementException
     {

@@ -22,7 +22,7 @@ import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveKeyframeTranslationType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.generators.parameterized.PVectorI3DGenerator;
 import javaslang.collection.List;
@@ -37,7 +37,7 @@ import java.util.Collections;
 public final class CaDefinitionCurveTranslationGenerator implements Generator<CaDefinitionCurveTranslation>
 {
   private final JointTree tree;
-  private final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvec_gen;
+  private final PVectorI3DGenerator<CaSpaceJointType> pvec_gen;
   private final Generator<CaCurveInterpolation> interp_gen;
   private final Generator<CaCurveEasing> easing_gen;
 
@@ -53,7 +53,7 @@ public final class CaDefinitionCurveTranslationGenerator implements Generator<Ca
   public CaDefinitionCurveTranslationGenerator(
     final Generator<CaCurveInterpolation> in_interp_gen,
     final Generator<CaCurveEasing> in_easing_gen,
-    final PVectorI3DGenerator<CaSpaceJointParentRelativeType> in_pvec_gen,
+    final PVectorI3DGenerator<CaSpaceJointType> in_pvec_gen,
     final JointTree in_tree)
   {
     this.tree = NullCheck.notNull(in_tree, "Tree");

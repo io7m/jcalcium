@@ -16,7 +16,7 @@
 
 package com.io7m.jcalcium.core.compiled;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jtensors.parameterized.PMatrixReadable4x4FType;
 
@@ -30,15 +30,19 @@ import java.util.NoSuchElementException;
 public interface CaSkeletonRestPoseFType
 {
   /**
+   * A specification of the inverse rest pose matrix for a given joint. This
+   * is a matrix that transforms an object-space position to joint-space for
+   * a given joint.
+   *
    * @param joint_id A joint ID
    *
-   * @return The absolute transform for the given joint
+   * @return The inverse rest pose transform for the given joint
    *
    * @throws NoSuchElementException If the joint does not exist
    */
 
-  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointAbsoluteType>
-  transformAbsolute4x4F(
+  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceJointType>
+  transformInverseRest4x4F(
     final int joint_id)
     throws NoSuchElementException;
 }

@@ -29,7 +29,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScaleType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslationType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.serializer.api.CaCompiledSerializerType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.QuaternionI4D;
@@ -211,7 +211,7 @@ final class CaV1Serializer implements CaCompiledSerializerType
   }
 
   private static Skeleton.V1Translation fromTranslation(
-    final PVectorI3D<CaSpaceJointParentRelativeType> translation)
+    final PVectorI3D<CaSpaceJointType> translation)
   {
     final Skeleton.V1Translation.Builder b = Skeleton.V1Translation.newBuilder();
     b.setX(translation.getXD());

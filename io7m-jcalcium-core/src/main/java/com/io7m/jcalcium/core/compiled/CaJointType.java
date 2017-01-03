@@ -18,7 +18,7 @@ package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
@@ -51,7 +51,7 @@ public interface CaJointType
    */
 
   @Value.Parameter
-  PVectorI3D<CaSpaceJointParentRelativeType> translation();
+  PVectorI3D<CaSpaceJointType> translation();
 
   /**
    * @return The parent-relative orientation of the joint

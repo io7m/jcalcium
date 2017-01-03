@@ -18,7 +18,7 @@ package com.io7m.jcalcium.generators;
 
 import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionJoint;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jorchard.generators.JOTreeNodeGenerator;
@@ -41,7 +41,7 @@ public final class JointTreeGenerator implements Generator<JointTree>
   private final IntegerGenerator sizes;
   private final Generator<JOTreeNodeType<CaJointName>> tree_gen;
   private final VectorI3DGenerator vec_gen;
-  private final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvec_gen;
+  private final PVectorI3DGenerator<CaSpaceJointType> pvec_gen;
   private final QuaternionI4DGenerator quat_gen;
 
   /**

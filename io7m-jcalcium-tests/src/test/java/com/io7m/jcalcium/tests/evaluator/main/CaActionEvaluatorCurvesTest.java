@@ -24,7 +24,7 @@ import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.main.CaActionEvaluatorCurves;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
@@ -92,7 +92,7 @@ public final class CaActionEvaluatorCurvesTest
 
     final Vector3DType s_out =
       new VectorM3D();
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
     final Quaternion4DType q_out =
       new QuaternionM4D();
@@ -144,7 +144,7 @@ public final class CaActionEvaluatorCurvesTest
     final CaActionEvaluatorCurvesDType eval =
       CaActionEvaluatorCurves.createD(skel, act, 60);
 
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
 
     eval.evaluateTranslation3DForGlobalFrame(0, 0L, 0L, 0.5, t_out);
@@ -204,7 +204,7 @@ public final class CaActionEvaluatorCurvesTest
     final CaActionEvaluatorCurvesDType eval =
       CaActionEvaluatorCurves.createD(skel, act, 60);
 
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
 
     eval.evaluateTranslation3DForGlobalFrame(0, 0L, 0L, 2.0, t_out);
@@ -266,7 +266,7 @@ public final class CaActionEvaluatorCurvesTest
 
     final Vector3DType s_out =
       new VectorM3D();
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
     final Quaternion4DType q_out =
       new QuaternionM4D();
@@ -440,7 +440,7 @@ public final class CaActionEvaluatorCurvesTest
 
     final Vector3DType s_out =
       new VectorM3D();
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
     final Quaternion4DType q_out =
       new QuaternionM4D();
@@ -558,7 +558,7 @@ public final class CaActionEvaluatorCurvesTest
 
     final Vector3DType s_out =
       new VectorM3D();
-    final PVector3DType<CaSpaceJointParentRelativeType> t_out =
+    final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
     final Quaternion4DType q_out =
       new QuaternionM4D();

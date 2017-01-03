@@ -48,7 +48,7 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveOrientation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveScale;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.generators.JointNameTree;
 import com.io7m.jcalcium.generators.JointNameTreeGenerator;
 import com.io7m.jcalcium.generators.JointTree;
@@ -768,7 +768,7 @@ public abstract class CaCompilerContract
 
     final VectorI3DGenerator vgen =
       new VectorI3DGenerator();
-    final PVectorI3DGenerator<CaSpaceJointParentRelativeType> pvgen =
+    final PVectorI3DGenerator<CaSpaceJointType> pvgen =
       new PVectorI3DGenerator<>();
     final QuaternionI4DGenerator qgen =
       new QuaternionI4DGenerator();

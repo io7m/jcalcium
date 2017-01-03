@@ -32,7 +32,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.format.protobuf3.CaLoaderCorruptedData;
 import com.io7m.jcalcium.format.protobuf3.CaLoaderIOException;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
@@ -74,7 +74,7 @@ final class CaV1Loader
     return new VectorI3D(v.getX(), v.getY(), v.getZ());
   }
 
-  private static PVectorI3D<CaSpaceJointParentRelativeType> translation(
+  private static PVectorI3D<CaSpaceJointType> translation(
     final Skeleton.V1TranslationOrBuilder v)
   {
     return new PVectorI3D<>(v.getX(), v.getY(), v.getZ());

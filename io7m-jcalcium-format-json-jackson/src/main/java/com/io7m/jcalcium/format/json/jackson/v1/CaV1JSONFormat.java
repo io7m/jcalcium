@@ -61,7 +61,7 @@ import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveScaleType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslation;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveTranslationType;
 import com.io7m.jcalcium.core.definitions.actions.CaDefinitionCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserType;
 import com.io7m.jcalcium.parser.api.CaParseError;
 import com.io7m.jcalcium.serializer.api.CaDefinitionSerializerType;
@@ -292,7 +292,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     @JsonProperty("parent")
     private final Optional<String> parent;
     @JsonProperty(value = "translation", required = true)
-    private final PVectorI3D<CaSpaceJointParentRelativeType> translation;
+    private final PVectorI3D<CaSpaceJointType> translation;
     @JsonProperty(value = "orientation-xyzw", required = true)
     private final QuaternionI4D orientation;
     @JsonProperty(value = "scale", required = true)
@@ -315,7 +315,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       @JsonProperty("parent")
       final Optional<String> in_parent,
       @JsonProperty(value = "translation", required = true)
-      final PVectorI3D<CaSpaceJointParentRelativeType> in_translation,
+      final PVectorI3D<CaSpaceJointType> in_translation,
       @JsonProperty(value = "orientation-xyzw", required = true)
       final QuaternionI4D in_orientation,
       @JsonProperty(value = "scale", required = true)
@@ -632,7 +632,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
     @JsonProperty(value = "easing", required = true)
     private final CaCurveEasing easing;
     @JsonProperty(value = "translation", required = true)
-    private final PVectorI3D<CaSpaceJointParentRelativeType> translation;
+    private final PVectorI3D<CaSpaceJointType> translation;
 
     CaV1KeyframeCurveTranslation(
       @JsonProperty(value = "index", required = true)
@@ -642,7 +642,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
       @JsonProperty(value = "easing", required = true)
       final CaCurveEasing in_easing,
       @JsonProperty(value = "translation", required = true)
-      final PVectorI3D<CaSpaceJointParentRelativeType> in_translation)
+      final PVectorI3D<CaSpaceJointType> in_translation)
     {
       this.index = in_index;
       this.interpolation = NullCheck.notNull(in_interpolation, "Interpolation");

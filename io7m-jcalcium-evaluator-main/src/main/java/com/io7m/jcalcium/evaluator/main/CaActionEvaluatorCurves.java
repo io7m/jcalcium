@@ -29,7 +29,7 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeScale;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation;
 import com.io7m.jnull.NullCheck;
@@ -157,7 +157,7 @@ public final class CaActionEvaluatorCurves
     final long frame_start,
     final long frame_current,
     final double time_scale,
-    final PVectorWritable3DType<CaSpaceJointParentRelativeType> out)
+    final PVectorWritable3DType<CaSpaceJointType> out)
   {
     this.joint_tracks[joint_id].evaluateTranslation3D(
       frame_start, frame_current, time_scale, out);
@@ -289,7 +289,7 @@ public final class CaActionEvaluatorCurves
       final long frame_start,
       final long frame_current,
       final double time_scale,
-      final PVectorWritable3DType<CaSpaceJointParentRelativeType> out)
+      final PVectorWritable3DType<CaSpaceJointType> out)
     {
       final int bound = Math.addExact(this.last_frame, 1);
 
@@ -300,7 +300,7 @@ public final class CaActionEvaluatorCurves
       int key_frame_next = keyframeIndexNext(
         this.keyframes_translation.keySet(), (int) Math.floor(frame));
 
-      final PVectorReadable3DType<CaSpaceJointParentRelativeType> trans_prev;
+      final PVectorReadable3DType<CaSpaceJointType> trans_prev;
       final CaCurveEasing easing;
       final CaCurveInterpolation interp;
       if (key_frame_prev >= 0) {
@@ -316,7 +316,7 @@ public final class CaActionEvaluatorCurves
         key_frame_prev = 0;
       }
 
-      final PVectorReadable3DType<CaSpaceJointParentRelativeType> trans_next;
+      final PVectorReadable3DType<CaSpaceJointType> trans_next;
       if (key_frame_next >= 0) {
         final CaCurveKeyframeTranslation kf =
           this.keyframes_translation.get(key_frame_next);

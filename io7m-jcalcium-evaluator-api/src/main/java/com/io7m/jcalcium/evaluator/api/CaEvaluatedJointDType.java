@@ -16,8 +16,7 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.spaces.CaSpaceJointAbsoluteType;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointParentRelativeType;
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jtensors.QuaternionReadable4DType;
 import com.io7m.jtensors.VectorReadable3DType;
@@ -31,16 +30,22 @@ import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 public interface CaEvaluatedJointDType extends CaEvaluatedJointType
 {
   /**
+   * A specification of the matrix that represents the concatenation of all
+   * joint transforms up to and including the current joint. In effect, this is
+   * a matrix that, if used to transform a vector {@code (0.0, 0.0, 0.0, 1.0)},
+   * will yield a vector equal to the current object-space position of the
+   * joint.
+   *
    * @return The absolute transform for the joint
    */
 
-  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceJointAbsoluteType> transformAbsolute4x4D();
+  PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectType> transformAbsolute4x4D();
 
   /**
    * @return The parent-relative offset for the joint
    */
 
-  PVectorReadable3DType<CaSpaceJointParentRelativeType> translation3D();
+  PVectorReadable3DType<CaSpaceJointType> translation3D();
 
   /**
    * @return The parent-relative orientation of the joint
