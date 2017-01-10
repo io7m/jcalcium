@@ -193,7 +193,7 @@ public final class CaFilterCommandCompileMeshWeights implements
         sb.append(text.toJavaStream().collect(Collectors.joining(" ")));
         sb.append(System.lineSeparator());
         return Validation.invalid(List.of(SMFParseError.of(
-          LexicalPosition.of(line, 0, file), sb.toString(), Optional.empty())));
+          LexicalPosition.of(line, 0, file), sb.toString(), empty())));
       } catch (final IllegalArgumentException e) {
         return SMFFilterCommandParsing.errorExpectedGotValidation(
           file, line, makeSyntax(), text);
