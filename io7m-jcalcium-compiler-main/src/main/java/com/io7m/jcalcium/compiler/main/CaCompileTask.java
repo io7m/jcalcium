@@ -67,9 +67,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_MULTIPLE_ROOT_JOINTS;
 import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NONEXISTENT_PARENT;
 import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NO_ROOT;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_MULTIPLE_ROOT_JOINTS;
 import static javaslang.control.Validation.invalid;
 import static javaslang.control.Validation.valid;
 
@@ -160,7 +160,7 @@ final class CaCompileTask
    * Attempt to construct a tree from the given set of joint definitions.
    *
    * @param joint_defs The joint definitions
-   * @param root      The root joint
+   * @param root       The root joint
    *
    * @return A tree, or a list of reasons why the joints do not form a tree
    */
@@ -378,7 +378,7 @@ final class CaCompileTask
 
     List<CaCompileError> errors = List.empty();
     SortedMap<CaJointName, IndexedSeq<CaCurveType>> results =
-      javaslang.collection.TreeMap.empty();
+      TreeMap.empty();
 
     for (final CaJointName joint : curves.keySet()) {
       final Validation<List<CaCompileError>, CaJoint> v_joint =

@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -133,7 +134,7 @@ final class CaV1Loader
   }
 
   private static SortedMap<Integer, CaCurveKeyframeTranslation> curveTranslationKeyframes(
-    final java.util.Map<Integer, Skeleton.V1CurveKeyframeTranslation> tr)
+    final Map<Integer, Skeleton.V1CurveKeyframeTranslation> tr)
   {
     SortedMap<Integer, CaCurveKeyframeTranslation> frames = TreeMap.empty();
     for (final Integer key : tr.keySet()) {
@@ -165,7 +166,7 @@ final class CaV1Loader
   }
 
   private static SortedMap<Integer, CaCurveKeyframeScale> curveScaleKeyframes(
-    final java.util.Map<Integer, Skeleton.V1CurveKeyframeScale> tr)
+    final Map<Integer, Skeleton.V1CurveKeyframeScale> tr)
   {
     SortedMap<Integer, CaCurveKeyframeScale> frames = TreeMap.empty();
     for (final Integer key : tr.keySet()) {
@@ -198,7 +199,7 @@ final class CaV1Loader
 
   private static SortedMap<Integer, CaCurveKeyframeOrientation>
   curveOrientationKeyframes(
-    final java.util.Map<Integer, Skeleton.V1CurveKeyframeOrientation> tr)
+    final Map<Integer, Skeleton.V1CurveKeyframeOrientation> tr)
   {
     SortedMap<Integer, CaCurveKeyframeOrientation> frames = TreeMap.empty();
     for (final Integer key : tr.keySet()) {
@@ -248,7 +249,7 @@ final class CaV1Loader
   }
 
   private static SortedMap<CaActionName, CaActionType> actions(
-    final java.util.Map<String, Skeleton.V1Action> actions)
+    final Map<String, Skeleton.V1Action> actions)
   {
     TreeMap<CaActionName, CaActionType> results = TreeMap.empty();
     for (final String name : actions.keySet()) {
@@ -333,7 +334,7 @@ final class CaV1Loader
      * must be sorted by ID and then added to a tree sequentially.
      */
 
-    final java.util.List<Skeleton.V1Joint> bones_ordered =
+    final List<Skeleton.V1Joint> bones_ordered =
       new ArrayList<>(bones.size());
     for (final Integer bone_id : bones.keySet()) {
       bones_ordered.add(bones.get(bone_id));

@@ -233,8 +233,8 @@ public final class CaJSONFormatProvider implements
           this.mapper.readValue(is, CaDefinitionSkeleton.class));
       } catch (final JsonMappingException e) {
         final JsonLocation loc = e.getLocation();
-        final javaslang.collection.List<CaParseError> xs =
-          javaslang.collection.List.of(
+        final List<CaParseError> xs =
+          List.of(
             CaParseError.of(
               LexicalPosition.of(
                 loc.getLineNr(),
@@ -245,8 +245,8 @@ public final class CaJSONFormatProvider implements
         return Validation.invalid(xs);
       } catch (final JsonParseException e) {
         final JsonLocation loc = e.getLocation();
-        final javaslang.collection.List<CaParseError> xs =
-          javaslang.collection.List.of(
+        final List<CaParseError> xs =
+          List.of(
             CaParseError.of(
               LexicalPosition.of(
                 loc.getLineNr(),
@@ -256,8 +256,8 @@ public final class CaJSONFormatProvider implements
             ));
         return Validation.invalid(xs);
       } catch (final IOException e) {
-        final javaslang.collection.List<CaParseError> xs =
-          javaslang.collection.List.of(
+        final List<CaParseError> xs =
+          List.of(
             CaParseError.of(
               LexicalPosition.of(
                 -1,
