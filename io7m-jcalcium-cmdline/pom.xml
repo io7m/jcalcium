@@ -44,7 +44,20 @@
       <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-mesh-processing-smf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-frontend</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-processing-main</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>

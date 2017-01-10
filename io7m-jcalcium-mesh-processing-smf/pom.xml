@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-  xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
@@ -10,17 +10,18 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-tests</artifactId>
+  <artifactId>io7m-jcalcium-mesh-processing-smf</artifactId>
 
-  <packaging>jar</packaging>
-  <name>io7m-jcalcium-tests</name>
-  <description>Skeletal animation (Unit tests)</description>
+  <packaging>bundle</packaging>
+  <name>io7m-jcalcium-evaluator-api</name>
+  <description>Skeletal animation (SMF filters)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
     <url>${project.parent.scm.url}</url>
     <connection>${project.parent.scm.connection}</connection>
-    <developerConnection>${project.parent.scm.developerConnection}</developerConnection>
+    <developerConnection>${project.parent.scm.developerConnection}
+    </developerConnection>
   </scm>
 
   <dependencies>
@@ -31,37 +32,27 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-compiler-main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-evaluator-main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-format-json-jackson</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-generators</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>io7m-jcalcium-mesh-processing-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-mesh-processing-smf</artifactId>
+      <artifactId>io7m-jcalcium-loader-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-parser-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-serializer-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-compiler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -70,14 +61,8 @@
       <artifactId>io7m-jnull-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.io7m.jtensors</groupId>
-      <artifactId>io7m-jtensors-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.io7m.jorchard</groupId>
-      <artifactId>io7m-jorchard-generators</artifactId>
-      <scope>test</scope>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-processing-api</artifactId>
     </dependency>
 
     <dependency>
@@ -89,31 +74,15 @@
       <artifactId>value</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <!-- JMockit MUST appear before junit (fixed in junit 5) -->
     <dependency>
-      <groupId>org.jmockit</groupId>
-      <artifactId>jmockit</artifactId>
-      <scope>test</scope>
+      <groupId>org.immutables.javaslang</groupId>
+      <artifactId>javaslang-encodings</artifactId>
+      <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.marschall</groupId>
-      <artifactId>memoryfilesystem</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.java.quickcheck</groupId>
-      <artifactId>quickcheck</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -124,6 +93,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+
+      <!-- Produce OSGi bundle -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              com.io7m.jcalcium.mesh.processing
+            </Export-Package>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
