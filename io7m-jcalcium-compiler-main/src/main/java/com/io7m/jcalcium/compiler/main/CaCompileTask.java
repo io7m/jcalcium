@@ -434,9 +434,9 @@ final class CaCompileTask
     }
 
     if (v_fps.isInvalid()) {
-      return Validation.invalid(errors.appendAll(v_fps.getError()));
+      return invalid(errors.appendAll(v_fps.getError()));
     }
-    return Validation.invalid(errors);
+    return invalid(errors);
   }
 
   private static Validation<List<CaCompileError>, CaCurveType>
