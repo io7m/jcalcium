@@ -33,7 +33,6 @@ import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import com.io7m.smfj.core.SMFAttribute;
 import com.io7m.smfj.core.SMFAttributeName;
-import com.io7m.smfj.core.SMFComponentType;
 import com.io7m.smfj.core.SMFCoordinateSystem;
 import com.io7m.smfj.core.SMFFaceWindingOrder;
 import com.io7m.smfj.core.SMFHeader;
@@ -73,6 +72,21 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
   static {
     LOG = LoggerFactory.getLogger(CaFilterCommandCompileMeshWeightsTest.class);
+  }
+
+  private static SMFHeader baseHeader(
+    final List<SMFAttribute> attributes)
+  {
+    final SMFCoordinateSystem coords =
+      SMFCoordinateSystem.of(
+        CAxisSystem.of(
+          CAxis.AXIS_POSITIVE_X,
+          CAxis.AXIS_POSITIVE_Y,
+          CAxis.AXIS_NEGATIVE_Z),
+        SMFFaceWindingOrder.FACE_WINDING_ORDER_COUNTER_CLOCKWISE);
+    final SMFSchemaIdentifier schema =
+      SMFSchemaIdentifier.builder().build();
+    return SMFHeader.of(0L, 16L, 0L, schema, coords, attributes, 0L);
   }
 
   @Test
@@ -349,7 +363,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       SMFMemoryMesh.builder()
         .setHeader(header)
         .setArrays(HashMap.ofEntries(
-          Tuple.of(attr_root_input, SMFAttributeArrayFloating2.of(Vector.empty()))
+          Tuple.of(
+            attr_root_input,
+            SMFAttributeArrayFloating2.of(Vector.empty()))
         ))
         .setTriangles(Vector.empty())
         .setMetadata(Vector.empty())
@@ -411,7 +427,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       SMFMemoryMesh.builder()
         .setHeader(header)
         .setArrays(HashMap.ofEntries(
-          Tuple.of(attr_root_input, SMFAttributeArrayFloating1.of(Vector.empty()))
+          Tuple.of(
+            attr_root_input,
+            SMFAttributeArrayFloating1.of(Vector.empty()))
         ))
         .setTriangles(Vector.empty())
         .setMetadata(Vector.empty())
@@ -424,7 +442,8 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
     Assert.assertTrue(r.isInvalid());
     Assert.assertThat(
       r.getError().get(0).message(),
-      StringContains.containsString("No attributes were matched by the given pattern."));
+      StringContains.containsString(
+        "No attributes were matched by the given pattern."));
 
     r.getError().forEach(x -> LOG.error("{}", x.message()));
   }
@@ -457,7 +476,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       SMFMemoryMesh.builder()
         .setHeader(header)
         .setArrays(HashMap.ofEntries(
-          Tuple.of(attr_root_input, SMFAttributeArrayFloating1.of(Vector.empty()))
+          Tuple.of(
+            attr_root_input,
+            SMFAttributeArrayFloating1.of(Vector.empty()))
         ))
         .setTriangles(Vector.empty())
         .setMetadata(Vector.empty())
@@ -473,21 +494,6 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       StringContains.containsString("No such file"));
 
     r.getError().forEach(x -> LOG.error("{}", x.message()));
-  }
-
-  private static SMFHeader baseHeader(
-    final List<SMFAttribute> attributes)
-  {
-    final SMFCoordinateSystem coords =
-      SMFCoordinateSystem.of(
-        CAxisSystem.of(
-          CAxis.AXIS_POSITIVE_X,
-          CAxis.AXIS_POSITIVE_Y,
-          CAxis.AXIS_NEGATIVE_Z),
-        SMFFaceWindingOrder.FACE_WINDING_ORDER_COUNTER_CLOCKWISE);
-    final SMFSchemaIdentifier schema =
-      SMFSchemaIdentifier.builder().build();
-    return SMFHeader.of(0L, 16L, 0L, schema, coords, attributes, 0L);
   }
 
   private Path writeSkeleton(

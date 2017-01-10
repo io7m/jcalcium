@@ -31,7 +31,6 @@ import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorI4L;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import javaslang.Tuple;
-import javaslang.collection.HashMap;
 import javaslang.collection.SortedMap;
 import javaslang.collection.TreeMap;
 import javaslang.collection.Vector;
@@ -402,7 +401,8 @@ public final class CaMeshWeightAggregationTest
       TreeMap.empty();
 
     this.expected.expect(PreconditionViolationException.class);
-    this.expected.expectMessage(StringContains.containsString("Must provide at least one weight array"));
+    this.expected.expectMessage(StringContains.containsString(
+      "Must provide at least one weight array"));
     CaMeshWeightAggregation.aggregateWeights(skeleton, weight_arrays);
   }
 
@@ -428,7 +428,8 @@ public final class CaMeshWeightAggregationTest
       );
 
     this.expected.expect(PreconditionViolationException.class);
-    this.expected.expectMessage(StringContains.containsString("Skeleton must contain the named joint"));
+    this.expected.expectMessage(StringContains.containsString(
+      "Skeleton must contain the named joint"));
     CaMeshWeightAggregation.aggregateWeights(skeleton, weight_arrays);
   }
 }

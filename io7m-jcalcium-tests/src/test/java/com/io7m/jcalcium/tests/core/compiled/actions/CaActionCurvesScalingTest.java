@@ -17,9 +17,9 @@
 package com.io7m.jcalcium.tests.core.compiled.actions;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesScaling;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
@@ -43,6 +43,115 @@ import java.util.Map;
 
 public final class CaActionCurvesScalingTest
 {
+  private static CaActionCurves makeAction(
+    final int fps)
+  {
+    final Map<Integer, CaCurveKeyframeTranslation> curve_trans_keyframes =
+      new HashMap<>(3);
+    curve_trans_keyframes.put(
+      Integer.valueOf(0),
+      CaCurveKeyframeTranslation.of(
+        0,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new PVectorI3D<>(0.0, 0.0, 0.0)));
+    curve_trans_keyframes.put(
+      Integer.valueOf(fps / 2),
+      CaCurveKeyframeTranslation.of(
+        fps / 2,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new PVectorI3D<>(1.0, 1.0, 1.0)));
+    curve_trans_keyframes.put(
+      Integer.valueOf(fps),
+      CaCurveKeyframeTranslation.of(
+        fps,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new PVectorI3D<>(0.0, 0.0, 0.0)));
+
+    final CaCurveTranslation curve_trans =
+      CaCurveTranslation.builder()
+        .setAction(CaActionName.of("action"))
+        .setJoint(CaJointName.of("joint0"))
+        .setJavaMapKeyframes(curve_trans_keyframes)
+        .build();
+
+    final Map<Integer, CaCurveKeyframeOrientation> curve_orient_keyframes =
+      new HashMap<>(3);
+    curve_orient_keyframes.put(
+      Integer.valueOf(0),
+      CaCurveKeyframeOrientation.of(
+        0,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new QuaternionI4D()));
+    curve_orient_keyframes.put(
+      Integer.valueOf(fps / 2),
+      CaCurveKeyframeOrientation.of(
+        fps / 2,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new QuaternionI4D(0.707, 0.0, 0.0, 0.707)));
+    curve_orient_keyframes.put(
+      Integer.valueOf(fps),
+      CaCurveKeyframeOrientation.of(
+        fps,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new QuaternionI4D()));
+
+    final CaCurveOrientation curve_orient =
+      CaCurveOrientation.builder()
+        .setAction(CaActionName.of("action"))
+        .setJoint(CaJointName.of("joint0"))
+        .setJavaMapKeyframes(curve_orient_keyframes)
+        .build();
+
+    final Map<Integer, CaCurveKeyframeScale> curve_scale_keyframes =
+      new HashMap<>(3);
+    curve_scale_keyframes.put(
+      Integer.valueOf(0),
+      CaCurveKeyframeScale.of(
+        0,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new VectorI3D(0.0, 0.0, 0.0)));
+    curve_scale_keyframes.put(
+      Integer.valueOf(fps / 2),
+      CaCurveKeyframeScale.of(
+        fps / 2,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new VectorI3D(1.0, 1.0, 1.0)));
+    curve_scale_keyframes.put(
+      Integer.valueOf(fps),
+      CaCurveKeyframeScale.of(
+        fps,
+        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+        CaCurveEasing.CURVE_EASING_IN_OUT,
+        new VectorI3D(0.0, 0.0, 0.0)));
+
+    final CaCurveScale curve_scale =
+      CaCurveScale.builder()
+        .setAction(CaActionName.of("action"))
+        .setJoint(CaJointName.of("joint0"))
+        .setJavaMapKeyframes(curve_scale_keyframes)
+        .build();
+
+    final Map<CaJointName, IndexedSeq<CaCurveType>> curves = new HashMap<>(1);
+    curves.put(CaJointName.of("joint0"), Vector.of(
+      curve_trans,
+      curve_orient,
+      curve_scale));
+
+    return CaActionCurves.builder()
+      .setFramesPerSecond(fps)
+      .setName(CaActionName.of("action"))
+      .setJavaMapCurves(curves)
+      .build();
+  }
+
   @Test
   public void testScaleSame()
   {
@@ -213,114 +322,5 @@ public final class CaActionCurvesScalingTest
         Assert.assertEquals(co_k.scale(), cs_k.scale());
       }
     }
-  }
-
-  private static CaActionCurves makeAction(
-    final int fps)
-  {
-    final Map<Integer, CaCurveKeyframeTranslation> curve_trans_keyframes =
-      new HashMap<>(3);
-    curve_trans_keyframes.put(
-      Integer.valueOf(0),
-      CaCurveKeyframeTranslation.of(
-        0,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(0.0, 0.0, 0.0)));
-    curve_trans_keyframes.put(
-      Integer.valueOf(fps / 2),
-      CaCurveKeyframeTranslation.of(
-        fps / 2,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(1.0, 1.0, 1.0)));
-    curve_trans_keyframes.put(
-      Integer.valueOf(fps),
-      CaCurveKeyframeTranslation.of(
-        fps,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(0.0, 0.0, 0.0)));
-
-    final CaCurveTranslation curve_trans =
-      CaCurveTranslation.builder()
-        .setAction(CaActionName.of("action"))
-        .setJoint(CaJointName.of("joint0"))
-        .setJavaMapKeyframes(curve_trans_keyframes)
-        .build();
-
-    final Map<Integer, CaCurveKeyframeOrientation> curve_orient_keyframes =
-      new HashMap<>(3);
-    curve_orient_keyframes.put(
-      Integer.valueOf(0),
-      CaCurveKeyframeOrientation.of(
-        0,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new QuaternionI4D()));
-    curve_orient_keyframes.put(
-      Integer.valueOf(fps / 2),
-      CaCurveKeyframeOrientation.of(
-        fps / 2,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new QuaternionI4D(0.707, 0.0, 0.0, 0.707)));
-    curve_orient_keyframes.put(
-      Integer.valueOf(fps),
-      CaCurveKeyframeOrientation.of(
-        fps,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new QuaternionI4D()));
-
-    final CaCurveOrientation curve_orient =
-      CaCurveOrientation.builder()
-        .setAction(CaActionName.of("action"))
-        .setJoint(CaJointName.of("joint0"))
-        .setJavaMapKeyframes(curve_orient_keyframes)
-        .build();
-
-    final Map<Integer, CaCurveKeyframeScale> curve_scale_keyframes =
-      new HashMap<>(3);
-    curve_scale_keyframes.put(
-      Integer.valueOf(0),
-      CaCurveKeyframeScale.of(
-        0,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new VectorI3D(0.0, 0.0, 0.0)));
-    curve_scale_keyframes.put(
-      Integer.valueOf(fps / 2),
-      CaCurveKeyframeScale.of(
-        fps / 2,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new VectorI3D(1.0, 1.0, 1.0)));
-    curve_scale_keyframes.put(
-      Integer.valueOf(fps),
-      CaCurveKeyframeScale.of(
-        fps,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new VectorI3D(0.0, 0.0, 0.0)));
-
-    final CaCurveScale curve_scale =
-      CaCurveScale.builder()
-        .setAction(CaActionName.of("action"))
-        .setJoint(CaJointName.of("joint0"))
-        .setJavaMapKeyframes(curve_scale_keyframes)
-        .build();
-
-    final Map<CaJointName, IndexedSeq<CaCurveType>> curves = new HashMap<>(1);
-    curves.put(CaJointName.of("joint0"), Vector.of(
-      curve_trans,
-      curve_orient,
-      curve_scale));
-
-    return CaActionCurves.builder()
-      .setFramesPerSecond(fps)
-      .setName(CaActionName.of("action"))
-      .setJavaMapCurves(curves)
-      .build();
   }
 }

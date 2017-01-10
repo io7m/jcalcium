@@ -17,9 +17,9 @@
 package com.io7m.jcalcium.tests.format.json.jackson.v1;
 
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.definitions.CaDefinitionJointType;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeletonType;
@@ -288,7 +288,9 @@ public final class CaV1JSONParserTest
   {
     final CaV1JSONFormat p = new CaV1JSONFormat(CaJSON.createMapper());
     final Validation<List<CaParseError>, CaDefinitionSkeleton> r =
-      p.parseSkeletonFromStream(resource("dup_joint.csj"), uri("dup_joint.csj"));
+      p.parseSkeletonFromStream(
+        resource("dup_joint.csj"),
+        uri("dup_joint.csj"));
 
     dump(r);
     Assert.assertFalse(r.isValid());

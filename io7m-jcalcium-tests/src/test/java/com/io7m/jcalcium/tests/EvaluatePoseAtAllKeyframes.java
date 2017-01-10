@@ -98,23 +98,29 @@ public final class EvaluatePoseAtAllKeyframes
         eval.evaluateForGlobalFrame(0L, index, 1.0);
 
         System.out.println("Keyframe " + index + ":");
-        eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
-          final CaEvaluatedJointDType joint = node.value();
-          final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
-            joint.transformJointObject4x4D();
-          final VectorM4D out = new VectorM4D();
-          MatrixM4x4D.multiplyVector4D(
-            context,
-            m,
-            new VectorI4D(0.0, 0.0, 0.0, 1.0),
-            out);
-          System.out.printf(
-            "%d: %f,%f,%f\n",
-            Integer.valueOf(joint.id()),
-            Double.valueOf(out.getXD()),
-            Double.valueOf(out.getYD()),
-            Double.valueOf(out.getZD()));
-        });
+        eval.evaluatedJointsD().forEachBreadthFirst(
+          unit(),
+          (i, depth, node) -> {
+            final CaEvaluatedJointDType joint = node.value();
+            final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
+              joint.transformJointObject4x4D();
+            final VectorM4D out = new VectorM4D();
+            MatrixM4x4D.multiplyVector4D(
+              context,
+              m,
+              new VectorI4D(
+                0.0,
+                0.0,
+                0.0,
+                1.0),
+              out);
+            System.out.printf(
+              "%d: %f,%f,%f\n",
+              Integer.valueOf(joint.id()),
+              Double.valueOf(out.getXD()),
+              Double.valueOf(out.getYD()),
+              Double.valueOf(out.getZD()));
+          });
         System.out.println();
       }
     }
