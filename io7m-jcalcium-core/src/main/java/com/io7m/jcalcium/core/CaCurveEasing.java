@@ -66,9 +66,10 @@ public enum CaCurveEasing
         return CURVE_EASING_OUT;
       case "in-out":
         return CURVE_EASING_IN_OUT;
+      default: {
+        throw new IllegalArgumentException(
+          "Unrecognized curve easing: " + name);
+      }
     }
-
-    throw new IllegalArgumentException(
-      "Unrecognized curve easing: " + name);
   }
 }

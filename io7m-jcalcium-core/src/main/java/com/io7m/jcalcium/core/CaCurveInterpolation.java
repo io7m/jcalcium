@@ -74,10 +74,11 @@ public enum CaCurveInterpolation
         return CURVE_INTERPOLATION_CONSTANT;
       case "quadratic":
         return CURVE_INTERPOLATION_QUADRATIC;
+      default: {
+        throw new IllegalArgumentException(
+          "Unrecognized curve interpolation: " + name);
+      }
     }
-
-    throw new IllegalArgumentException(
-      "Unrecognized curve interpolation: " + name);
   }
 
   /**

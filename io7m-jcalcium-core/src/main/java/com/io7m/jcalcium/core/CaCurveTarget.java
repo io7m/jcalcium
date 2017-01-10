@@ -66,8 +66,9 @@ public enum CaCurveTarget
         return CURVE_TARGET_ORIENTATION;
       case "scale":
         return CURVE_TARGET_SCALE;
+      default: {
+        throw new IllegalArgumentException("Unrecognized curve kind: " + name);
+      }
     }
-
-    throw new IllegalArgumentException("Unrecognized curve kind: " + name);
   }
 }

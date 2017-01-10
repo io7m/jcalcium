@@ -50,9 +50,10 @@ public enum CaActionKind
     switch (NullCheck.notNull(name, "Name")) {
       case "curves":
         return ACTION_CURVES;
+      default: {
+        throw new IllegalArgumentException(
+          "Unrecognized action kind: " + name);
+      }
     }
-
-    throw new IllegalArgumentException(
-      "Unrecognized action kind: " + name);
   }
 }
