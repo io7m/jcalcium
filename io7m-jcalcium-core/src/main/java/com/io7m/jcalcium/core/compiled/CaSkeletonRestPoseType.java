@@ -17,7 +17,7 @@
 package com.io7m.jcalcium.core.compiled;
 
 /**
- * The rest pose for a skeleton.
+ * The rest pose transforms for a skeleton.
  */
 
 public interface CaSkeletonRestPoseType
