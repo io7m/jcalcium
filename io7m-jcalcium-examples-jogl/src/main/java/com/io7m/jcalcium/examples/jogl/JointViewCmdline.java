@@ -1075,7 +1075,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
       }
 
       case KeyEvent.VK_N: {
-        this.actions_index = this.actions_index % this.actions_ordered.size();
+        this.actions_index = (this.actions_index + 1) % this.actions_ordered.size();
+        LOG.debug("action: {}", Integer.valueOf(this.actions_index));
         break;
       }
 
