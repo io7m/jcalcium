@@ -23,6 +23,8 @@ import com.io7m.junreachable.UnreachableCodeException;
 import javaslang.Tuple;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.io7m.jfunctional.Unit.unit;
 
@@ -32,6 +34,12 @@ import static com.io7m.jfunctional.Unit.unit;
 
 public final class CaActionCurvesScaling
 {
+  private static final Logger LOG;
+
+  static {
+    LOG = LoggerFactory.getLogger(CaActionCurvesScaling.class);
+  }
+
   private CaActionCurvesScaling()
   {
     throw new UnreachableCodeException();
@@ -124,7 +132,16 @@ public final class CaActionCurvesScaling
       i -> "Target FPS must be > 0");
 
     if (action.framesPerSecond() == target_fps) {
+      LOG.debug("no scaling required for action {}", action.name().value());
       return action;
+    }
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+        "scaling action {} from {} to {} fps",
+        action.name().value(),
+        Integer.valueOf(action.framesPerSecond()),
+        Integer.valueOf(target_fps));
     }
 
     final double scale =
