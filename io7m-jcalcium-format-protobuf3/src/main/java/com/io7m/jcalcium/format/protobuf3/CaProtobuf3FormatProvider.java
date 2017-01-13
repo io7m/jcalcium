@@ -196,7 +196,7 @@ public final class CaProtobuf3FormatProvider implements
           final StringBuilder sb = new StringBuilder(128);
           sb.append("Failed to read major version number.");
           sb.append(System.lineSeparator());
-          sb.append("  Expected: 2 octets");
+          sb.append("  Expected: 4 octets");
           sb.append(System.lineSeparator());
           sb.append("  Received: ");
           sb.append(r);
@@ -216,7 +216,7 @@ public final class CaProtobuf3FormatProvider implements
           final StringBuilder sb = new StringBuilder(128);
           sb.append("Failed to read minor version number.");
           sb.append(System.lineSeparator());
-          sb.append("  Expected: 2 octets");
+          sb.append("  Expected: 4 octets");
           sb.append(System.lineSeparator());
           sb.append("  Received: ");
           sb.append(r);
