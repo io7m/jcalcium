@@ -20,8 +20,9 @@ package com.io7m.jcalcium.mesh.deformation.cpu;
  * Functions to construct deformation matrices.
  */
 
-public interface CaMeshDeformationsType extends CaMeshDeformationsDType,
-  CaMeshDeformationsFType
+public interface CaMeshDeformationMatricesType extends
+  CaMeshDeformationMatricesDType,
+  CaMeshDeformationMatricesFType
 {
   // No extra methods
 }

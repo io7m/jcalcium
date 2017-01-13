@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
  * Methods to construct double-precision deformation matrices.
  */
 
-public interface CaMeshDeformationsDType
+public interface CaMeshDeformationMatricesDType
 {
   /**
    * Construct a weighted deformation matrix. The matrix is a weighted blend of

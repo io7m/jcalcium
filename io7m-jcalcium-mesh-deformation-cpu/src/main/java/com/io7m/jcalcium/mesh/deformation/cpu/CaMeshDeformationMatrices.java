@@ -33,14 +33,15 @@ import com.io7m.jtensors.parameterized.PMatrixWritable4x4FType;
  * Functions to construct deformation matrices.
  */
 
-public final class CaMeshDeformations implements CaMeshDeformationsType
+public final class CaMeshDeformationMatrices implements
+  CaMeshDeformationMatricesType
 {
   private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d;
   private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_temp;
   private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f;
   private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_temp;
 
-  private CaMeshDeformations()
+  private CaMeshDeformationMatrices()
   {
     this.m4d = PMatrixHeapArrayM4x4D.newMatrix();
     this.m4d_temp = PMatrixHeapArrayM4x4D.newMatrix();
@@ -54,9 +55,9 @@ public final class CaMeshDeformations implements CaMeshDeformationsType
    * @return A new matrix provider
    */
 
-  public static CaMeshDeformationsType create()
+  public static CaMeshDeformationMatricesType create()
   {
-    return new CaMeshDeformations();
+    return new CaMeshDeformationMatrices();
   }
 
   @Override
