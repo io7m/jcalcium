@@ -167,7 +167,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -214,7 +213,6 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private R2SurfaceShaderBasicParameters render_floor_parameters;
   private R2MaterialOpaqueSingle<R2SurfaceShaderBasicParameters> render_floor_material;
   private R2SceneStencilsType render_stencils;
-  private R2DebugInstances render_debug;
   private R2DebugVisualizerRendererParameters render_debug_parameters;
   private JCGLTextureUnitAllocatorType render_texture_units;
   private R2DebugCubeType render_debug_cube;
@@ -527,9 +525,6 @@ public final class JointViewCmdline implements Runnable, KeyListener
       R2SceneStencils.newMasks();
     this.render_lights =
       R2SceneLights.newLights();
-    this.render_debug =
-      R2DebugInstances.builder().build();
-
     this.render_debug_cube =
       R2DebugCube.newDebugCube(this.g33);
 
