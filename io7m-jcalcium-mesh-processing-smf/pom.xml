@@ -13,7 +13,7 @@
   <artifactId>io7m-jcalcium-mesh-processing-smf</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-evaluator-api</name>
+  <name>io7m-jcalcium-mesh-processing-smf</name>
   <description>Skeletal animation (SMF filters)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 

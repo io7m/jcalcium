@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,13 +14,14 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.evaluator.api;
+package com.io7m.jcalcium.mesh.deformation.cpu;
 
 /**
- * The type of evaluator providers.
+ * Functions to construct deformation matrices.
  */
 
-public interface CaEvaluatorProviderType
+public interface CaMeshDeformationsType extends CaMeshDeformationsDType,
+  CaMeshDeformationsFType
 {
   // No extra methods
 }

@@ -32,8 +32,12 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonD;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContext;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jorchard.core.JOTreeNode;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
@@ -149,29 +153,33 @@ public final class CaEvaluatorSingleDTest
     final CaSkeletonRestPoseDType rest_pose =
       CaSkeletonRestPose.createD(context, skeleton);
 
-    final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(rest_pose, act, 60);
+    final CaEvaluationContextType eval_context =
+      CaEvaluationContext.create();
+    final CaEvaluatedSkeletonMutableDType eval_skeleton =
+      CaEvaluatedSkeletonD.create(eval_context, rest_pose);
+    final CaEvaluatorSingleType eval =
+      CaEvaluatorSingleD.create(eval_context, eval_skeleton, act, 60);
 
     eval.evaluateForGlobalFrame(0L, 0L, 1.0);
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
-      eval.evaluatedJointsD();
-
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_joints =
+      eval_skeleton.joints();
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_0 =
       eval_joints;
-    final CaEvaluatedJointDType eval_joint_0 = eval_node_0.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
+    final CaEvaluatedJointReadableDType eval_joint_0 = eval_node_0.value();
+
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_1 = eval_node_1.value();
+    final CaEvaluatedJointReadableDType eval_joint_1 = eval_node_1.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_2 = eval_node_2.value();
+    final CaEvaluatedJointReadableDType eval_joint_2 = eval_node_2.value();
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_3 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_3 =
       eval_node_2.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_3 = eval_node_3.value();
+    final CaEvaluatedJointReadableDType eval_joint_3 = eval_node_3.value();
 
     final VectorM4D output = new VectorM4D();
 
@@ -316,22 +324,26 @@ public final class CaEvaluatorSingleDTest
     final CaSkeletonRestPoseDType rest_pose =
       CaSkeletonRestPose.createD(context, skeleton);
 
-    final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(rest_pose, act, 60);
+    final CaEvaluationContextType eval_context =
+      CaEvaluationContext.create();
+    final CaEvaluatedSkeletonMutableDType eval_skeleton =
+      CaEvaluatedSkeletonD.create(eval_context, rest_pose);
+    final CaEvaluatorSingleType eval =
+      CaEvaluatorSingleD.create(eval_context, eval_skeleton, act, 60);
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
-      eval.evaluatedJointsD();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_joints =
+      eval_skeleton.joints();
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_0 =
       eval_joints;
-    final CaEvaluatedJointDType eval_joint_0 =
+    final CaEvaluatedJointReadableDType eval_joint_0 =
       eval_node_0.value();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_1 =
+    final CaEvaluatedJointReadableDType eval_joint_1 =
       eval_node_1.value();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_2 =
+    final CaEvaluatedJointReadableDType eval_joint_2 =
       eval_node_2.value();
 
     final VectorM4D output = new VectorM4D();
@@ -513,22 +525,26 @@ public final class CaEvaluatorSingleDTest
     final CaSkeletonRestPoseDType rest_pose =
       CaSkeletonRestPose.createD(context, skeleton);
 
-    final CaEvaluatorSingleDType eval =
-      CaEvaluatorSingleD.create(rest_pose, act, 60);
+    final CaEvaluationContextType eval_context =
+      CaEvaluationContext.create();
+    final CaEvaluatedSkeletonMutableDType eval_skeleton =
+      CaEvaluatedSkeletonD.create(eval_context, rest_pose);
+    final CaEvaluatorSingleType eval =
+      CaEvaluatorSingleD.create(eval_context, eval_skeleton, act, 60);
 
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_joints =
-      eval.evaluatedJointsD();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_0 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_joints =
+      eval_skeleton.joints();
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_0 =
       eval_joints;
-    final CaEvaluatedJointDType eval_joint_0 =
+    final CaEvaluatedJointReadableDType eval_joint_0 =
       eval_node_0.value();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_1 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_1 =
       eval_node_0.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_1 =
+    final CaEvaluatedJointReadableDType eval_joint_1 =
       eval_node_1.value();
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> eval_node_2 =
+    final JOTreeNodeReadableType<CaEvaluatedJointReadableDType> eval_node_2 =
       eval_node_1.childrenReadable().iterator().next();
-    final CaEvaluatedJointDType eval_joint_2 =
+    final CaEvaluatedJointReadableDType eval_joint_2 =
       eval_node_2.value();
 
     final VectorM4D output = new VectorM4D();

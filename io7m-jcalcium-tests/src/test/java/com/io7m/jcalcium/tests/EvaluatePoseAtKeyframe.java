@@ -4,10 +4,15 @@ import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
+import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonD;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContext;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
@@ -88,13 +93,19 @@ public final class EvaluatePoseAtKeyframe
         loader.loadCompiledSkeletonFromStream(is, path.toUri());
       final CaSkeletonRestPoseDType rest_pose =
         CaSkeletonRestPose.createD(context, skeleton);
-      final CaEvaluatorSingleDType eval =
-        CaEvaluatorSingleD.create(
-          rest_pose, skeleton.actionsByName().get(act).get(), 60);
+
+      final CaActionType action =
+        skeleton.actionsByName().get(act).get();
+      final CaEvaluationContextType eval_context =
+        CaEvaluationContext.create();
+      final CaEvaluatedSkeletonMutableDType eval_skel =
+        CaEvaluatedSkeletonD.create(eval_context, rest_pose);
+      final CaEvaluatorSingleType eval =
+        CaEvaluatorSingleD.create(eval_context, eval_skel, action, 60);
 
       eval.evaluateForGlobalFrame(0L, keyframe, 1.0);
-      eval.evaluatedJointsD().forEachBreadthFirst(unit(), (i, depth, node) -> {
-        final CaEvaluatedJointDType joint = node.value();
+      eval_skel.joints().forEachBreadthFirst(unit(), (i, depth, node) -> {
+        final CaEvaluatedJointReadableDType joint = node.value();
         final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
           joint.transformJointObject4x4D();
         final VectorM4D out = new VectorM4D();

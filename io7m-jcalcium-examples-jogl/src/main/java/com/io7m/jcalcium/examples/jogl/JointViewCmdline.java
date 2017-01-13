@@ -20,9 +20,9 @@ import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jareas.core.AreaInclusiveUnsignedL;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
@@ -34,8 +34,12 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonD;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContext;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
@@ -222,7 +226,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private GLWindow window;
   private JCGLContextType jc_context;
   private JCGLInterfaceGL33Type g33;
-  private Map<CaActionName, CaEvaluatorSingleDType> actions;
+  private Map<CaActionName, CaEvaluatorSingleType> actions;
   private long time_then;
   private final AtomicReference<Double> time_scale;
   private volatile long frame;
@@ -233,6 +237,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private R2MainType main;
   private R2InstanceBillboardedDynamicType skeleton_joints;
   private AreaInclusiveUnsignedL window_area;
+  private CaEvaluationContextType eval_context;
+  private CaEvaluatedSkeletonMutableDType eval_skeleton;
 
   private JointViewCmdline(
     final String[] in_args)
@@ -342,7 +348,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
     final JOTreeNodeType<CaJoint> tree_root = JOTreeNode.create(root);
     final JOTreeNodeType<CaJoint> tree_hip = JOTreeNode.create(hip);
     tree_root.childAdd(tree_hip);
-    final JOTreeNodeType<CaJoint> tree_arm_left = JOTreeNode.create(shoulder_left);
+    final JOTreeNodeType<CaJoint> tree_arm_left = JOTreeNode.create(
+      shoulder_left);
     tree_arm_left.childAdd(JOTreeNode.create(hand_left));
     tree_hip.childAdd(tree_arm_left);
     final JOTreeNodeType<CaJoint> tree_arm_right = JOTreeNode.create(
@@ -420,7 +427,9 @@ public final class JointViewCmdline implements Runnable, KeyListener
       CaActionCurves.builder()
         .setName(CaActionName.of("action"))
         .setFramesPerSecond(60)
-        .putCurves(CaJointName.of("shoulder-left"), Vector.of(curve_orientation))
+        .putCurves(
+          CaJointName.of("shoulder-left"),
+          Vector.of(curve_orientation))
         .putCurves(
           CaJointName.of("shoulder-right"),
           Vector.of(curve_translation))
@@ -738,12 +747,12 @@ public final class JointViewCmdline implements Runnable, KeyListener
       this.actions.size() > 0,
       size -> "Must have at least one action");
 
-    final CaEvaluatorSingleDType eval =
+    final CaEvaluatorSingleType eval =
       this.actions.get(this.actions_ordered.get(this.actions_index));
     eval.evaluateForGlobalFrame(this.frame_start, this.frame, time_scale);
 
-    final Int2ReferenceSortedMap<CaEvaluatedJointDType> joints =
-      eval.evaluatedJointsDByID();
+    final Int2ReferenceSortedMap<CaEvaluatedJointReadableDType> joints =
+      this.eval_skeleton.jointsByID();
 
     final java.util.List<R2DebugLineSegment> joint_lines = new ArrayList<>();
 
@@ -758,7 +767,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
         joints.containsKey(index),
         b -> "Joint map must contain joint " + b);
 
-      final CaEvaluatedJointDType joint_current = joints.get(index);
+      final CaEvaluatedJointReadableDType joint_current = joints.get(index);
       MatrixM4x4D.multiplyVector4D(
         this.matrix_context4x4d,
         joint_current.transformJointObject4x4D(),
@@ -772,10 +781,10 @@ public final class JointViewCmdline implements Runnable, KeyListener
           (float) out_current.getZD());
       this.skeleton_joints.addInstance(position_current, 0.1f, 0.0f);
 
-      final OptionalInt parent_opt = joint_current.parent();
+      final Optional<CaEvaluatedJointReadableDType> parent_opt =
+        joint_current.parent();
       if (parent_opt.isPresent()) {
-        final CaEvaluatedJointDType joint_parent =
-          joints.get(parent_opt.getAsInt());
+        final CaEvaluatedJointReadableDType joint_parent = parent_opt.get();
 
         MatrixM4x4D.multiplyVector4D(
           this.matrix_context4x4d,
@@ -956,13 +965,23 @@ public final class JointViewCmdline implements Runnable, KeyListener
     final CaSkeletonRestPoseDType rest_pose =
       CaSkeletonRestPose.createD(c, skeleton);
 
+    this.eval_context =
+      CaEvaluationContext.create();
+    this.eval_skeleton =
+      CaEvaluatedSkeletonD.create(this.eval_context, rest_pose);
+
     final Iterator<Tuple2<CaActionName, CaActionType>> iter =
       skeleton.actionsByName().iterator();
     while (iter.hasNext()) {
       final Tuple2<CaActionName, CaActionType> pair = iter.next();
-      this.actions.put(
-        pair._1,
-        CaEvaluatorSingleD.create(rest_pose, pair._2, 60));
+
+      final CaEvaluatorSingleType eval =
+        CaEvaluatorSingleD.create(
+          this.eval_context,
+          this.eval_skeleton,
+          pair._2, 60);
+
+      this.actions.put(pair._1, eval);
       this.actions_ordered = this.actions_ordered.append(pair._1);
       this.actions_index = this.actions_ordered.size() - 1;
     }

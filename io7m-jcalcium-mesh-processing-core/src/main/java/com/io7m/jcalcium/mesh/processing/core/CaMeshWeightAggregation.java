@@ -22,7 +22,7 @@ import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorI4L;
-import com.io7m.junreachable.UnimplementedCodeException;
+import com.io7m.junreachable.UnreachableCodeException;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.collection.List;
@@ -42,7 +42,7 @@ public final class CaMeshWeightAggregation
 {
   private CaMeshWeightAggregation()
   {
-
+    throw new UnreachableCodeException();
   }
 
   /**
@@ -179,7 +179,7 @@ public final class CaMeshWeightAggregation
       }
 
       default: {
-        throw new UnimplementedCodeException();
+        throw new UnreachableCodeException();
       }
     }
   }

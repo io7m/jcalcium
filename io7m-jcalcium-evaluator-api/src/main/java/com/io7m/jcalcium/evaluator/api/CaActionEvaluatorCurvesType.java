@@ -22,5 +22,5 @@ package com.io7m.jcalcium.evaluator.api;
 
 public interface CaActionEvaluatorCurvesType extends CaActionEvaluatorType
 {
-
+  // No extra methods
 }

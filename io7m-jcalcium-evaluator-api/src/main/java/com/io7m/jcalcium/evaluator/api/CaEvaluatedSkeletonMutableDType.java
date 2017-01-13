@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,31 +16,27 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jcalcium.core.CaJointName;
-
-import java.util.OptionalInt;
+import com.io7m.jorchard.core.JOTreeNodeReadableType;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
 
 /**
- * The type of evaluated joints.
+ * The type of mutable evaluated skeletons with double-precision components.
  */
 
-public interface CaEvaluatedJointType
+public interface CaEvaluatedSkeletonMutableDType extends
+  CaEvaluatedSkeletonReadableDType, CaEvaluatedSkeletonMutableType
 {
   /**
-   * @return The joint name
+   * @return The tree of evaluated joints
    */
 
-  CaJointName name();
+  JOTreeNodeReadableType<CaEvaluatedJointMutableDType> jointsMutable();
 
   /**
-   * @return The joint ID
+   * A read-only view of the evaluated joints organized by ID.
+   *
+   * @return The set of evaluated joints by ID
    */
 
-  int id();
-
-  /**
-   * @return The ID of the parent, if any
-   */
-
-  OptionalInt parent();
+  Int2ReferenceSortedMap<CaEvaluatedJointMutableDType> jointsMutableByID();
 }

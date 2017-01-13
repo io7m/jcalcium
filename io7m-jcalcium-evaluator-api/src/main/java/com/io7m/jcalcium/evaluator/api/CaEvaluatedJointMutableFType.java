@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,27 +16,12 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
-
 /**
- * The type of evaluators that evaluate a single action for a single skeleton
- * and yield values with double-precision components.
+ * The type of mutable evaluated joints with single-precision components.
  */
 
-public interface CaEvaluatorSingleDType extends CaEvaluatorSingleType
+public interface CaEvaluatedJointMutableFType extends
+  CaEvaluatedJointReadableFType
 {
-  /**
-   * @return The tree of evaluated joints
-   */
-
-  JOTreeNodeReadableType<CaEvaluatedJointDType> evaluatedJointsD();
-
-  /**
-   * A read-only view of the evaluated joints organized by ID.
-   *
-   * @return The set of evaluated joints by ID
-   */
-
-  Int2ReferenceSortedMap<CaEvaluatedJointDType> evaluatedJointsDByID();
+  // No extra methods
 }

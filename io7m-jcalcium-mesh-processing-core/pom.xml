@@ -13,7 +13,7 @@
   <artifactId>io7m-jcalcium-mesh-processing-core</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-evaluator-api</name>
+  <name>io7m-jcalcium-mesh-processing-core</name>
   <description>Skeletal animation (Mesh processing core)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 

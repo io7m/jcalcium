@@ -75,6 +75,10 @@
       <artifactId>io7m-r2-meshes-defaults</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.io7m.smfj.jcanephora</groupId>
+      <artifactId>io7m-smfj-jcanephora-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.timehack6435126</groupId>
       <artifactId>io7m-timehack6435126-core</artifactId>
     </dependency>

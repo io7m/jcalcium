@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,18 +16,23 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
+import com.io7m.jcalcium.core.CaJointName;
 
 /**
- * The type of evaluators that evaluate a single action for a single skeleton
- * and yield values with single-precision components.
+ * The type of evaluated joints.
  */
 
-public interface CaEvaluatorSingleFType extends CaEvaluatorSingleType
+public interface CaEvaluatedJointReadableType
 {
   /**
-   * @return The tree of evaluated joints
+   * @return The joint name
    */
 
-  JOTreeNodeReadableType<CaEvaluatedJointFType> evaluatedJointsF();
+  CaJointName name();
+
+  /**
+   * @return The joint ID
+   */
+
+  int id();
 }

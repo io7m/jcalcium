@@ -10,11 +10,11 @@
     <artifactId>io7m-jcalcium</artifactId>
     <version>0.1.0</version>
   </parent>
-  <artifactId>io7m-jcalcium-format-json-jackson</artifactId>
+  <artifactId>io7m-jcalcium-mesh-deformation-cpu</artifactId>
 
   <packaging>bundle</packaging>
-  <name>io7m-jcalcium-format-json-jackson</name>
-  <description>Skeletal animation (JSON format)</description>
+  <name>io7m-jcalcium-mesh-deformation-cpu</name>
+  <description>Skeletal animation (CPU-side mesh deformation)</description>
   <url>http://io7m.github.io/jcalcium/</url>
 
   <scm>
@@ -31,12 +31,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-parser-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>io7m-jcalcium-serializer-api</artifactId>
+      <artifactId>io7m-jcalcium-evaluator-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -44,26 +39,20 @@
       <groupId>com.io7m.jnull</groupId>
       <artifactId>io7m-jnull-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.io7m.jtensors</groupId>
-      <artifactId>io7m-jtensors-core</artifactId>
-    </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
+      <groupId>io.javaslang</groupId>
+      <artifactId>javaslang</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jdk8</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.immutables.javaslang</groupId>
+      <artifactId>javaslang-encodings</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -89,8 +78,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.io7m.jcalcium.json.jackson,
-              com.io7m.jcalcium.json.jackson.v1
+              com.io7m.jcalcium.mesh.deformation.cpu
             </Export-Package>
           </instructions>
         </configuration>

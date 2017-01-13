@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,13 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jcalcium.evaluator.api;
-
 /**
- * The type of evaluator providers.
+ * CPU-side mesh deformation.
  */
 
-public interface CaEvaluatorProviderType
-{
-  // No extra methods
-}
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.jcalcium.mesh.deformation.cpu;
+

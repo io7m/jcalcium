@@ -16,59 +16,37 @@
 
 package com.io7m.jcalcium.evaluator.main;
 
-import com.io7m.jcalcium.core.CaJointName;
-import com.io7m.jcalcium.core.compiled.CaJoint;
-import com.io7m.jcalcium.core.compiled.CaSkeleton;
-import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
-import com.io7m.jcalcium.core.spaces.CaSpaceObjectDeformedType;
-import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
-import com.io7m.jnull.Nullable;
-import com.io7m.jorchard.core.JOTreeNodeReadableType;
-import com.io7m.jorchard.core.JOTreeNodeType;
-import com.io7m.jtensors.Matrix4x4DType;
-import com.io7m.jtensors.MatrixHeapArrayM4x4D;
-import com.io7m.jtensors.MatrixM4x4D;
+import com.io7m.jtensors.Quaternion4DType;
+import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.QuaternionM4D;
-import com.io7m.jtensors.QuaternionReadable4DType;
-import com.io7m.jtensors.VectorM3D;
-import com.io7m.jtensors.VectorReadable3DType;
-import com.io7m.jtensors.parameterized.PMatrix4x4DType;
-import com.io7m.jtensors.parameterized.PMatrixHeapArrayM4x4D;
-import com.io7m.jtensors.parameterized.PMatrixReadable4x4DType;
+import com.io7m.jtensors.Vector3DType;
+import com.io7m.jtensors.VectorI3D;
+import com.io7m.jtensors.parameterized.PVector3DType;
+import com.io7m.jtensors.parameterized.PVectorI3D;
 import com.io7m.jtensors.parameterized.PVectorM3D;
-import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 import com.io7m.junreachable.UnreachableCodeException;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceRBTreeMap;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMaps;
-
-import java.util.Optional;
-import java.util.OptionalInt;
 
 import static com.io7m.jfunctional.Unit.unit;
 
 /**
- * The default implementation of the {@link CaEvaluatorSingleDType} type.
+ * The default implementation of the {@link CaEvaluatorSingleType} type.
  */
 
-public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
+public final class CaEvaluatorSingleD implements CaEvaluatorSingleType
 {
-  private final JOTreeNodeType<JointStateD> joint_states;
-  private final JOTreeNodeReadableType<CaEvaluatedJointDType> joint_states_view;
-  private final Matrix4x4DType m_translation;
-  private final Matrix4x4DType m_orientation;
-  private final Matrix4x4DType m_scale;
-  private final Matrix4x4DType m_accumulated;
-  private final Int2ReferenceSortedMap<JointStateD> joint_states_by_id;
-  private final Int2ReferenceSortedMap<CaEvaluatedJointDType> joint_states_by_id_view;
-  private final CaSkeletonRestPoseDType rest_pose;
+  private final Quaternion4DType temp_orientation;
+  private final PVector3DType<CaSpaceJointType> temp_translation;
+  private final Vector3DType temp_scale;
+  private final CaEvaluatedSkeletonMutableDType skeleton;
   private ActionKind kind;
   private CaActionEvaluatorCurvesDType eval_curves;
   private long frame_start;
@@ -76,80 +54,48 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
   private double time_scale;
 
   private CaEvaluatorSingleD(
-    final CaSkeletonRestPoseDType in_rest_pose,
+    final CaEvaluationContextType in_context,
+    final CaEvaluatedSkeletonMutableDType in_skeleton,
     final CaActionType in_action,
     final int global_fps)
   {
-    this.rest_pose = NullCheck.notNull(in_rest_pose, "Rest pose");
+    NullCheck.notNull(in_context, "Context");
+    this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
     NullCheck.notNull(in_action, "Action");
 
-    this.joint_states_by_id =
-      new Int2ReferenceRBTreeMap<>();
-    this.joint_states_by_id_view =
-      Int2ReferenceSortedMaps.unmodifiable(castMap(this.joint_states_by_id));
-
-    final CaSkeleton skeleton = in_rest_pose.skeleton();
-    this.joint_states = skeleton.joints().mapBreadthFirst(
-      unit(), (input, depth, node) -> {
-        final CaJoint c_joint = node.value();
-
-        final Optional<JOTreeNodeReadableType<CaJoint>> parent_opt =
-          node.parentReadable();
-
-        final OptionalInt c_joint_parent;
-        if (parent_opt.isPresent()) {
-          c_joint_parent = OptionalInt.of(parent_opt.get().value().id());
-        } else {
-          c_joint_parent = OptionalInt.empty();
-        }
-
-        final JointStateD c_joint_state =
-          new JointStateD(c_joint.name(), c_joint.id(), c_joint_parent);
-        this.joint_states_by_id.put(node.value().id(), c_joint_state);
-        return c_joint_state;
-      });
-
-    @SuppressWarnings("unchecked")
-    final JOTreeNodeReadableType<CaEvaluatedJointDType> view_typed =
-      (JOTreeNodeReadableType<CaEvaluatedJointDType>) (Object) this.joint_states;
-    this.joint_states_view = view_typed;
+    this.temp_orientation = new QuaternionM4D();
+    this.temp_translation = new PVectorM3D<>();
+    this.temp_scale = new PVectorM3D<>();
 
     in_action.matchAction(this, (t, curves) -> {
       t.kind = ActionKind.ACTION_CURVES;
-      t.eval_curves =
-        CaActionEvaluatorCurves.createD(skeleton, curves, global_fps);
+      t.eval_curves = CaActionEvaluatorCurves.createD(
+        t.skeleton.restPose().skeleton(),
+        curves,
+        global_fps);
       return unit();
     });
-
-    this.m_translation = MatrixHeapArrayM4x4D.newMatrix();
-    this.m_orientation = MatrixHeapArrayM4x4D.newMatrix();
-    this.m_scale = MatrixHeapArrayM4x4D.newMatrix();
-    this.m_accumulated = MatrixHeapArrayM4x4D.newMatrix();
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <A, B extends A> Int2ReferenceSortedMap<A> castMap(
-    final Int2ReferenceSortedMap<B> m)
-  {
-    return (Int2ReferenceSortedMap<A>) m;
   }
 
   /**
    * Create a new single-action evaluator.
    *
-   * @param in_rest_pose The skeleton rest pose transforms
-   * @param in_action    The action
-   * @param global_fps   The global FPS rate
+   * @param in_context  An evaluation context
+   * @param in_skeleton The evaluated skeleton
+   * @param in_action   The action
+   * @param global_fps  The global FPS rate
    *
    * @return An evaluator
    */
 
-  public static CaEvaluatorSingleDType create(
-    final CaSkeletonRestPoseDType in_rest_pose,
+  public static CaEvaluatorSingleType create(
+    final CaEvaluationContextType in_context,
+    final CaEvaluatedSkeletonMutableDType in_skeleton,
     final CaActionType in_action,
     final int global_fps)
   {
-    return new CaEvaluatorSingleD(in_rest_pose, in_action, global_fps);
+    return new CaEvaluatorSingleD(
+      in_context, in_skeleton, in_action, global_fps);
   }
 
   @Override
@@ -168,18 +114,6 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     throw new UnreachableCodeException();
   }
 
-  @Override
-  public JOTreeNodeReadableType<CaEvaluatedJointDType> evaluatedJointsD()
-  {
-    return this.joint_states_view;
-  }
-
-  @Override
-  public Int2ReferenceSortedMap<CaEvaluatedJointDType> evaluatedJointsDByID()
-  {
-    return this.joint_states_by_id_view;
-  }
-
   private Unit evaluateCurves(
     final long in_frame_start,
     final long in_frame_current,
@@ -188,150 +122,41 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleDType
     this.frame_start = in_frame_start;
     this.frame_current = in_frame_current;
     this.time_scale = in_time_scale;
-    this.joint_states.forEachBreadthFirst(this, (t, depth, node) -> {
-      final JointStateD joint = node.value();
 
-      t.eval_curves.evaluateOrientation4DForGlobalFrame(
-        joint.joint_id,
-        t.frame_start,
-        t.frame_current,
-        t.time_scale,
-        joint.orientation);
+    this.skeleton.jointsMutable().forEachBreadthFirst(
+      this, (t, depth, node) -> {
 
-      t.eval_curves.evaluateTranslation3DForGlobalFrame(
-        joint.joint_id,
-        t.frame_start,
-        t.frame_current,
-        t.time_scale,
-        joint.translation);
+        final CaEvaluatedJointMutableDType joint = node.value();
+        t.eval_curves.evaluateOrientation4DForGlobalFrame(
+          joint.id(),
+          t.frame_start,
+          t.frame_current,
+          t.time_scale,
+          t.temp_orientation);
+        joint.setOrientation(new QuaternionI4D(t.temp_orientation));
 
-      t.eval_curves.evaluateScale3DForGlobalFrame(
-        joint.joint_id,
-        t.frame_start,
-        t.frame_current,
-        t.time_scale,
-        joint.scale);
+        t.eval_curves.evaluateTranslation3DForGlobalFrame(
+          joint.id(),
+          t.frame_start,
+          t.frame_current,
+          t.time_scale,
+          t.temp_translation);
+        joint.setTranslation3D(new PVectorI3D<>(t.temp_translation));
 
-      final JointStateD joint_parent = node.parentReadable().map(
-        JOTreeNodeReadableType::value).orElse(null);
+        t.eval_curves.evaluateScale3DForGlobalFrame(
+          joint.id(),
+          t.frame_start,
+          t.frame_current,
+          t.time_scale,
+          t.temp_scale);
+        joint.setScale(new VectorI3D(t.temp_scale));
+      });
 
-      t.makeTransform(joint_parent, joint);
-    });
     return unit();
-  }
-
-  private void makeTransform(
-    final @Nullable JointStateD joint_parent,
-    final JointStateD joint)
-  {
-    MatrixM4x4D.makeTranslation3D(
-      joint.translation, this.m_translation);
-
-    QuaternionM4D.makeRotationMatrix4x4(
-      joint.orientation, this.m_orientation);
-
-    MatrixM4x4D.setIdentity(this.m_scale);
-    this.m_scale.setR0C0D(joint.scale.getXD());
-    this.m_scale.setR1C1D(joint.scale.getYD());
-    this.m_scale.setR2C2D(joint.scale.getZD());
-
-    MatrixM4x4D.multiply(
-      this.m_translation, this.m_orientation, this.m_accumulated);
-    MatrixM4x4D.multiply(
-      this.m_accumulated, this.m_scale, this.m_accumulated);
-
-    if (joint_parent != null) {
-      MatrixM4x4D.multiply(
-        joint_parent.transform_joint_object,
-        this.m_accumulated,
-        joint.transform_joint_object);
-    } else {
-      MatrixM4x4D.copy(this.m_accumulated, joint.transform_joint_object);
-    }
-
-    MatrixM4x4D.multiply(
-      joint.transform_joint_object,
-      this.rest_pose.transformInverseRest4x4D(joint.joint_id),
-      joint.transform_deform);
   }
 
   private enum ActionKind
   {
     ACTION_CURVES
-  }
-
-  private static final class JointStateD implements CaEvaluatedJointDType
-  {
-    private final CaJointName joint_name;
-    private final int joint_id;
-    private final VectorM3D scale;
-    private final PVectorM3D<CaSpaceJointType> translation;
-    private final QuaternionM4D orientation;
-    private final PMatrix4x4DType<CaSpaceJointType, CaSpaceObjectType> transform_joint_object;
-    private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> transform_deform;
-    private final OptionalInt joint_parent;
-
-    JointStateD(
-      final CaJointName in_joint_name,
-      final int in_joint_id,
-      final OptionalInt in_joint_parent)
-    {
-      this.joint_name = NullCheck.notNull(in_joint_name, "Bone name");
-      this.joint_parent = NullCheck.notNull(in_joint_parent, "Parent");
-      this.joint_id = in_joint_id;
-      this.translation = new PVectorM3D<>();
-      this.orientation = new QuaternionM4D();
-      this.scale = new VectorM3D();
-      this.transform_joint_object = PMatrixHeapArrayM4x4D.newMatrix();
-      this.transform_deform = PMatrixHeapArrayM4x4D.newMatrix();
-    }
-
-    @Override
-    public CaJointName name()
-    {
-      return this.joint_name;
-    }
-
-    @Override
-    public int id()
-    {
-      return this.joint_id;
-    }
-
-    @Override
-    public OptionalInt parent()
-    {
-      return this.joint_parent;
-    }
-
-    @Override
-    public PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> transformJointObject4x4D()
-    {
-      return this.transform_joint_object;
-    }
-
-    @Override
-    public PMatrixReadable4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> transformDeform4x4D()
-    {
-      return this.transform_deform;
-    }
-
-    @Override
-    public PVectorReadable3DType<CaSpaceJointType> translation3D()
-    {
-      return this.translation;
-    }
-
-    @Override
-    public QuaternionReadable4DType orientation4D()
-    {
-      return this.orientation;
-    }
-
-    @Override
-    public VectorReadable3DType scale3D()
-    {
-      return this.scale;
-    }
   }
 }

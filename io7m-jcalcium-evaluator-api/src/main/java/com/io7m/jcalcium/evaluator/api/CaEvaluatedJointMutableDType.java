@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,11 +16,39 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
+import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
+import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.VectorI3D;
+import com.io7m.jtensors.parameterized.PVectorI3D;
+
 /**
- * The type of evaluator providers.
+ * The type of mutable evaluated joints with double-precision components.
  */
 
-public interface CaEvaluatorProviderType
+public interface CaEvaluatedJointMutableDType extends
+  CaEvaluatedJointReadableDType
 {
-  // No extra methods
+  /**
+   * Set the translation for the joint.
+   *
+   * @param p The joint-space translation
+   */
+
+  void setTranslation3D(PVectorI3D<CaSpaceJointType> p);
+
+  /**
+   * Set the orientation for the joint.
+   *
+   * @param q The orientation
+   */
+
+  void setOrientation(QuaternionI4D q);
+
+  /**
+   * Set the scale for the joint.
+   *
+   * @param s The scale
+   */
+
+  void setScale(VectorI3D s);
 }

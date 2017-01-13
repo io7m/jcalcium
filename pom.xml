@@ -29,6 +29,7 @@
     <module>io7m-jcalcium-format-protobuf3</module>
     <module>io7m-jcalcium-generators</module>
     <module>io7m-jcalcium-loader-api</module>
+    <module>io7m-jcalcium-mesh-deformation-cpu</module>
     <module>io7m-jcalcium-mesh-processing-core</module>
     <module>io7m-jcalcium-mesh-processing-smf</module>
     <module>io7m-jcalcium-parser-api</module>
@@ -187,6 +188,11 @@
         <groupId>org.immutables.javaslang</groupId>
         <artifactId>javaslang-encodings</artifactId>
         <version>0.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.smfj.jcanephora</groupId>
+        <artifactId>io7m-smfj-jcanephora-core</artifactId>
+        <version>0.1.0</version>
       </dependency>
 
       <dependency>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,34 +24,38 @@ import com.io7m.jtensors.VectorReadable3FType;
 import com.io7m.jtensors.parameterized.PMatrixReadable4x4FType;
 import com.io7m.jtensors.parameterized.PVectorReadable3FType;
 
+import java.util.Optional;
+
 /**
- * The type of evaluated joints with single-precision components.
+ * The type of readable evaluated joints with single-precision components.
  */
 
-public interface CaEvaluatedJointFType extends CaEvaluatedJointType
+public interface CaEvaluatedJointReadableFType extends
+  CaEvaluatedJointReadableType
 {
   /**
-   * A specification of the matrix that represents the concatenation of all
-   * joint transforms up to and including the current joint. This is a matrix
-   * that, for example, if used to transform a vector {@code (0.0, 0.0, 0.0,
-   * 1.0)} will yield a vector equal to the current object-space position of the
-   * joint.
+   * <p>A matrix that represents the concatenation of all joint transforms up to
+   * and including the current joint. This is a matrix that, for example, if
+   * used to transform a vector {@code (0.0, 0.0, 0.0, 1.0)} will yield a vector
+   * equal to the current object-space position of the joint.</p>
    *
    * @return The absolute transform for the joint
    */
 
-  PMatrixReadable4x4FType<CaSpaceJointType, CaSpaceObjectType> transformJointObject4x4F();
+  PMatrixReadable4x4FType<CaSpaceJointType, CaSpaceObjectType>
+  transformJointObject4x4F();
 
   /**
-   * A specification of the matrix that deforms an object-space position and
+   * <p>A matrix that deforms an object-space position and
    * yields (unsurprisingly) a deformed object-space position. This is the
    * matrix that is used, for example, to deform meshes on the GPU when
-   * animating.
+   * animating.</p>
    *
    * @return The deform transform for the joint
    */
 
-  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> transformDeform4x4F();
+  PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType>
+  transformDeform4x4F();
 
   /**
    * @return The parent-relative offset for the joint
@@ -70,4 +74,10 @@ public interface CaEvaluatedJointFType extends CaEvaluatedJointType
    */
 
   VectorReadable3FType scale3F();
+
+  /**
+   * @return The parent, if any
+   */
+
+  Optional<CaEvaluatedJointReadableFType> parent();
 }

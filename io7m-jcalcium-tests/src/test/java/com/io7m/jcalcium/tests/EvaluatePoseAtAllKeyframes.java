@@ -7,8 +7,12 @@ import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointDType;
-import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonD;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContext;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluatorSingleType;
 import com.io7m.jcalcium.evaluator.main.CaEvaluatorSingleD;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
@@ -91,17 +95,21 @@ public final class EvaluatePoseAtAllKeyframes
         CaSkeletonRestPose.createD(context, skeleton);
       final CaActionType action =
         skeleton.actionsByName().get(act_name).get();
-      final CaEvaluatorSingleDType eval =
-        CaEvaluatorSingleD.create(rest_pose, action, 60);
+      final CaEvaluationContextType eval_context =
+        CaEvaluationContext.create();
+      final CaEvaluatedSkeletonMutableDType eval_skel =
+        CaEvaluatedSkeletonD.create(eval_context, rest_pose);
+      final CaEvaluatorSingleType eval =
+        CaEvaluatorSingleD.create(eval_context, eval_skel, action, 60);
 
       for (int index = 0; index < keyframe_max; ++index) {
         eval.evaluateForGlobalFrame(0L, index, 1.0);
 
         System.out.println("Keyframe " + index + ":");
-        eval.evaluatedJointsD().forEachBreadthFirst(
+        eval_skel.joints().forEachBreadthFirst(
           unit(),
           (i, depth, node) -> {
-            final CaEvaluatedJointDType joint = node.value();
+            final CaEvaluatedJointReadableDType joint = node.value();
             final PMatrixReadable4x4DType<CaSpaceJointType, CaSpaceObjectType> m =
               joint.transformJointObject4x4D();
             final VectorM4D out = new VectorM4D();

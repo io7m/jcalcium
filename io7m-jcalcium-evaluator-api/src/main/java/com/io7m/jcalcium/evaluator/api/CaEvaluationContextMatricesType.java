@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,11 +16,45 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
+import com.io7m.jtensors.Matrix4x4DType;
+
 /**
- * The type of evaluator providers.
+ * A set of temporary matrices.
  */
 
-public interface CaEvaluatorProviderType
+public interface CaEvaluationContextMatricesType extends AutoCloseable
 {
-  // No extra methods
+  /**
+   * Close the instance.
+   *
+   * @throws IllegalStateException Iff the instance has already been closed
+   */
+
+  @Override
+  void close()
+    throws IllegalStateException;
+
+  /**
+   * @return A 4x4 matrix
+   */
+
+  Matrix4x4DType accumulated4x4D();
+
+  /**
+   * @return A 4x4 matrix
+   */
+
+  Matrix4x4DType translation4x4D();
+
+  /**
+   * @return A 4x4 matrix
+   */
+
+  Matrix4x4DType orientation4x4D();
+
+  /**
+   * @return A 4x4 matrix
+   */
+
+  Matrix4x4DType scale4x4D();
 }
