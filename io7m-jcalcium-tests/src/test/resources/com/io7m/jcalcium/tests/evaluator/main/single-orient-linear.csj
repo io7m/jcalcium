@@ -37,6 +37,12 @@
                 "interpolation": "linear",
                 "easing": "out",
                 "quaternion-xyzw": [1.0, 0.0, 0.0, 0.0]
+              },
+              {
+                "index": 21,
+                "interpolation": "linear",
+                "easing": "out",
+                "quaternion-xyzw": [1.0, 0.0, 0.0, 0.0]
               }
             ]
           }

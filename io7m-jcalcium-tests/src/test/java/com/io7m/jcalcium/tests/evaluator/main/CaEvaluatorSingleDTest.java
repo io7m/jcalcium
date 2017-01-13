@@ -286,19 +286,19 @@ public final class CaEvaluatorSingleDTest
           CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
           CaCurveEasing.CURVE_EASING_IN_OUT,
           new PVectorI3D<>(1.0, 0.0, 0.0));
-
-      TreeMap<Integer, CaCurveKeyframeTranslation> keyframes = TreeMap.empty();
-      keyframes = keyframes.put(
-        Integer.valueOf(curve_kf_0.index()),
-        curve_kf_0);
-      keyframes = keyframes.put(
-        Integer.valueOf(curve_kf_1.index()),
-        curve_kf_1);
+      final CaCurveKeyframeTranslation curve_kf_2 =
+        CaCurveKeyframeTranslation.of(
+          11,
+          CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+          CaCurveEasing.CURVE_EASING_IN_OUT,
+          new PVectorI3D<>(1.0, 0.0, 0.0));
 
       final CaCurveTranslation.Builder curve_b = CaCurveTranslation.builder();
       curve_b.setAction(CaActionName.of("act"));
       curve_b.setJoint(joint_0.name());
-      curve_b.setKeyframes(keyframes);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_0.index()), curve_kf_0);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_1.index()), curve_kf_1);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_2.index()), curve_kf_2);
       final CaCurveTranslation curve = curve_b.build();
 
       SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
@@ -487,19 +487,21 @@ public final class CaEvaluatorSingleDTest
           QuaternionI4D.makeFromAxisAngle(
             new VectorI3D(0.0, 1.0, 0.0),
             Math.toRadians(90.0)));
-
-      TreeMap<Integer, CaCurveKeyframeOrientation> keyframes = TreeMap.empty();
-      keyframes = keyframes.put(
-        Integer.valueOf(curve_kf_0.index()),
-        curve_kf_0);
-      keyframes = keyframes.put(
-        Integer.valueOf(curve_kf_1.index()),
-        curve_kf_1);
+      final CaCurveKeyframeOrientation curve_kf_2 =
+        CaCurveKeyframeOrientation.of(
+          11,
+          CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
+          CaCurveEasing.CURVE_EASING_IN_OUT,
+          QuaternionI4D.makeFromAxisAngle(
+            new VectorI3D(0.0, 1.0, 0.0),
+            Math.toRadians(90.0)));
 
       final CaCurveOrientation.Builder curve_b = CaCurveOrientation.builder();
       curve_b.setAction(CaActionName.of("act"));
       curve_b.setJoint(joint_0.name());
-      curve_b.setKeyframes(keyframes);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_0.index()), curve_kf_0);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_1.index()), curve_kf_1);
+      curve_b.putKeyframes(Integer.valueOf(curve_kf_2.index()), curve_kf_2);
       final CaCurveOrientation curve = curve_b.build();
 
       SortedMap<CaJointName, IndexedSeq<CaCurveType>> curves = TreeMap.empty();
