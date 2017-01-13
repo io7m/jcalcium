@@ -16,11 +16,14 @@
 
 package com.io7m.jcalcium.mesh.deformation.cpu;
 
+import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectDeformedType;
 import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableFType;
+import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorI4L;
+import com.io7m.jtensors.parameterized.PMatrixReadable4x4FType;
 import com.io7m.jtensors.parameterized.PMatrixWritable4x4FType;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
 
@@ -43,9 +46,89 @@ public interface CaMeshDeformationsFType
    * @param output        The output matrix
    */
 
-  void weightedDeformationMatrixF(
+  default void weightedDeformationMatrixF(
     final Int2ReferenceSortedMap<CaEvaluatedJointReadableFType> joints,
     final VectorI4L joint_indices,
     final VectorI4D joint_weights,
-    final PMatrixWritable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> output);
+    final PMatrixWritable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> output)
+  {
+    NullCheck.notNull(joints, "Joints");
+    NullCheck.notNull(joint_indices, "Joint indices");
+    NullCheck.notNull(joint_weights, "Joint weights");
+    NullCheck.notNull(output, "Output");
+
+    final int joint_index_0 = Math.toIntExact(joint_indices.getXL());
+    final int joint_index_1 = Math.toIntExact(joint_indices.getYL());
+    final int joint_index_2 = Math.toIntExact(joint_indices.getZL());
+    final int joint_index_3 = Math.toIntExact(joint_indices.getWL());
+
+    final double joint_weight_0 = joint_weights.getXD();
+    final double joint_weight_1 = joint_weights.getYD();
+    final double joint_weight_2 = joint_weights.getZD();
+    final double joint_weight_3 = joint_weights.getWD();
+
+    Preconditions.checkPreconditionI(
+      joint_index_0,
+      joints.containsKey(joint_index_0),
+      joint -> "Joint " + joint + " must exist");
+    Preconditions.checkPreconditionI(
+      joint_index_1,
+      joints.containsKey(joint_index_1),
+      joint -> "Joint " + joint + " must exist");
+    Preconditions.checkPreconditionI(
+      joint_index_2,
+      joints.containsKey(joint_index_2),
+      joint -> "Joint " + joint + " must exist");
+    Preconditions.checkPreconditionI(
+      joint_index_3,
+      joints.containsKey(joint_index_3),
+      joint -> "Joint " + joint + " must exist");
+
+    final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_0 =
+      joints.get(joint_index_0).transformDeform4x4F();
+    final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_1 =
+      joints.get(joint_index_1).transformDeform4x4F();
+    final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_2 =
+      joints.get(joint_index_2).transformDeform4x4F();
+    final PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_3 =
+      joints.get(joint_index_3).transformDeform4x4F();
+
+    this.weightedDeformationMatrixExplicitF(
+      deform_joint_0,
+      joint_weight_0,
+      deform_joint_1,
+      joint_weight_1,
+      deform_joint_2,
+      joint_weight_2,
+      deform_joint_3,
+      joint_weight_3,
+      output);
+  }
+
+  /**
+   * Construct a weighted deformation matrix. The matrix is a weighted blend of
+   * the given joint deformation matrices. For best results, {@code
+   * joint_weight_0 + joint_weight_1 + joint_weight_2 + joint_weight_3 == 1.0}.
+   *
+   * @param deform_joint_0 The first joint deformation matrix
+   * @param joint_weight_0 The weight for {@code deform_joint_0}
+   * @param deform_joint_1 The first joint deformation matrix
+   * @param joint_weight_1 The weight for {@code deform_joint_1}
+   * @param deform_joint_2 The first joint deformation matrix
+   * @param joint_weight_2 The weight for {@code deform_joint_2}
+   * @param deform_joint_3 The first joint deformation matrix
+   * @param joint_weight_3 The weight for {@code deform_joint_3}
+   * @param output         The output matrix
+   */
+
+  void weightedDeformationMatrixExplicitF(
+    PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_0,
+    double joint_weight_0,
+    PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_1,
+    double joint_weight_1,
+    PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_2,
+    double joint_weight_2,
+    PMatrixReadable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> deform_joint_3,
+    double joint_weight_3,
+    PMatrixWritable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> output);
 }
