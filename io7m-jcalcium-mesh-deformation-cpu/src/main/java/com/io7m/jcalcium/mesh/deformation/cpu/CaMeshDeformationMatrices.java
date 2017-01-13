@@ -72,9 +72,7 @@ public final class CaMeshDeformationMatrices implements
     final double joint_weight_3,
     final PMatrixWritable4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> output)
   {
-    MatrixM4x4D.setZero(this.m4d);
-    MatrixM4x4D.scale(deform_joint_0, joint_weight_0, this.m4d_temp);
-    MatrixM4x4D.addInPlace(this.m4d, this.m4d_temp);
+    MatrixM4x4D.scale(deform_joint_0, joint_weight_0, this.m4d);
     MatrixM4x4D.scale(deform_joint_1, joint_weight_1, this.m4d_temp);
     MatrixM4x4D.addInPlace(this.m4d, this.m4d_temp);
     MatrixM4x4D.scale(deform_joint_2, joint_weight_2, this.m4d_temp);
@@ -95,9 +93,7 @@ public final class CaMeshDeformationMatrices implements
     final double joint_weight_3,
     final PMatrixWritable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> output)
   {
-    MatrixM4x4F.setZero(this.m4f);
-    MatrixM4x4F.scale(deform_joint_0, joint_weight_0, this.m4f_temp);
-    MatrixM4x4F.addInPlace(this.m4f, this.m4f_temp);
+    MatrixM4x4F.scale(deform_joint_0, joint_weight_0, this.m4f);
     MatrixM4x4F.scale(deform_joint_1, joint_weight_1, this.m4f_temp);
     MatrixM4x4F.addInPlace(this.m4f, this.m4f_temp);
     MatrixM4x4F.scale(deform_joint_2, joint_weight_2, this.m4f_temp);
