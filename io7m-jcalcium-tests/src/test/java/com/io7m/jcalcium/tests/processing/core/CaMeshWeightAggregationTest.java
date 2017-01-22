@@ -372,13 +372,11 @@ public final class CaMeshWeightAggregationTest
     Assert.assertEquals(2L, vi.get(0).getZL());
     Assert.assertEquals(3L, vi.get(0).getWL());
 
-    final VectorI4D normalized =
-      VectorI4D.normalize(new VectorI4D(1.0, 0.9, 0.8, 0.7));
-
-    Assert.assertEquals(normalized.getXD(), vw.get(0).getXD(), 0.000001);
-    Assert.assertEquals(normalized.getYD(), vw.get(0).getYD(), 0.000001);
-    Assert.assertEquals(normalized.getZD(), vw.get(0).getZD(), 0.000001);
-    Assert.assertEquals(normalized.getWD(), vw.get(0).getWD(), 0.000001);
+    final VectorI4D vvw = vw.get(0);
+    Assert.assertEquals(
+      1.0,
+      vvw.getXD() + vvw.getYD() + vvw.getZD() + vvw.getWD(),
+      0.000001);
   }
 
   @Test

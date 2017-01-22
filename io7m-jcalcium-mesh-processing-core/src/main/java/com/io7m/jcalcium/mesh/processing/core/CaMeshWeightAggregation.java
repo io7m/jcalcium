@@ -16,9 +16,11 @@
 
 package com.io7m.jcalcium.mesh.processing.core;
 
+import com.io7m.jaffirm.core.Postconditions;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jequality.AlmostEqualDouble;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorI4L;
@@ -31,6 +33,8 @@ import javaslang.collection.Seq;
 import javaslang.collection.Set;
 import javaslang.collection.SortedMap;
 import javaslang.collection.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
@@ -40,6 +44,16 @@ import java.util.Comparator;
 
 public final class CaMeshWeightAggregation
 {
+  private static final Logger LOG;
+  private static final AlmostEqualDouble.ContextRelative CONTEXT;
+
+  static {
+    LOG = LoggerFactory.getLogger(CaMeshWeightAggregation.class);
+
+    CONTEXT = new AlmostEqualDouble.ContextRelative();
+    CONTEXT.setMaxAbsoluteDifference(0.00000_00000_00001);
+  }
+
   private CaMeshWeightAggregation()
   {
     throw new UnreachableCodeException();
@@ -118,70 +132,96 @@ public final class CaMeshWeightAggregation
   private static Tuple2<VectorI4L, VectorI4D> packWeights(
     final Seq<Tuple2<Integer, Double>> weighted_indices)
   {
-    final VectorI4L index4;
-    final VectorI4D weight4;
-
     switch (weighted_indices.size()) {
       case 1: {
-        index4 = new VectorI4L(
+        final VectorI4L index4 = new VectorI4L(
           weighted_indices.get(0)._1.longValue(),
           0L,
           0L,
           0L);
-        weight4 = new VectorI4D(
+        final VectorI4D weight4 = new VectorI4D(
           weighted_indices.get(0)._2.doubleValue(),
           0.0,
           0.0,
           0.0);
-        return Tuple.of(index4, VectorI4D.normalize(weight4));
+        return Tuple.of(index4, rescale(weight4));
       }
 
       case 2: {
-        index4 = new VectorI4L(
+        final VectorI4L index4 = new VectorI4L(
           weighted_indices.get(0)._1.longValue(),
           weighted_indices.get(1)._1.longValue(),
           0L,
           0L);
-        weight4 = new VectorI4D(
+        final VectorI4D weight4 = new VectorI4D(
           weighted_indices.get(0)._2.doubleValue(),
           weighted_indices.get(1)._2.doubleValue(),
           0.0,
           0.0);
-        return Tuple.of(index4, VectorI4D.normalize(weight4));
+        return Tuple.of(index4, rescale(weight4));
       }
 
       case 3: {
-        index4 = new VectorI4L(
+        final VectorI4L index4 = new VectorI4L(
           weighted_indices.get(0)._1.longValue(),
           weighted_indices.get(1)._1.longValue(),
           weighted_indices.get(2)._1.longValue(),
           0L);
-        weight4 = new VectorI4D(
+        final VectorI4D weight4 = new VectorI4D(
           weighted_indices.get(0)._2.doubleValue(),
           weighted_indices.get(1)._2.doubleValue(),
           weighted_indices.get(2)._2.doubleValue(),
           0.0);
-        return Tuple.of(index4, VectorI4D.normalize(weight4));
+        return Tuple.of(index4, rescale(weight4));
       }
 
       case 4: {
-        index4 = new VectorI4L(
+        final VectorI4L index4 = new VectorI4L(
           weighted_indices.get(0)._1.longValue(),
           weighted_indices.get(1)._1.longValue(),
           weighted_indices.get(2)._1.longValue(),
           weighted_indices.get(3)._1.longValue());
-        weight4 = new VectorI4D(
+        final VectorI4D weight4 = new VectorI4D(
           weighted_indices.get(0)._2.doubleValue(),
           weighted_indices.get(1)._2.doubleValue(),
           weighted_indices.get(2)._2.doubleValue(),
           weighted_indices.get(3)._2.doubleValue());
-        return Tuple.of(index4, VectorI4D.normalize(weight4));
+        return Tuple.of(index4, rescale(weight4));
       }
 
       default: {
         throw new UnreachableCodeException();
       }
     }
+  }
+
+  /**
+   * Scale the components of the given vector such that the sum of all
+   * components is {@code 1.0}. Special case: A zero vector always yields a zero
+   * vector.
+   */
+
+  private static VectorI4D rescale(
+    final VectorI4D weight4)
+  {
+    final double sum =
+      weight4.getXD() + weight4.getYD() + weight4.getZD() + weight4.getWD();
+
+    if (sum == 0.0) {
+      return weight4;
+    }
+
+    final double rx = weight4.getXD() / sum;
+    final double ry = weight4.getYD() / sum;
+    final double rz = weight4.getZD() / sum;
+    final double rw = weight4.getWD() / sum;
+
+    final double rsum = rx + ry + rz + rw;
+    Postconditions.checkPostconditionD(
+      rsum,
+      AlmostEqualDouble.almostEqual(CONTEXT, rsum, 1.0),
+      x -> "Resulting weight sum must be ~= 1.0");
+    return new VectorI4D(rx, ry, rz, rw);
   }
 
   private static Comparator<Tuple2<Integer, Double>> compareWeightedIndex()
