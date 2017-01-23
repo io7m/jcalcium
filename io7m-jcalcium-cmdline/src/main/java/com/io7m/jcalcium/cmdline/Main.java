@@ -419,19 +419,17 @@ public final class Main implements Runnable
           provider.loaderFormat();
         final SortedSet<CaFormatVersion> versions =
           provider.loaderSupportedVersions();
-        versions.forEach(version -> {
-          System.out.printf(
-            fmt_s,
-            format.name(),
-            format.suffix(),
-            format.mimeType(),
-            String.format(
-              "%d.%d",
-              Integer.valueOf(version.major()),
-              Integer.valueOf(version.minor())),
-            "load",
-            format.description());
-        });
+        versions.forEach(version -> System.out.printf(
+          fmt_s,
+          format.name(),
+          format.suffix(),
+          format.mimeType(),
+          String.format(
+            "%d.%d",
+            Integer.valueOf(version.major()),
+            Integer.valueOf(version.minor())),
+          "load",
+          format.description()));
       }
     }
 
@@ -450,19 +448,17 @@ public final class Main implements Runnable
           provider.serializerFormat();
         final SortedSet<CaFormatVersion> versions =
           provider.serializerSupportedVersions();
-        versions.forEach(version -> {
-          System.out.printf(
-            fmt_s,
-            format.name(),
-            format.suffix(),
-            format.mimeType(),
-            String.format(
-              "%d.%d",
-              Integer.valueOf(version.major()),
-              Integer.valueOf(version.minor())),
-            "compile",
-            format.description());
-        });
+        versions.forEach(version -> System.out.printf(
+          fmt_s,
+          format.name(),
+          format.suffix(),
+          format.mimeType(),
+          String.format(
+            "%d.%d",
+            Integer.valueOf(version.major()),
+            Integer.valueOf(version.minor())),
+          "compile",
+          format.description()));
       }
     }
 
@@ -481,19 +477,17 @@ public final class Main implements Runnable
           provider.serializerFormat();
         final SortedSet<CaFormatVersion> versions =
           provider.serializerSupportedVersions();
-        versions.forEach(version -> {
-          System.out.printf(
-            fmt_s,
-            format.name(),
-            format.suffix(),
-            format.mimeType(),
-            String.format(
-              "%d.%d",
-              Integer.valueOf(version.major()),
-              Integer.valueOf(version.minor())),
-            "serialize",
-            format.description());
-        });
+        versions.forEach(version -> System.out.printf(
+          fmt_s,
+          format.name(),
+          format.suffix(),
+          format.mimeType(),
+          String.format(
+            "%d.%d",
+            Integer.valueOf(version.major()),
+            Integer.valueOf(version.minor())),
+          "serialize",
+          format.description()));
       }
     }
 
@@ -512,19 +506,17 @@ public final class Main implements Runnable
           provider.parserFormat();
         final SortedSet<CaFormatVersion> versions =
           provider.parserSupportedVersions();
-        versions.forEach(version -> {
-          System.out.printf(
-            fmt_s,
-            format.name(),
-            format.suffix(),
-            format.mimeType(),
-            String.format(
-              "%d.%d",
-              Integer.valueOf(version.major()),
-              Integer.valueOf(version.minor())),
-            "parse",
-            format.description());
-        });
+        versions.forEach(version -> System.out.printf(
+          fmt_s,
+          format.name(),
+          format.suffix(),
+          format.mimeType(),
+          String.format(
+            "%d.%d",
+            Integer.valueOf(version.major()),
+            Integer.valueOf(version.minor())),
+          "parse",
+          format.description()));
       }
     }
   }

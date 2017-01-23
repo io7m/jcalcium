@@ -83,9 +83,7 @@ public final class JointTreeGenerator implements Generator<JointTree>
         return b.build();
       });
 
-    out.forEachDepthFirst(map, (input, depth, node) -> {
-      map.put(node.value().name(), node);
-    });
+    out.forEachDepthFirst(map, (input, depth, node) -> map.put(node.value().name(), node));
 
     return new JointTree(out, javaslang.collection.HashMap.ofAll(map));
   }

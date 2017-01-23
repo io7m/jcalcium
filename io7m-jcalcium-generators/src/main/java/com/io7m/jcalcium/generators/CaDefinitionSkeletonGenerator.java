@@ -28,7 +28,6 @@ import javaslang.Tuple;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import net.java.quickcheck.Generator;
-import net.java.quickcheck.generator.support.IntegerGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,13 +91,11 @@ public final class CaDefinitionSkeletonGenerator
         y.curves().forEach(curves_pair -> {
           final List<CaDefinitionCurveType> curves = curves_pair._2;
           curve_count.addAndGet(curves.size());
-          curves.forEach(curve -> {
-            LOG.trace(
-              "action: {} joint {} curve type {}",
-              name.value(),
-              curve.joint().value(),
-              curve.getClass().getSimpleName());
-          });
+          curves.forEach(curve -> LOG.trace(
+            "action: {} joint {} curve type {}",
+            name.value(),
+            curve.joint().value(),
+            curve.getClass().getSimpleName()));
         });
         return unit();
       });
