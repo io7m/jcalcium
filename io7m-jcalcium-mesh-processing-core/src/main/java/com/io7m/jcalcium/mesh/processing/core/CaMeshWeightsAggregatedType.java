@@ -67,9 +67,9 @@ public interface CaMeshWeightsAggregatedType
       Long.valueOf(0L), (Long m, VectorI4L v) -> {
         final long mm = m.longValue();
         long k = Math.max(mm, v.getXL());
-        k = Math.max(mm, v.getYL());
-        k = Math.max(mm, v.getZL());
-        k = Math.max(mm, v.getWL());
+        k = Math.max(k, v.getYL());
+        k = Math.max(k, v.getZL());
+        k = Math.max(k, v.getWL());
         return Long.valueOf(k);
       });
 
