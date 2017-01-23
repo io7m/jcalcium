@@ -20,11 +20,13 @@ import com.io7m.smfj.processing.api.SMFFilterCommandModule;
 import com.io7m.smfj.processing.api.SMFFilterCommandModuleProviderAbstract;
 import javaslang.Tuple;
 import javaslang.collection.TreeMap;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * A filter command provider.
  */
 
+@Component
 public final class CaFilterCommandProvider extends
   SMFFilterCommandModuleProviderAbstract
 {
@@ -43,6 +45,6 @@ public final class CaFilterCommandProvider extends
         Tuple.of(
           CaFilterCommandCompileSkeleton.NAME,
           CaFilterCommandCompileSkeleton::parse)
-        )));
+      )));
   }
 }
