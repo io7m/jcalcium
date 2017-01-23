@@ -70,7 +70,7 @@ public final class CaActionTimeline
   {
     final IntSortedSet tails = keys.tailSet(Math.addExact(frame, 1));
     if (tails.isEmpty()) {
-      return -1;
+      return keys.firstInt();
     }
 
     final int result = tails.firstInt();
@@ -87,7 +87,7 @@ public final class CaActionTimeline
   {
     final IntSortedSet heads = keys.headSet(Math.addExact(frame, 1));
     if (heads.isEmpty()) {
-      return -1;
+      return keys.lastInt();
     }
 
     final int result = heads.lastInt();

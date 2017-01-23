@@ -190,10 +190,8 @@ public final class CaEvaluatedJointMutableD implements
       m_scale.setR1C1D(this.scale.getYD());
       m_scale.setR2C2D(this.scale.getZD());
 
-      MatrixM4x4D.multiply(
-        m_translation, m_orientation, m_accumulated);
-      MatrixM4x4D.multiply(
-        m_accumulated, m_scale, m_accumulated);
+      MatrixM4x4D.multiply(m_translation, m_orientation, m_accumulated);
+      MatrixM4x4D.multiply(m_accumulated, m_scale, m_accumulated);
 
       if (this.joint_parent.isPresent()) {
         MatrixM4x4D.multiply(

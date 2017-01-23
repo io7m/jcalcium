@@ -36,17 +36,30 @@ import com.io7m.jtensors.parameterized.PMatrixWritable4x4FType;
 public final class CaMeshDeformationMatrices implements
   CaMeshDeformationMatricesType
 {
-  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d;
-  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_temp;
-  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f;
-  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_temp;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_0;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_1;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_2;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_3;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4d_x;
+  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_0;
+  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_1;
+  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_2;
+  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_3;
+  private final PMatrix4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> m4f_x;
 
   private CaMeshDeformationMatrices()
   {
-    this.m4d = PMatrixHeapArrayM4x4D.newMatrix();
-    this.m4d_temp = PMatrixHeapArrayM4x4D.newMatrix();
-    this.m4f = PMatrixHeapArrayM4x4F.newMatrix();
-    this.m4f_temp = PMatrixHeapArrayM4x4F.newMatrix();
+    this.m4d_0 = PMatrixHeapArrayM4x4D.newMatrix();
+    this.m4d_1 = PMatrixHeapArrayM4x4D.newMatrix();
+    this.m4d_2 = PMatrixHeapArrayM4x4D.newMatrix();
+    this.m4d_3 = PMatrixHeapArrayM4x4D.newMatrix();
+    this.m4d_x = PMatrixHeapArrayM4x4D.newMatrix();
+
+    this.m4f_0 = PMatrixHeapArrayM4x4F.newMatrix();
+    this.m4f_1 = PMatrixHeapArrayM4x4F.newMatrix();
+    this.m4f_2 = PMatrixHeapArrayM4x4F.newMatrix();
+    this.m4f_3 = PMatrixHeapArrayM4x4F.newMatrix();
+    this.m4f_x = PMatrixHeapArrayM4x4F.newMatrix();
   }
 
   /**
@@ -72,13 +85,14 @@ public final class CaMeshDeformationMatrices implements
     final double joint_weight_3,
     final PMatrixWritable4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> output)
   {
-    MatrixM4x4D.scale(deform_joint_0, joint_weight_0, this.m4d);
-    MatrixM4x4D.scale(deform_joint_1, joint_weight_1, this.m4d_temp);
-    MatrixM4x4D.addInPlace(this.m4d, this.m4d_temp);
-    MatrixM4x4D.scale(deform_joint_2, joint_weight_2, this.m4d_temp);
-    MatrixM4x4D.addInPlace(this.m4d, this.m4d_temp);
-    MatrixM4x4D.scale(deform_joint_3, joint_weight_3, this.m4d_temp);
-    MatrixM4x4D.add(this.m4d, this.m4d_temp, output);
+    MatrixM4x4D.scale(deform_joint_0, joint_weight_0, this.m4d_0);
+    MatrixM4x4D.scale(deform_joint_1, joint_weight_1, this.m4d_1);
+    MatrixM4x4D.scale(deform_joint_2, joint_weight_2, this.m4d_2);
+    MatrixM4x4D.scale(deform_joint_3, joint_weight_3, this.m4d_3);
+
+    MatrixM4x4D.add(this.m4d_0, this.m4d_1, this.m4d_x);
+    MatrixM4x4D.add(this.m4d_x, this.m4d_2, this.m4d_x);
+    MatrixM4x4D.add(this.m4d_x, this.m4d_3, output);
   }
 
   @Override
@@ -93,12 +107,13 @@ public final class CaMeshDeformationMatrices implements
     final double joint_weight_3,
     final PMatrixWritable4x4FType<CaSpaceObjectType, CaSpaceObjectDeformedType> output)
   {
-    MatrixM4x4F.scale(deform_joint_0, joint_weight_0, this.m4f);
-    MatrixM4x4F.scale(deform_joint_1, joint_weight_1, this.m4f_temp);
-    MatrixM4x4F.addInPlace(this.m4f, this.m4f_temp);
-    MatrixM4x4F.scale(deform_joint_2, joint_weight_2, this.m4f_temp);
-    MatrixM4x4F.addInPlace(this.m4f, this.m4f_temp);
-    MatrixM4x4F.scale(deform_joint_3, joint_weight_3, this.m4f_temp);
-    MatrixM4x4F.add(this.m4f, this.m4f_temp, output);
+    MatrixM4x4F.scale(deform_joint_0, joint_weight_0, this.m4f_0);
+    MatrixM4x4F.scale(deform_joint_1, joint_weight_1, this.m4f_1);
+    MatrixM4x4F.scale(deform_joint_2, joint_weight_2, this.m4f_2);
+    MatrixM4x4F.scale(deform_joint_3, joint_weight_3, this.m4f_3);
+
+    MatrixM4x4F.add(this.m4f_0, this.m4f_1, this.m4f_x);
+    MatrixM4x4F.add(this.m4f_x, this.m4f_2, this.m4f_x);
+    MatrixM4x4F.add(this.m4f_x, this.m4f_3, output);
   }
 }

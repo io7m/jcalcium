@@ -49,6 +49,16 @@
       <artifactId>io7m-jcalcium-format-protobuf3</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-mesh-processing-smf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>io7m-jcalcium-mesh-deformation-cpu</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.jnull</groupId>
@@ -75,8 +85,20 @@
       <artifactId>io7m-r2-meshes-defaults</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.io7m.smfj.jcanephora</groupId>
-      <artifactId>io7m-smfj-jcanephora-core</artifactId>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-bytebuffer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-frontend</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-parser-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-validation-main</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.timehack6435126</groupId>

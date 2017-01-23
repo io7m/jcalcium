@@ -64,6 +64,10 @@
       <groupId>com.io7m.smfj</groupId>
       <artifactId>io7m-smfj-processing-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.io7m.smfj</groupId>
+      <artifactId>io7m-smfj-validation-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>io.javaslang</groupId>
