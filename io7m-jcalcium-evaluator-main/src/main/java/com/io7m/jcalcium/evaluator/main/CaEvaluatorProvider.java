@@ -17,11 +17,13 @@
 package com.io7m.jcalcium.evaluator.main;
 
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorProviderType;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * The default evaluator provider implementation.
  */
 
+@Component
 public final class CaEvaluatorProvider implements CaEvaluatorProviderType
 {
   /**

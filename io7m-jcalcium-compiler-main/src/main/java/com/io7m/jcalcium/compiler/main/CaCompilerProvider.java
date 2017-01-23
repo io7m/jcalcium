@@ -18,11 +18,13 @@ package com.io7m.jcalcium.compiler.main;
 
 import com.io7m.jcalcium.compiler.api.CaCompilerProviderType;
 import com.io7m.jcalcium.compiler.api.CaCompilerType;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * The default implementation of the {@link CaCompilerProviderType}.
  */
 
+@Component
 public final class CaCompilerProvider implements CaCompilerProviderType
 {
   /**

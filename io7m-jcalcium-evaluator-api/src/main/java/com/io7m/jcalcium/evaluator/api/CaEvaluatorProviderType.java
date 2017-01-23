@@ -16,10 +16,13 @@
 
 package com.io7m.jcalcium.evaluator.api;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * The type of evaluator providers.
  */
 
+@ProviderType
 public interface CaEvaluatorProviderType
 {
   // No extra methods

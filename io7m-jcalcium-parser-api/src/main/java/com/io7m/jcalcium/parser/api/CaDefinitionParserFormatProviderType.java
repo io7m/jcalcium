@@ -19,11 +19,13 @@ package com.io7m.jcalcium.parser.api;
 import com.io7m.jcalcium.core.definitions.CaFormatDescription;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import javaslang.collection.SortedSet;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * A provider of parsers for a given format.
  */
 
+@ProviderType
 public interface CaDefinitionParserFormatProviderType
 {
   /**

@@ -27,6 +27,7 @@ import com.io7m.jcalcium.serializer.api.CaCompiledSerializerFormatProviderType;
 import com.io7m.jcalcium.serializer.api.CaCompiledSerializerType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.SortedSet;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import java.util.Objects;
  * A provider for the protobuf3 format.
  */
 
+@Component
 public final class CaProtobuf3FormatProvider implements
   CaLoaderFormatProviderType,
   CaCompiledSerializerFormatProviderType

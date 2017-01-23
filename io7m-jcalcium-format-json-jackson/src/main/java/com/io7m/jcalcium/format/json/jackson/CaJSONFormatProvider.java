@@ -43,6 +43,7 @@ import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.SortedSet;
 import javaslang.control.Validation;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,7 @@ import java.util.Optional;
  * A format provider for the JSON format.
  */
 
+@Component
 public final class CaJSONFormatProvider implements
   CaDefinitionParserFormatProviderType,
   CaDefinitionSerializerFormatProviderType

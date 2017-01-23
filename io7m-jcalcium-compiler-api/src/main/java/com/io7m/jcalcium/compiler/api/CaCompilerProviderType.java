@@ -16,10 +16,13 @@
 
 package com.io7m.jcalcium.compiler.api;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * A provider for {@link CaCompilerType} values.
  */
 
+@ProviderType
 public interface CaCompilerProviderType
 {
   /**
