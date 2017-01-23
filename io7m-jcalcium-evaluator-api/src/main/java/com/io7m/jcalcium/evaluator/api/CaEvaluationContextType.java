@@ -36,7 +36,7 @@ public interface CaEvaluationContextType
   /**
    * Create a new set of matrices. The method is allowed to return the same
    * instance as has been returned previously if and only if the {@link
-   * java.lang.AutoCloseable#close()} method has been called on the returned
+   * AutoCloseable#close()} method has been called on the returned
    * instance.
    *
    * @return A new set of matrices

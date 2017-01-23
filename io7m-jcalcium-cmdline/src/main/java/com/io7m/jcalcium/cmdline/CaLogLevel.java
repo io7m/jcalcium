@@ -27,31 +27,31 @@ import com.io7m.junreachable.UnreachableCodeException;
 public enum CaLogLevel
 {
   /**
-   * @see ch.qos.logback.classic.Level#TRACE
+   * @see Level#TRACE
    */
 
   LOG_TRACE("trace"),
 
   /**
-   * @see ch.qos.logback.classic.Level#DEBUG
+   * @see Level#DEBUG
    */
 
   LOG_DEBUG("debug"),
 
   /**
-   * @see ch.qos.logback.classic.Level#INFO
+   * @see Level#INFO
    */
 
   LOG_INFO("info"),
 
   /**
-   * @see ch.qos.logback.classic.Level#WARN
+   * @see Level#WARN
    */
 
   LOG_WARN("warn"),
 
   /**
-   * @see ch.qos.logback.classic.Level#ERROR
+   * @see Level#ERROR
    */
 
   LOG_ERROR("error");
