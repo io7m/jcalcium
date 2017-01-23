@@ -15,13 +15,8 @@ import net.java.quickcheck.generator.support.IntegerGenerator;
 
 public final class CaDefinitionCurveGenerator implements Generator<CaDefinitionCurveType>
 {
-  private final CaCurveInterpolationGenerator interp_gen;
-  private final CaCurveEasingGenerator easing_gen;
-  private final QuaternionI4DGenerator quat_gen;
   private final CaDefinitionCurveOrientationGenerator curve_ori_gen;
-  private final PVectorI3DGenerator<CaSpaceJointType> pvec_gen;
   private final CaDefinitionCurveTranslationGenerator curve_tra_gen;
-  private final VectorI3DGenerator vec_gen;
   private final CaDefinitionCurveScaleGenerator curve_sca_gen;
   private final IntegerGenerator which_gen;
 
@@ -34,21 +29,26 @@ public final class CaDefinitionCurveGenerator implements Generator<CaDefinitionC
   public CaDefinitionCurveGenerator(
     final JointTree in_tree)
   {
-    this.interp_gen = new CaCurveInterpolationGenerator();
-    this.easing_gen = new CaCurveEasingGenerator();
-    this.quat_gen = new QuaternionI4DGenerator();
-    this.pvec_gen = new PVectorI3DGenerator<>();
-    this.vec_gen = new VectorI3DGenerator();
+    final CaCurveInterpolationGenerator interp_gen =
+      new CaCurveInterpolationGenerator();
+    final CaCurveEasingGenerator easing_gen =
+      new CaCurveEasingGenerator();
+    final QuaternionI4DGenerator quat_gen =
+      new QuaternionI4DGenerator();
+    final PVectorI3DGenerator<CaSpaceJointType> pvec_gen =
+      new PVectorI3DGenerator<>();
+    final VectorI3DGenerator vec_gen =
+      new VectorI3DGenerator();
 
     this.curve_ori_gen =
       new CaDefinitionCurveOrientationGenerator(
-        this.interp_gen, this.easing_gen, this.quat_gen, in_tree);
+        interp_gen, easing_gen, quat_gen, in_tree);
     this.curve_tra_gen =
       new CaDefinitionCurveTranslationGenerator(
-        this.interp_gen, this.easing_gen, this.pvec_gen, in_tree);
+        interp_gen, easing_gen, pvec_gen, in_tree);
     this.curve_sca_gen =
       new CaDefinitionCurveScaleGenerator(
-        this.interp_gen, this.easing_gen, this.vec_gen, in_tree);
+        interp_gen, easing_gen, vec_gen, in_tree);
 
     this.which_gen = new IntegerGenerator(0, 2);
   }

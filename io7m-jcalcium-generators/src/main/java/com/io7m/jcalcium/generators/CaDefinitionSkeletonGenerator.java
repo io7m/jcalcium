@@ -52,7 +52,6 @@ public final class CaDefinitionSkeletonGenerator
   private final CaSkeletonNameGenerator name_gen;
   private final JointTree tree;
   private final CaDefinitionActionGenerator act_gen;
-  private final IntegerGenerator act_count_gen;
 
   /**
    * Construct a generator.
@@ -65,7 +64,6 @@ public final class CaDefinitionSkeletonGenerator
   {
     this.name_gen = new CaSkeletonNameGenerator();
     this.act_gen = new CaDefinitionActionGenerator(in_tree);
-    this.act_count_gen = new IntegerGenerator(0, 5);
     this.tree = NullCheck.notNull(in_tree, "Tree");
   }
 

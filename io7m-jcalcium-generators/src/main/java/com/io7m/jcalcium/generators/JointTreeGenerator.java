@@ -37,8 +37,6 @@ import java.util.Optional;
 
 public final class JointTreeGenerator implements Generator<JointTree>
 {
-  private final CaJointNameGenerator names;
-  private final IntegerGenerator sizes;
   private final Generator<JOTreeNodeType<CaJointName>> tree_gen;
   private final VectorI3DGenerator vec_gen;
   private final PVectorI3DGenerator<CaSpaceJointType> pvec_gen;
@@ -50,9 +48,9 @@ public final class JointTreeGenerator implements Generator<JointTree>
 
   public JointTreeGenerator()
   {
-    this.names = new CaJointNameGenerator();
-    this.sizes = new IntegerGenerator(1, 32);
-    this.tree_gen = JOTreeNodeGenerator.create(this.sizes, this.names, 0.2);
+    final CaJointNameGenerator names = new CaJointNameGenerator();
+    final IntegerGenerator sizes = new IntegerGenerator(1, 32);
+    this.tree_gen = JOTreeNodeGenerator.create(sizes, names, 0.2);
     this.vec_gen = new VectorI3DGenerator();
     this.pvec_gen = new PVectorI3DGenerator<>();
     this.quat_gen = new QuaternionI4DGenerator();
