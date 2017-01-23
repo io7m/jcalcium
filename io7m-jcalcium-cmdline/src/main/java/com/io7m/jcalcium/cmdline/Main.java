@@ -73,6 +73,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
@@ -154,7 +155,7 @@ public final class Main implements Runnable
         while (providers.hasNext()) {
           final CaDefinitionParserFormatProviderType current_provider =
             providers.next();
-          if (current_provider.parserFormat().suffix().equals(suffix)) {
+          if (Objects.equals(current_provider.parserFormat().suffix(), suffix)) {
             LOG.debug("using provider: {}", current_provider);
             return current_provider;
           }
@@ -169,7 +170,7 @@ public final class Main implements Runnable
       while (providers.hasNext()) {
         final CaDefinitionParserFormatProviderType current_provider =
           providers.next();
-        if (current_provider.parserFormat().name().equals(format)) {
+        if (Objects.equals(current_provider.parserFormat().name(), format)) {
           LOG.debug("using provider: {}", current_provider);
           return current_provider;
         }
@@ -198,7 +199,9 @@ public final class Main implements Runnable
         while (providers.hasNext()) {
           final CaDefinitionSerializerFormatProviderType current_provider =
             providers.next();
-          if (current_provider.serializerFormat().suffix().equals(suffix)) {
+          if (Objects.equals(
+            current_provider.serializerFormat().suffix(),
+            suffix)) {
             LOG.debug("using provider: {}", current_provider);
             return current_provider;
           }
@@ -213,7 +216,7 @@ public final class Main implements Runnable
       while (providers.hasNext()) {
         final CaDefinitionSerializerFormatProviderType current_provider =
           providers.next();
-        if (current_provider.serializerFormat().name().equals(format)) {
+        if (Objects.equals(current_provider.serializerFormat().name(), format)) {
           LOG.debug("using provider: {}", current_provider);
           return current_provider;
         }
@@ -242,7 +245,9 @@ public final class Main implements Runnable
         while (providers.hasNext()) {
           final CaCompiledSerializerFormatProviderType current_provider =
             providers.next();
-          if (current_provider.serializerFormat().suffix().equals(suffix)) {
+          if (Objects.equals(
+            current_provider.serializerFormat().suffix(),
+            suffix)) {
             LOG.debug("using provider: {}", current_provider);
             return current_provider;
           }
@@ -257,7 +262,7 @@ public final class Main implements Runnable
       while (providers.hasNext()) {
         final CaCompiledSerializerFormatProviderType current_provider =
           providers.next();
-        if (current_provider.serializerFormat().name().equals(format)) {
+        if (Objects.equals(current_provider.serializerFormat().name(), format)) {
           LOG.debug("using provider: {}", current_provider);
           return current_provider;
         }

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -76,7 +77,7 @@ public final class CaLoaders
       while (providers.hasNext()) {
         final CaLoaderFormatProviderType current_provider =
           providers.next();
-        if (current_provider.loaderFormat().name().equals(format)) {
+        if (Objects.equals(current_provider.loaderFormat().name(), format)) {
           LOG.debug("using provider: {}", current_provider);
           return current_provider;
         }
@@ -97,7 +98,7 @@ public final class CaLoaders
       while (providers.hasNext()) {
         final CaLoaderFormatProviderType current_provider =
           providers.next();
-        if (current_provider.loaderFormat().suffix().equals(suffix)) {
+        if (Objects.equals(current_provider.loaderFormat().suffix(), suffix)) {
           LOG.debug("Using provider: {}", current_provider);
           return current_provider;
         }

@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 /**
  * A provider for the protobuf3 format.
@@ -287,7 +288,7 @@ public final class CaProtobuf3FormatProvider implements
       throws CaLoaderUnsupportedVersion
     {
       for (final CaFormatVersion supported : CaV1Protobuf3Format.supported()) {
-        if (supported.equals(version)) {
+        if (Objects.equals(supported, version)) {
           return new CaV1Protobuf3Format();
         }
       }

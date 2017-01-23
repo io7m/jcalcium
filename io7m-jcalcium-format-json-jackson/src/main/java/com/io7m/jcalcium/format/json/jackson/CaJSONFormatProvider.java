@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -146,12 +147,12 @@ public final class CaJSONFormatProvider implements
       LOG.debug("deserializing");
 
       final String fv = p.nextFieldName();
-      if ("version".equals(fv)) {
+      if (Objects.equals("version", fv)) {
         final String v = p.nextTextValue();
         if (v.startsWith("calcium skeleton 1.")) {
           LOG.debug("instantiating parser for version {} file", v);
           final String sn = p.nextFieldName();
-          if ("skeleton".equals(sn)) {
+          if (Objects.equals("skeleton", sn)) {
             p.nextToken();
             final CaV1JSONFormat.CaV1Skeleton sk =
               p.readValueAs(CaV1JSONFormat.CaV1Skeleton.class);

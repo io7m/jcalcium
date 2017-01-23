@@ -18,6 +18,8 @@ package com.io7m.jcalcium.cmdline;
 
 import com.beust.jcommander.IStringConverter;
 
+import java.util.Objects;
+
 /**
  * A converter for {@link CaLogLevel} values.
  */
@@ -38,7 +40,7 @@ public final class CaLogLevelConverter implements
   public CaLogLevel convert(final String value)
   {
     for (final CaLogLevel v : CaLogLevel.values()) {
-      if (value.equals(v.getName())) {
+      if (Objects.equals(value, v.getName())) {
         return v;
       }
     }
