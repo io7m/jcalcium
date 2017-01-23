@@ -1028,6 +1028,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
       default: {
         // Nothing
+        break;
       }
     }
   }
@@ -1107,6 +1108,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
       default: {
         // Nothing
+        break;
       }
     }
   }

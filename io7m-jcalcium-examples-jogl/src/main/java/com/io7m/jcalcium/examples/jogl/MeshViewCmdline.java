@@ -1363,6 +1363,7 @@ public final class MeshViewCmdline implements Runnable, KeyListener
 
       default: {
         // Nothing
+        break;
       }
     }
   }
@@ -1442,6 +1443,7 @@ public final class MeshViewCmdline implements Runnable, KeyListener
 
       default: {
         // Nothing
+        break;
       }
     }
   }
