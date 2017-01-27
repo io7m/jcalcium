@@ -16,6 +16,7 @@
 
 package com.io7m.jcalcium.mesh.processing.smf;
 
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributes;
 import com.io7m.jcoords.core.conversion.CAxis;
 import com.io7m.jcoords.core.conversion.CAxisSystem;
 import com.io7m.junreachable.UnreachableCodeException;
@@ -72,11 +73,16 @@ public final class CaSchemas
   public static final SMFAttributeName TANGENT4_NAME;
 
   static {
-    JOINT_INDICES_NAME = SMFAttributeName.of("JOINT_INDICES");
-    JOINT_WEIGHTS_NAME = SMFAttributeName.of("JOINT_WEIGHTS");
-    NORMALS_NAME = SMFAttributeName.of("NORMAL");
-    POSITION_NAME = SMFAttributeName.of("POSITION");
-    TANGENT4_NAME = SMFAttributeName.of("TANGENT4");
+    JOINT_INDICES_NAME =
+      SMFAttributeName.of("JOINT_INDICES");
+    JOINT_WEIGHTS_NAME =
+      SMFAttributeName.of("JOINT_WEIGHTS");
+    NORMALS_NAME =
+      SMFAttributeName.of(CaMeshDeformableAttributes.NORMAL.name());
+    POSITION_NAME =
+      SMFAttributeName.of(CaMeshDeformableAttributes.POSITION.name());
+    TANGENT4_NAME =
+      SMFAttributeName.of(CaMeshDeformableAttributes.TANGENT4.name());
   }
 
   private CaSchemas()
@@ -112,13 +118,6 @@ public final class CaSchemas
         OptionalInt.of(3),
         OptionalInt.empty());
 
-    final SMFSchemaAttribute normal =
-      SMFSchemaAttribute.of(
-        NORMALS_NAME,
-        Optional.of(SMFComponentType.ELEMENT_TYPE_FLOATING),
-        OptionalInt.of(3),
-        OptionalInt.empty());
-
     final SMFSchemaAttribute joint_indices =
       SMFSchemaAttribute.of(
         JOINT_INDICES_NAME,
@@ -134,9 +133,15 @@ public final class CaSchemas
         OptionalInt.empty());
 
     builder.putRequiredAttributes(position.name(), position);
-    builder.putRequiredAttributes(normal.name(), normal);
     builder.putRequiredAttributes(joint_indices.name(), joint_indices);
     builder.putRequiredAttributes(joint_weights.name(), joint_weights);
+
+    final SMFSchemaAttribute normal =
+      SMFSchemaAttribute.of(
+        NORMALS_NAME,
+        Optional.of(SMFComponentType.ELEMENT_TYPE_FLOATING),
+        OptionalInt.of(3),
+        OptionalInt.empty());
 
     final SMFSchemaAttribute tangent4 =
       SMFSchemaAttribute.of(
@@ -145,6 +150,7 @@ public final class CaSchemas
         OptionalInt.of(4),
         OptionalInt.empty());
 
+    builder.putOptionalAttributes(normal.name(), normal);
     builder.putOptionalAttributes(tangent4.name(), tangent4);
     return builder.build();
   }

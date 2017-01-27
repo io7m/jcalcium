@@ -20,20 +20,12 @@ import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jareas.core.AreaInclusiveUnsignedL;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaCurveEasing;
-import com.io7m.jcalcium.core.CaCurveInterpolation;
-import com.io7m.jcalcium.core.CaJointName;
-import com.io7m.jcalcium.core.CaSkeletonName;
-import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
-import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
-import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
-import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeTranslation;
-import com.io7m.jcalcium.core.compiled.actions.CaCurveOrientation;
-import com.io7m.jcalcium.core.compiled.actions.CaCurveTranslation;
+import com.io7m.jcalcium.core.spaces.CaSpaceObjectDeformedType;
+import com.io7m.jcalcium.core.spaces.CaSpaceObjectType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedJointReadableDType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonD;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatedSkeletonMutableDType;
@@ -45,6 +37,22 @@ import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
 import com.io7m.jcalcium.loader.api.CaLoaderType;
 import com.io7m.jcalcium.loader.api.CaLoaders;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributeCursorReadableType;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributeCursorType;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributes;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformationMatrices;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformationMatricesType;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformerCPU;
+import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformerCPUType;
+import com.io7m.jcalcium.mesh.deformation.smf.CaMeshDeformableCPUSMFAbstract;
+import com.io7m.jcalcium.mesh.deformation.smf.CaMeshDeformableCPUSMFConfiguration;
+import com.io7m.jcalcium.mesh.deformation.smf.CaMeshDeformableCPUSMFEventsType;
+import com.io7m.jcalcium.mesh.deformation.smf.CaMeshDeformableCPUSMFPackedAttributeSet;
+import com.io7m.jcalcium.mesh.deformation.smf.CaMeshDeformableCPUSMFProvider;
+import com.io7m.jcalcium.mesh.deformation.smf.CaSetAuxiliaryType;
+import com.io7m.jcalcium.mesh.deformation.smf.CaSetJointType;
+import com.io7m.jcalcium.mesh.deformation.smf.CaSetSourceType;
+import com.io7m.jcalcium.mesh.deformation.smf.CaSetTargetType;
 import com.io7m.jcamera.JCameraContext;
 import com.io7m.jcamera.JCameraSpherical;
 import com.io7m.jcamera.JCameraSphericalInput;
@@ -53,13 +61,25 @@ import com.io7m.jcamera.JCameraSphericalIntegrator;
 import com.io7m.jcamera.JCameraSphericalIntegratorType;
 import com.io7m.jcamera.JCameraSphericalSnapshot;
 import com.io7m.jcamera.JCameraSphericalType;
+import com.io7m.jcanephora.core.JCGLArrayBufferType;
+import com.io7m.jcanephora.core.JCGLArrayObjectBuilderType;
+import com.io7m.jcanephora.core.JCGLArrayObjectType;
+import com.io7m.jcanephora.core.JCGLBufferUpdateType;
+import com.io7m.jcanephora.core.JCGLBufferUpdates;
 import com.io7m.jcanephora.core.JCGLClearSpecification;
 import com.io7m.jcanephora.core.JCGLExceptionNonCompliant;
 import com.io7m.jcanephora.core.JCGLExceptionUnsupported;
+import com.io7m.jcanephora.core.JCGLIndexBufferType;
 import com.io7m.jcanephora.core.JCGLProjectionMatrices;
 import com.io7m.jcanephora.core.JCGLProjectionMatricesType;
+import com.io7m.jcanephora.core.JCGLScalarType;
+import com.io7m.jcanephora.core.JCGLUnsignedType;
+import com.io7m.jcanephora.core.JCGLUsageHint;
+import com.io7m.jcanephora.core.api.JCGLArrayBuffersType;
+import com.io7m.jcanephora.core.api.JCGLArrayObjectsType;
 import com.io7m.jcanephora.core.api.JCGLContextType;
 import com.io7m.jcanephora.core.api.JCGLFramebuffersType;
+import com.io7m.jcanephora.core.api.JCGLIndexBuffersType;
 import com.io7m.jcanephora.core.api.JCGLInterfaceGL33Type;
 import com.io7m.jcanephora.core.api.JCGLTexturesType;
 import com.io7m.jcanephora.jogl.JCGLImplementationJOGL;
@@ -73,24 +93,23 @@ import com.io7m.jcanephora.texture_unit_allocator.JCGLTextureUnitAllocatorType;
 import com.io7m.jcanephora.texture_unit_allocator.JCGLTextureUnitContextParentType;
 import com.io7m.jcanephora.texture_unit_allocator.JCGLTextureUnitContextType;
 import com.io7m.jnull.NullCheck;
-import com.io7m.jorchard.core.JOTreeNode;
-import com.io7m.jorchard.core.JOTreeNodeType;
+import com.io7m.jpra.runtime.java.JPRACursor1DType;
 import com.io7m.jtensors.MatrixM4x4D;
-import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.QuaternionM4F;
-import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.VectorI3F;
 import com.io7m.jtensors.VectorI4D;
 import com.io7m.jtensors.VectorI4F;
 import com.io7m.jtensors.VectorM4D;
+import com.io7m.jtensors.parameterized.PMatrix4x4DType;
 import com.io7m.jtensors.parameterized.PMatrixDirect4x4FType;
 import com.io7m.jtensors.parameterized.PMatrixDirectM4x4F;
+import com.io7m.jtensors.parameterized.PMatrixHeapArrayM4x4D;
 import com.io7m.jtensors.parameterized.PMatrixI3x3F;
-import com.io7m.jtensors.parameterized.PVectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3F;
 import com.io7m.jtensors.parameterized.PVectorI4F;
 import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.junsigned.ranges.UnsignedRangeInclusiveL;
+import com.io7m.r2.core.R2AttributeConventions;
 import com.io7m.r2.core.R2CopyDepth;
 import com.io7m.r2.core.R2FilterType;
 import com.io7m.r2.core.R2GeometryBuffer;
@@ -142,6 +161,21 @@ import com.io7m.r2.main.R2MainType;
 import com.io7m.r2.meshes.defaults.R2UnitSphere;
 import com.io7m.r2.spaces.R2SpaceEyeType;
 import com.io7m.r2.spaces.R2SpaceWorldType;
+import com.io7m.smfj.bytebuffer.SMFByteBufferFloat4Type;
+import com.io7m.smfj.bytebuffer.SMFByteBufferIntegerUnsigned4Type;
+import com.io7m.smfj.bytebuffer.SMFByteBufferPackedAttribute;
+import com.io7m.smfj.bytebuffer.SMFByteBufferPackedTriangles;
+import com.io7m.smfj.bytebuffer.SMFByteBufferPackingConfiguration;
+import com.io7m.smfj.core.SMFAttribute;
+import com.io7m.smfj.core.SMFAttributeName;
+import com.io7m.smfj.core.SMFErrorType;
+import com.io7m.smfj.core.SMFHeader;
+import com.io7m.smfj.core.SMFTriangles;
+import com.io7m.smfj.frontend.SMFParserProviders;
+import com.io7m.smfj.parser.api.SMFParserEventsMeta;
+import com.io7m.smfj.parser.api.SMFParserProviderType;
+import com.io7m.smfj.validation.api.SMFSchemaValidatorType;
+import com.io7m.smfj.validation.main.SMFSchemaValidator;
 import com.io7m.timehack6435126.TimeHack6435126;
 import com.jogamp.newt.event.InputEvent;
 import com.jogamp.newt.event.KeyEvent;
@@ -155,12 +189,15 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceSortedMap;
 import javaslang.Tuple2;
 import javaslang.collection.Iterator;
 import javaslang.collection.List;
-import javaslang.collection.Vector;
+import javaslang.collection.SortedMap;
+import javaslang.control.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -171,16 +208,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.io7m.jcalcium.mesh.processing.smf.CaSchemas.NORMALS_NAME;
+import static com.io7m.jcalcium.mesh.processing.smf.CaSchemas.POSITION_NAME;
 import static com.io7m.jfunctional.Unit.unit;
 
-public final class JointViewCmdline implements Runnable, KeyListener
+public final class MeshViewNewCmdline implements Runnable, KeyListener
 {
   private static final Logger LOG;
-  private static final boolean FILE;
 
   static {
-    LOG = LoggerFactory.getLogger(JointViewCmdline.class);
-    FILE = true;
+    LOG = LoggerFactory.getLogger(MeshViewNewCmdline.class);
   }
 
   private final String[] args;
@@ -190,12 +227,14 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private final JCameraSphericalIntegratorType camera_integrator;
   private final MatrixM4x4D.ContextMM4D matrix_context4x4d;
   private final PMatrixDirect4x4FType<R2SpaceWorldType, R2SpaceEyeType> matrix_view;
+  private final CaMeshDeformationMatricesType matrix_deformations;
+  private final PMatrix4x4DType<CaSpaceObjectType, CaSpaceObjectDeformedType> matrix_deform;
   private final AtomicReference<Double> time_scale;
+  private final CaMeshDeformerCPUType deformer;
   private JCGLProfilingType render_profiling;
   private R2MatricesType render_matrices;
   private JCGLProjectionMatricesType render_projections;
   private R2ProjectionFOV render_projection;
-  private R2DebugVisualizerRendererType renderer;
   private R2GeometryBufferType render_gbuffer;
   private R2LightBufferType render_lbuffer;
   private R2SceneOpaquesType render_opaques;
@@ -236,7 +275,14 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private CaEvaluationContextType eval_context;
   private CaEvaluatedSkeletonMutableDType eval_skeleton;
 
-  private JointViewCmdline(
+  private CPUMesh mesh;
+  private R2TransformSOT mesh_transform;
+  private R2InstanceSingle mesh_instance;
+  private R2ShaderInstanceSingleType<R2SurfaceShaderBasicParameters> render_skeleton_mesh_shader;
+  private R2SurfaceShaderBasicParameters render_skeleton_mesh_parameters;
+  private R2MaterialOpaqueSingle<R2SurfaceShaderBasicParameters> render_skeleton_mesh_material;
+
+  private MeshViewNewCmdline(
     final String[] in_args)
   {
     this.args = NullCheck.notNull(in_args, "args");
@@ -246,6 +292,9 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
     this.matrix_context4x4d = new MatrixM4x4D.ContextMM4D();
     this.matrix_view = PMatrixDirectM4x4F.newMatrix();
+    this.matrix_deformations = CaMeshDeformationMatrices.create();
+    this.matrix_deform = PMatrixHeapArrayM4x4D.newMatrix();
+    this.deformer = CaMeshDeformerCPU.create(this.matrix_deformations);
 
     this.camera_context =
       new JCameraContext();
@@ -267,175 +316,160 @@ public final class JointViewCmdline implements Runnable, KeyListener
   {
     TimeHack6435126.enableHighResolutionTimer();
 
-    new JointViewCmdline(args).run();
+    new MeshViewNewCmdline(args).run();
   }
 
   private static CaSkeleton loadSkeleton(
     final Path path)
     throws CaLoaderException, IOException
   {
-    LOG.debug("loading skeleton");
+    LOG.debug("loadSkeleton: {}", path);
 
-    if (FILE) {
-      final CaLoaderFormatProviderType provider =
-        CaLoaders.findProvider(path, Optional.empty());
-      final CaLoaderType loader =
-        provider.loaderCreate();
+    final CaLoaderFormatProviderType provider =
+      CaLoaders.findProvider(path, Optional.empty());
+    final CaLoaderType loader =
+      provider.loaderCreate();
 
-      try (final InputStream is = Files.newInputStream(path)) {
-        final CaSkeleton skeleton =
-          loader.loadCompiledSkeletonFromStream(is, path.toUri());
-        LOG.debug(
-          "joints: {} joints", Integer.valueOf(skeleton.jointsByID().size()));
-        return skeleton;
+    try (final InputStream is = Files.newInputStream(path)) {
+      final CaSkeleton skeleton =
+        loader.loadCompiledSkeletonFromStream(is, path.toUri());
+      LOG.debug(
+        "joints: {} joints", Integer.valueOf(skeleton.jointsByID().size()));
+      return skeleton;
+    }
+  }
+
+  private CPUMesh loadMesh(
+    final Path path)
+    throws IOException
+  {
+    LOG.debug("loadMesh: {}", path);
+
+    final Optional<SMFParserProviderType> provider_opt =
+      SMFParserProviders.findParserProvider(Optional.empty(), path.toString());
+
+    if (provider_opt.isPresent()) {
+      final SMFParserProviderType provider = provider_opt.get();
+      final CaMeshDeformableCPUSMFEventsType<CPUMesh> events =
+        new CPUMeshEvents(this.g33);
+
+      final CaMeshDeformableCPUSMFConfiguration config =
+        CaMeshDeformableCPUSMFConfiguration.builder()
+          .addSourceAttributes(CaMeshDeformableAttributes.POSITION)
+          .addSourceAttributes(CaMeshDeformableAttributes.NORMAL)
+          .build();
+
+      try (final InputStream stream = Files.newInputStream(path)) {
+        final Validation<List<SMFErrorType>, CPUMesh> result =
+          CaMeshDeformableCPUSMFProvider.createFromStream(
+            provider,
+            new SMFSchemaValidator(),
+            SMFParserEventsMeta.ignore(),
+            config,
+            events,
+            path,
+            stream);
+
+        if (result.isInvalid()) {
+          result.getError().forEach(e -> LOG.error(e.fullMessage()));
+          throw new IOException("CPUMesh could not be loaded");
+        }
+
+        return result.get();
       }
     }
 
-    final CaJoint root =
-      CaJoint.of(
-        CaJointName.of("root"),
-        0,
-        new PVectorI3D<>(0.0, 0.0, 0.0),
-        new QuaternionI4D(),
-        new VectorI3D(1.0, 1.0, 1.0));
+    throw new UnsupportedOperationException("No support for the given format");
+  }
 
-    final CaJoint hip =
-      CaJoint.of(
-        CaJointName.of("hip"),
-        1,
-        new PVectorI3D<>(0.0, 3.0, 0.0),
-        new QuaternionI4D(),
-        new VectorI3D(1.0, 1.0, 1.0));
+  private static JCGLUnsignedType renderInitMeshGetTriangleType(
+    final int size)
+  {
+    switch (size) {
+      case 8: {
+        return JCGLUnsignedType.TYPE_UNSIGNED_BYTE;
+      }
+      case 16: {
+        return JCGLUnsignedType.TYPE_UNSIGNED_SHORT;
+      }
+      case 32: {
+        return JCGLUnsignedType.TYPE_UNSIGNED_INT;
+      }
+      case 64: {
+        throw new UnsupportedOperationException(
+          "64 bit indices are not supported");
+      }
+      default: {
+        throw new UnreachableCodeException();
+      }
+    }
+  }
 
-    final CaJoint shoulder_left =
-      CaJoint.of(
-        CaJointName.of("shoulder-left"),
-        2,
-        new PVectorI3D<>(0.0, 0.0, 0.0),
-        QuaternionI4D.makeFromAxisAngle(
-          new VectorI3D(0.0, 0.0, -1.0),
-          Math.toRadians(45.0)),
-        new VectorI3D(1.0, 1.0, 1.0));
-    final CaJoint shoulder_right =
-      CaJoint.of(
-        CaJointName.of("shoulder-right"),
-        3,
-        new PVectorI3D<>(0.0, 0.0, 0.0),
-        QuaternionI4D.makeFromAxisAngle(
-          new VectorI3D(0.0, 0.0, -1.0),
-          Math.toRadians(-45.0)),
-        new VectorI3D(1.0, 1.0, 1.0));
+  private static JCGLScalarType renderInitMeshGetScalarType(
+    final SMFByteBufferPackedAttribute packed_attribute)
+  {
+    final SMFAttribute attribute = packed_attribute.attribute();
+    switch (attribute.componentType()) {
+      case ELEMENT_TYPE_INTEGER_SIGNED: {
+        switch (attribute.componentSizeBits()) {
+          case 8: {
+            return JCGLScalarType.TYPE_BYTE;
+          }
+          case 16: {
+            return JCGLScalarType.TYPE_SHORT;
+          }
+          case 32: {
+            return JCGLScalarType.TYPE_INT;
+          }
+          case 64: {
+            throw new UnsupportedOperationException(
+              "64 bit types are not supported");
+          }
+          default: {
+            throw new UnreachableCodeException();
+          }
+        }
+      }
+      case ELEMENT_TYPE_INTEGER_UNSIGNED: {
+        switch (attribute.componentSizeBits()) {
+          case 8: {
+            return JCGLScalarType.TYPE_UNSIGNED_BYTE;
+          }
+          case 16: {
+            return JCGLScalarType.TYPE_UNSIGNED_SHORT;
+          }
+          case 32: {
+            return JCGLScalarType.TYPE_UNSIGNED_INT;
+          }
+          case 64: {
+            throw new UnsupportedOperationException(
+              "64 bit types are not supported");
+          }
+          default: {
+            throw new UnreachableCodeException();
+          }
+        }
+      }
+      case ELEMENT_TYPE_FLOATING: {
+        switch (attribute.componentSizeBits()) {
+          case 16: {
+            return JCGLScalarType.TYPE_HALF_FLOAT;
+          }
+          case 32: {
+            return JCGLScalarType.TYPE_FLOAT;
+          }
+          case 64: {
+            throw new UnsupportedOperationException(
+              "64 bit types are not supported");
+          }
+          default: {
+            throw new UnreachableCodeException();
+          }
+        }
+      }
+    }
 
-    final CaJoint hand_left =
-      CaJoint.of(
-        CaJointName.of("hand-left"),
-        4,
-        new PVectorI3D<>(-1.0, 0.0, 0.0),
-        new QuaternionI4D(),
-        new VectorI3D(1.0, 1.0, 1.0));
-    final CaJoint hand_right =
-      CaJoint.of(
-        CaJointName.of("hand-right"),
-        5,
-        new PVectorI3D<>(1.0, 0.0, 0.0),
-        new QuaternionI4D(),
-        new VectorI3D(1.0, 1.0, 1.0));
-
-    final JOTreeNodeType<CaJoint> tree_root = JOTreeNode.create(root);
-    final JOTreeNodeType<CaJoint> tree_hip = JOTreeNode.create(hip);
-    tree_root.childAdd(tree_hip);
-    final JOTreeNodeType<CaJoint> tree_arm_left = JOTreeNode.create(
-      shoulder_left);
-    tree_arm_left.childAdd(JOTreeNode.create(hand_left));
-    tree_hip.childAdd(tree_arm_left);
-    final JOTreeNodeType<CaJoint> tree_arm_right = JOTreeNode.create(
-      shoulder_right);
-    tree_arm_right.childAdd(JOTreeNode.create(hand_right));
-    tree_hip.childAdd(tree_arm_right);
-
-    final CaCurveKeyframeOrientation o_keyframe_0 =
-      CaCurveKeyframeOrientation.of(
-        0,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        QuaternionI4D.makeFromAxisAngle(
-          new VectorI3D(0.0, 0.0, -1.0),
-          Math.toRadians(45.0)));
-
-    final CaCurveKeyframeOrientation o_keyframe_1 =
-      CaCurveKeyframeOrientation.of(
-        30,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        QuaternionI4D.makeFromAxisAngle(
-          new VectorI3D(0.0, 0.0, -1.0),
-          Math.toRadians(0.0)));
-
-    final CaCurveKeyframeOrientation o_keyframe_2 =
-      CaCurveKeyframeOrientation.of(
-        60,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        QuaternionI4D.makeFromAxisAngle(
-          new VectorI3D(0.0, 0.0, -1.0),
-          Math.toRadians(45.0)));
-
-    final CaCurveOrientation curve_orientation =
-      CaCurveOrientation.builder()
-        .setAction(CaActionName.of("action"))
-        .setJoint(CaJointName.of("shoulder-left"))
-        .putKeyframes(Integer.valueOf(0), o_keyframe_0)
-        .putKeyframes(Integer.valueOf(30), o_keyframe_1)
-        .putKeyframes(Integer.valueOf(60), o_keyframe_2)
-        .build();
-
-    final CaCurveKeyframeTranslation t_keyframe_0 =
-      CaCurveKeyframeTranslation.of(
-        0,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(0.0, 0.0, 0.0));
-
-    final CaCurveKeyframeTranslation t_keyframe_1 =
-      CaCurveKeyframeTranslation.of(
-        30,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(0.0, 1.0, 0.0));
-
-    final CaCurveKeyframeTranslation t_keyframe_2 =
-      CaCurveKeyframeTranslation.of(
-        60,
-        CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR,
-        CaCurveEasing.CURVE_EASING_IN_OUT,
-        new PVectorI3D<>(0.0, 0.0, 0.0));
-
-    final CaCurveTranslation curve_translation =
-      CaCurveTranslation.builder()
-        .setAction(CaActionName.of("action"))
-        .setJoint(CaJointName.of("shoulder-right"))
-        .putKeyframes(Integer.valueOf(0), t_keyframe_0)
-        .putKeyframes(Integer.valueOf(30), t_keyframe_1)
-        .putKeyframes(Integer.valueOf(60), t_keyframe_2)
-        .build();
-
-    final CaActionCurves action =
-      CaActionCurves.builder()
-        .setName(CaActionName.of("action"))
-        .setFramesPerSecond(60)
-        .putCurves(
-          CaJointName.of("shoulder-left"),
-          Vector.of(curve_orientation))
-        .putCurves(
-          CaJointName.of("shoulder-right"),
-          Vector.of(curve_translation))
-        .build();
-
-    final CaSkeleton.Builder sb = CaSkeleton.builder();
-    sb.setName(CaSkeletonName.of("skeleton"));
-    sb.setJoints(tree_root);
-    sb.putActionsByName(action.name(), action);
-    return sb.build();
+    throw new UnreachableCodeException();
   }
 
   @Override
@@ -444,13 +478,14 @@ public final class JointViewCmdline implements Runnable, KeyListener
     try {
       LOG.info("start");
 
-      if (this.args.length != 1) {
-        LOG.info("usage: file.ccp");
+      if (this.args.length != 2) {
+        LOG.info("usage: file.ccp mesh.smf[b|t]");
         System.exit(1);
       }
 
-      final Path path = Paths.get(this.args[0]);
-      this.skeleton = loadSkeleton(path);
+      final Path skeleton_path = Paths.get(this.args[0]);
+      this.skeleton = loadSkeleton(skeleton_path);
+      final Path mesh_path = Paths.get(this.args[1]);
       this.loadActions(this.skeleton);
 
       LOG.debug("opening GL window");
@@ -458,7 +493,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
       final GLCapabilities caps = new GLCapabilities(profile);
       this.window = GLWindow.create(caps);
       this.window.setSize(640, 480);
-      this.window.setTitle("Jointview: " + path);
+      this.window.setTitle("Meshview: " + skeleton_path);
       this.window.setVisible(true, true);
       this.window.addKeyListener(this);
       this.window_area = this.windowMakeArea();
@@ -474,6 +509,7 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
       LOG.debug("opened window");
 
+      this.mesh = this.loadMesh(mesh_path);
       this.renderInit();
       while (this.window.isVisible()) {
         this.render();
@@ -507,6 +543,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
   private void renderInit()
   {
+    LOG.debug("renderInit");
+
     this.main = R2Main.newBuilder().build(this.g33);
 
     final AreaInclusiveUnsignedL area = this.windowMakeArea();
@@ -572,6 +610,24 @@ public final class JointViewCmdline implements Runnable, KeyListener
         this.main.getIDPool().freshID(),
         this.render_skeleton_joint_shader,
         this.render_skeleton_joint_parameters);
+
+    this.render_skeleton_mesh_shader =
+      R2SurfaceShaderBasicSingle.newShader(
+        this.g33.getShaders(),
+        this.main.getShaderPreprocessingEnvironment(),
+        this.main.getIDPool());
+
+    this.render_skeleton_mesh_parameters =
+      R2SurfaceShaderBasicParameters.builder()
+        .setTextureDefaults(this.main.getTextureDefaults())
+        .setAlbedoColor(new PVectorI4F<>(1.0f, 0.0f, 0.0f, 1.0f))
+        .build();
+
+    this.render_skeleton_mesh_material =
+      R2MaterialOpaqueSingle.of(
+        this.main.getIDPool().freshID(),
+        this.render_skeleton_mesh_shader,
+        this.render_skeleton_mesh_parameters);
 
     final R2TransformSOT render_floor_transform = R2TransformSOT.newTransform();
     render_floor_transform.setScale(10.0f);
@@ -641,10 +697,13 @@ public final class JointViewCmdline implements Runnable, KeyListener
     this.renderInitCamera();
     this.renderInitFramebuffer(area);
     this.renderInitSkeleton();
+    this.renderInitMesh();
   }
 
   private void renderInitCamera()
   {
+    LOG.debug("renderInitCamera");
+
     this.camera.cameraSetTargetPosition3f(0.0f, 0.0f, 0.0f);
     this.camera.cameraSetZoom(5.0f);
     this.camera.cameraSetAngleIncline((float) Math.toRadians(40.0));
@@ -654,6 +713,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private void renderInitFramebuffer(
     final AreaInclusiveUnsignedL area)
   {
+    LOG.debug("renderInitFramebuffer");
+
     final JCGLFramebuffersType g_fb = this.g33.getFramebuffers();
     final JCGLTexturesType g_tex = this.g33.getTextures();
 
@@ -698,12 +759,26 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
   private void renderInitSkeleton()
   {
+    LOG.debug("renderInitSkeleton");
+
     this.skeleton_joints =
       R2InstanceBillboardedDynamic.newBillboarded(
         this.main.getIDPool(),
         this.g33.getArrayBuffers(),
         this.g33.getArrayObjects(),
         this.skeleton.jointsByID().size());
+  }
+
+  private void renderInitMesh()
+  {
+    LOG.debug("renderInitMesh");
+
+    this.mesh_transform = R2TransformSOT.newTransform();
+    this.mesh_instance = R2InstanceSingle.of(
+      this.main.getIDPool().freshID(),
+      this.mesh.array(),
+      this.mesh_transform,
+      PMatrixI3x3F.identity());
   }
 
   private AreaInclusiveUnsignedL windowMakeArea()
@@ -746,6 +821,18 @@ public final class JointViewCmdline implements Runnable, KeyListener
 
     final Int2ReferenceSortedMap<CaEvaluatedJointReadableDType> joints =
       this.eval_skeleton.jointsByID();
+
+    this.deformer.deformD(this.eval_skeleton, this.mesh);
+
+    {
+      final JCGLBufferUpdateType<JCGLArrayBufferType> update =
+        this.mesh.targetBufferUpdate();
+
+      final JCGLArrayBuffersType g_ab = this.g33.getArrayBuffers();
+      g_ab.arrayBufferBind(update.getBuffer());
+      g_ab.arrayBufferUpdate(update);
+      g_ab.arrayBufferUnbind();
+    }
 
     final java.util.List<R2DebugLineSegment> joint_lines = new ArrayList<>();
 
@@ -835,6 +922,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
       this.render_floor, this.render_floor_material);
     this.render_opaques.opaquesAddBillboardedInstance(
       this.skeleton_joints, this.render_skeleton_joint_material);
+    this.render_opaques.opaquesAddSingleInstance(
+      this.mesh_instance, this.render_skeleton_mesh_material);
 
     this.render_lights.lightsReset();
     this.render_lights.lightsGetGroup(1).lightGroupAddSingle(
@@ -954,6 +1043,8 @@ public final class JointViewCmdline implements Runnable, KeyListener
   private void loadActions(
     final CaSkeleton skeleton)
   {
+    LOG.debug("loadActions");
+
     final MatrixM4x4D.ContextMM4D c = new MatrixM4x4D.ContextMM4D();
     final CaSkeletonRestPoseDType rest_pose =
       CaSkeletonRestPose.createD(c, skeleton);
@@ -1110,6 +1201,210 @@ public final class JointViewCmdline implements Runnable, KeyListener
         // Nothing
         break;
       }
+    }
+  }
+
+  private static final class CPUMesh extends CaMeshDeformableCPUSMFAbstract
+  {
+    private final JCGLArrayObjectType mesh_array;
+    private final JCGLArrayBufferType mesh_aux_buffer;
+    private final JCGLIndexBufferType mesh_index_buffer;
+    private final JCGLArrayBufferType mesh_target_buffer;
+    private final JCGLBufferUpdateType<JCGLArrayBufferType> mesh_target_buffer_update;
+
+    private CPUMesh(
+      final SortedMap<String, CaMeshDeformableAttributeCursorType> in_target_cursors,
+      final SortedMap<String, CaMeshDeformableAttributeCursorReadableType> in_source_cursors,
+      final JPRACursor1DType<SMFByteBufferIntegerUnsigned4Type> in_joint_indices_cursor,
+      final JPRACursor1DType<SMFByteBufferFloat4Type> in_joint_weights_cursor,
+      final long in_vertex_count,
+      final JCGLArrayObjectType in_mesh_array,
+      final JCGLArrayBufferType in_mesh_aux_buffer,
+      final JCGLIndexBufferType in_mesh_index_buffer,
+      final JCGLArrayBufferType in_mesh_target_buffer,
+      final JCGLBufferUpdateType<JCGLArrayBufferType> in_mesh_target_buffer_update)
+    {
+      super(
+        in_target_cursors,
+        in_source_cursors,
+        in_joint_indices_cursor,
+        in_joint_weights_cursor,
+        in_vertex_count);
+      this.mesh_array = in_mesh_array;
+      this.mesh_aux_buffer = in_mesh_aux_buffer;
+      this.mesh_index_buffer = in_mesh_index_buffer;
+      this.mesh_target_buffer = in_mesh_target_buffer;
+      this.mesh_target_buffer_update = in_mesh_target_buffer_update;
+    }
+
+    JCGLBufferUpdateType<JCGLArrayBufferType> targetBufferUpdate()
+    {
+      return this.mesh_target_buffer_update;
+    }
+
+    JCGLArrayObjectType array()
+    {
+      return this.mesh_array;
+    }
+  }
+
+  private static final class CPUMeshEvents
+    implements CaMeshDeformableCPUSMFEventsType<CPUMesh>
+  {
+    private static final Logger LOG_MESH;
+
+    static {
+      LOG_MESH = LoggerFactory.getLogger(CPUMeshEvents.class);
+    }
+
+    private final JCGLInterfaceGL33Type g33;
+    private JCGLIndexBufferType mesh_index_buffer;
+    private JCGLBufferUpdateType<JCGLIndexBufferType> mesh_index_buffer_update;
+    private JCGLArrayBufferType mesh_target_buffer;
+    private JCGLBufferUpdateType<JCGLArrayBufferType> mesh_target_buffer_update;
+    private JCGLArrayBufferType mesh_aux_buffer;
+    private JCGLBufferUpdateType<JCGLArrayBufferType> mesh_aux_buffer_update;
+
+    CPUMeshEvents(
+      final JCGLInterfaceGL33Type in_g33)
+    {
+      this.g33 = NullCheck.notNull(in_g33, "G33");
+    }
+
+    @Override
+    public ByteBuffer onAllocateTargetBuffer(
+      final long size)
+    {
+      LOG_MESH.debug("allocating target buffer");
+
+      final JCGLArrayBuffersType g_ab = this.g33.getArrayBuffers();
+      this.mesh_target_buffer =
+        g_ab.arrayBufferAllocate(size, JCGLUsageHint.USAGE_DYNAMIC_DRAW);
+      this.mesh_target_buffer_update =
+        JCGLBufferUpdates.newUpdateReplacingAll(this.mesh_target_buffer);
+      return this.mesh_target_buffer_update.getData();
+    }
+
+    @Override
+    public ByteBuffer onAllocateAuxiliaryBuffer(
+      final long size)
+    {
+      LOG_MESH.debug("allocating auxiliary buffer");
+
+      final JCGLArrayBuffersType g_ab = this.g33.getArrayBuffers();
+      this.mesh_aux_buffer =
+        g_ab.arrayBufferAllocate(size, JCGLUsageHint.USAGE_STATIC_DRAW);
+      this.mesh_aux_buffer_update =
+        JCGLBufferUpdates.newUpdateReplacingAll(this.mesh_aux_buffer);
+      return this.mesh_aux_buffer_update.getData();
+    }
+
+    @Override
+    public ByteBuffer onAllocateJointBuffer(final long size_octets)
+    {
+      LOG_MESH.debug("allocating joint buffer");
+
+      return ByteBuffer.allocate(
+        Math.toIntExact(size_octets)).order(ByteOrder.nativeOrder());
+    }
+
+    @Override
+    public ByteBuffer onAllocateSourceBuffer(final long size_octets)
+    {
+      LOG_MESH.debug("allocating source buffer");
+
+      return ByteBuffer.allocate(
+        Math.toIntExact(size_octets)).order(ByteOrder.nativeOrder());
+    }
+
+    @Override
+    public ByteBuffer onAllocateTriangleBuffer(
+      final SMFTriangles triangles,
+      final long size_octets)
+    {
+      LOG_MESH.debug("allocating triangle buffer");
+
+      final JCGLIndexBuffersType g_ib = this.g33.getIndexBuffers();
+      final JCGLUnsignedType type = renderInitMeshGetTriangleType(
+        Math.toIntExact(triangles.triangleIndexSizeBits()));
+      this.mesh_index_buffer =
+        g_ib.indexBufferAllocate(
+          Math.multiplyExact(triangles.triangleCount(), 3L),
+          type,
+          JCGLUsageHint.USAGE_STATIC_DRAW);
+      this.mesh_index_buffer_update =
+        JCGLBufferUpdates.newUpdateReplacingAll(this.mesh_index_buffer);
+      return this.mesh_index_buffer_update.getData();
+    }
+
+    @Override
+    public CPUMesh onCreated(
+      final SMFHeader header,
+      final CaMeshDeformableCPUSMFPackedAttributeSet<CaSetJointType> joint_data,
+      final JPRACursor1DType<SMFByteBufferIntegerUnsigned4Type> cursor_joint_index,
+      final JPRACursor1DType<SMFByteBufferFloat4Type> cursor_joint_weight,
+      final CaMeshDeformableCPUSMFPackedAttributeSet<CaSetSourceType> source_data,
+      final SortedMap<String, CaMeshDeformableAttributeCursorReadableType> source_cursors,
+      final CaMeshDeformableCPUSMFPackedAttributeSet<CaSetTargetType> target_data,
+      final SortedMap<String, CaMeshDeformableAttributeCursorType> target_cursors,
+      final CaMeshDeformableCPUSMFPackedAttributeSet<CaSetAuxiliaryType> aux_data,
+      final SMFByteBufferPackedTriangles triangle_data)
+    {
+      LOG_MESH.debug("constructing mesh");
+
+      final JCGLIndexBuffersType g_ib = this.g33.getIndexBuffers();
+      final JCGLArrayBuffersType g_ab = this.g33.getArrayBuffers();
+      final JCGLArrayObjectsType g_ao = this.g33.getArrayObjects();
+
+      g_ib.indexBufferBind(this.mesh_index_buffer);
+      g_ib.indexBufferUpdate(this.mesh_index_buffer_update);
+      g_ib.indexBufferUnbind();
+
+      g_ab.arrayBufferBind(this.mesh_aux_buffer);
+      g_ab.arrayBufferUpdate(this.mesh_aux_buffer_update);
+      g_ab.arrayBufferUnbind();
+
+      final SMFByteBufferPackingConfiguration mesh_data_config =
+        source_data.set().configuration();
+      final SortedMap<SMFAttributeName, SMFByteBufferPackedAttribute> mesh_data_by_name =
+        mesh_data_config.packedAttributesByName();
+      final SMFByteBufferPackedAttribute mesh_attr_position =
+        mesh_data_by_name.get(POSITION_NAME).get();
+      final SMFByteBufferPackedAttribute mesh_attr_normal =
+        mesh_data_by_name.get(NORMALS_NAME).get();
+
+      final JCGLArrayObjectBuilderType aob = g_ao.arrayObjectNewBuilder();
+      aob.setIndexBuffer(this.mesh_index_buffer);
+      aob.setAttributeFloatingPoint(
+        R2AttributeConventions.POSITION_ATTRIBUTE_INDEX,
+        this.mesh_target_buffer,
+        3,
+        renderInitMeshGetScalarType(mesh_attr_position),
+        mesh_data_config.vertexSizeOctets(),
+        (long) mesh_attr_position.offsetOctets(),
+        false);
+      aob.setAttributeFloatingPoint(
+        R2AttributeConventions.NORMAL_ATTRIBUTE_INDEX,
+        this.mesh_target_buffer,
+        3,
+        renderInitMeshGetScalarType(mesh_attr_normal),
+        mesh_data_config.vertexSizeOctets(),
+        (long) mesh_attr_normal.offsetOctets(),
+        false);
+      final JCGLArrayObjectType mesh_array = g_ao.arrayObjectAllocate(aob);
+      g_ao.arrayObjectUnbind();
+
+      return new CPUMesh(
+        target_cursors,
+        source_cursors,
+        cursor_joint_index,
+        cursor_joint_weight,
+        header.vertexCount(),
+        mesh_array,
+        this.mesh_aux_buffer,
+        this.mesh_index_buffer,
+        this.mesh_target_buffer,
+        this.mesh_target_buffer_update);
     }
   }
 }

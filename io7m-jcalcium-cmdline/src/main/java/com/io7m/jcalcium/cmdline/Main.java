@@ -689,16 +689,7 @@ public final class Main implements Runnable
           }
         }
         if (!loader.errors().isEmpty()) {
-          loader.errors().map(e -> {
-            final LexicalPosition<Path> lex = e.lexical();
-            LOG.error(
-              "{}:{}:{}: {}",
-              this.file_in,
-              Integer.valueOf(lex.line()),
-              Integer.valueOf(lex.column()),
-              e.message());
-            return unit();
-          });
+          loader.errors().forEach(e -> LOG.error(e.fullMessage()));
           Main.this.exit_code = 1;
           return Optional.empty();
         }
@@ -723,17 +714,7 @@ public final class Main implements Runnable
           return Optional.of(r.get());
         }
 
-        r.getError().map(e -> {
-          final LexicalPosition<Path> lex = e.lexical();
-          LOG.error(
-            "{}:{}:{}: {}",
-            path_commands,
-            Integer.valueOf(lex.line()),
-            Integer.valueOf(lex.column()),
-            e.message());
-          return unit();
-        });
-
+        r.getError().forEach(e -> LOG.error(e.fullMessage()));
         return Optional.empty();
       }
     }

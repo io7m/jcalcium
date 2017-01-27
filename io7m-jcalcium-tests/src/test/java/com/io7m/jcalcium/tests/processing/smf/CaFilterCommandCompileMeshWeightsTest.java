@@ -37,6 +37,7 @@ import com.io7m.smfj.core.SMFCoordinateSystem;
 import com.io7m.smfj.core.SMFFaceWindingOrder;
 import com.io7m.smfj.core.SMFHeader;
 import com.io7m.smfj.core.SMFSchemaIdentifier;
+import com.io7m.smfj.core.SMFTriangles;
 import com.io7m.smfj.parser.api.SMFParseError;
 import com.io7m.smfj.processing.api.SMFAttributeArrayFloating1;
 import com.io7m.smfj.processing.api.SMFAttributeArrayFloating2;
@@ -86,7 +87,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
         SMFFaceWindingOrder.FACE_WINDING_ORDER_COUNTER_CLOCKWISE);
     final SMFSchemaIdentifier schema =
       SMFSchemaIdentifier.builder().build();
-    return SMFHeader.of(0L, 16L, 0L, schema, coords, attributes, 0L);
+
+    return SMFHeader.of(
+      SMFTriangles.of(0L, 16L), 0L, schema, coords, attributes, 0L);
   }
 
   @Test

@@ -1,0 +1,24 @@
+smf 1 0
+meta 0
+vertices 1
+triangles 1 8
+coordinates +x +y -z counter-clockwise
+attribute "POSITION" float 3 32
+attribute "NORMAL" float 3 32
+attribute "TANGENT4" float 4 32
+attribute "JOINT_INDICES" integer-unsigned 4 8
+attribute "JOINT_WEIGHTS" float 4 32
+data
+attribute "POSITION"
+0.0 1.0 2.0
+attribute "NORMAL"
+0.0 0.0 1.0
+attribute "TANGENT4"
+1.0 0.0 0.0 1.0
+attribute "JOINT_INDICES"
+0 0 0 0
+attribute "JOINT_WEIGHTS"
+1.0 0.0 0.0 0.0
+triangles
+0 0 0
+metadata

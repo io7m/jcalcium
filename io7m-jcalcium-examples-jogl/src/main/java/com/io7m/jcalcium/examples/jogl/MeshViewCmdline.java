@@ -162,12 +162,13 @@ import com.io7m.smfj.bytebuffer.SMFByteBufferPackerEventsType;
 import com.io7m.smfj.bytebuffer.SMFByteBufferPackingConfiguration;
 import com.io7m.smfj.core.SMFAttribute;
 import com.io7m.smfj.core.SMFAttributeName;
+import com.io7m.smfj.core.SMFErrorType;
 import com.io7m.smfj.core.SMFHeader;
+import com.io7m.smfj.core.SMFTriangles;
 import com.io7m.smfj.frontend.SMFParserProviders;
 import com.io7m.smfj.parser.api.SMFParserEventsMeta;
 import com.io7m.smfj.parser.api.SMFParserProviderType;
 import com.io7m.smfj.parser.api.SMFParserSequentialType;
-import com.io7m.smfj.validation.api.SMFSchemaValidationError;
 import com.io7m.smfj.validation.main.SMFSchemaValidator;
 import com.io7m.timehack6435126.TimeHack6435126;
 import com.jogamp.newt.event.InputEvent;
@@ -192,7 +193,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -359,6 +359,7 @@ public final class MeshViewCmdline implements Runnable, KeyListener
 
     if (provider_opt.isPresent()) {
       final SMFParserProviderType provider = provider_opt.get();
+      final SMFSchemaValidator validator = new SMFSchemaValidator();
 
       try (final InputStream stream = Files.newInputStream(path)) {
         final SMFByteBufferPackedMeshLoaderType loader =
@@ -367,42 +368,29 @@ public final class MeshViewCmdline implements Runnable, KeyListener
             new SMFByteBufferPackerEventsType()
             {
               @Override
-              public SortedMap<Integer, SMFByteBufferPackingConfiguration> onHeader(
+              public Validation<List<SMFErrorType>, SortedMap<Integer, SMFByteBufferPackingConfiguration>> onHeader(
                 final SMFHeader head)
               {
-                final SMFSchemaValidator validator = new SMFSchemaValidator();
-                final Validation<List<SMFSchemaValidationError>, SMFHeader> results =
-                  validator.validate(head, CaSchemas.standardConventions());
+                return validator.validate(
+                  head,
+                  CaSchemas.standardConventions()).map(header -> {
+                  final SortedMap<SMFAttributeName, SMFAttribute> by_name =
+                    head.attributesByName();
 
-                if (!results.isValid()) {
-                  results.getError().forEach(e -> {
-                    if (e.exception().isPresent()) {
-                      LOG.error("{}: ", e.message(), e.exception().get());
-                    } else {
-                      LOG.error(e.message());
-                    }
-                  });
+                  final SMFByteBufferPackingConfiguration mesh_b =
+                    SMFByteBufferPackingConfiguration.of(Vector.of(
+                      by_name.get(POSITION_NAME).get(),
+                      by_name.get(NORMALS_NAME).get()));
 
-                  throw new UncheckedIOException(
-                    new IOException("Mesh validation failed"));
-                }
+                  final SMFByteBufferPackingConfiguration joint_b =
+                    SMFByteBufferPackingConfiguration.of(Vector.of(
+                      by_name.get(JOINT_INDICES_NAME).get(),
+                      by_name.get(JOINT_WEIGHTS_NAME).get()));
 
-                final SortedMap<SMFAttributeName, SMFAttribute> by_name =
-                  head.attributesByName();
-
-                final SMFByteBufferPackingConfiguration mesh_b =
-                  SMFByteBufferPackingConfiguration.of(Vector.of(
-                    by_name.get(POSITION_NAME).get(),
-                    by_name.get(NORMALS_NAME).get()));
-
-                final SMFByteBufferPackingConfiguration joint_b =
-                  SMFByteBufferPackingConfiguration.of(Vector.of(
-                    by_name.get(JOINT_INDICES_NAME).get(),
-                    by_name.get(JOINT_WEIGHTS_NAME).get()));
-
-                return TreeMap.ofEntries(
-                  Tuple.of(Integer.valueOf(0), mesh_b),
-                  Tuple.of(Integer.valueOf(1), joint_b));
+                  return TreeMap.ofEntries(
+                    Tuple.of(Integer.valueOf(0), mesh_b),
+                    Tuple.of(Integer.valueOf(1), joint_b));
+                });
               }
 
               @Override
@@ -412,7 +400,9 @@ public final class MeshViewCmdline implements Runnable, KeyListener
               }
 
               @Override
-              public ByteBuffer onAllocateTriangleBuffer(final long size)
+              public ByteBuffer onAllocateTriangleBuffer(
+                final SMFTriangles triangles,
+                final long size)
               {
                 return ByteBuffer.allocate(Math.toIntExact(size))
                   .order(ByteOrder.nativeOrder());
@@ -435,14 +425,14 @@ public final class MeshViewCmdline implements Runnable, KeyListener
 
           if (!loader.errors().isEmpty()) {
             loader.errors().forEach(e -> LOG.error(e.fullMessage()));
-            throw new IOException("Mesh parsing failed");
+            throw new IOException("CPUMesh parsing failed");
           }
 
           parser.parseData();
 
           if (!loader.errors().isEmpty()) {
             loader.errors().forEach(e -> LOG.error(e.fullMessage()));
-            throw new IOException("Mesh parsing failed");
+            throw new IOException("CPUMesh parsing failed");
           }
         }
 
@@ -861,9 +851,9 @@ public final class MeshViewCmdline implements Runnable, KeyListener
 
     this.mesh_index_buffer =
       g_ib.indexBufferAllocate(
-        Math.multiplyExact(header.triangleCount(), 3L),
+        Math.multiplyExact(header.triangles().triangleCount(), 3L),
         renderInitMeshGetTriangleType(
-          Math.toIntExact(header.triangleIndexSizeBits())),
+          Math.toIntExact(header.triangles().triangleIndexSizeBits())),
         JCGLUsageHint.USAGE_STATIC_DRAW);
 
     {
@@ -1386,7 +1376,7 @@ public final class MeshViewCmdline implements Runnable, KeyListener
     }
 
     switch (e.getKeyCode()) {
-      case KeyEvent.VK_PLUS: {
+      case KeyEvent.VK_ADD: {
         this.time_scale.updateAndGet(x -> {
           final Double next = Double.valueOf(x.doubleValue() + 0.01);
           LOG.debug("time scale: {}", next);
@@ -1394,7 +1384,7 @@ public final class MeshViewCmdline implements Runnable, KeyListener
         });
         break;
       }
-      case KeyEvent.VK_MINUS: {
+      case KeyEvent.VK_SUBTRACT: {
         this.time_scale.updateAndGet(x -> {
           final Double next = Double.valueOf(x.doubleValue() - 0.01);
           LOG.debug("time scale: {}", next);
