@@ -352,6 +352,7 @@ public final class CaMeshDeformableCPUSMFProvider
 
     private static SMFByteBufferPackingConfiguration
     createMeshAuxiliaryPackingConfiguration(
+      final CaMeshDeformableCPUSMFConfiguration config,
       final SMFHeaderType header,
       final SMFByteBufferPackingConfigurationType mesh_source_config,
       final SMFByteBufferPackingConfigurationType mesh_joint_config)
@@ -362,8 +363,12 @@ public final class CaMeshDeformableCPUSMFProvider
         mesh_source_config.packedAttributesByName();
       final SortedMap<SMFAttributeName, SMFByteBufferPackedAttribute> j_names =
         mesh_joint_config.packedAttributesByName();
-      return SMFByteBufferPackingConfiguration.of(header_by_name.removeKeys(
-        name -> s_names.containsKey(name) || j_names.containsKey(name)).values());
+      final SortedMap<SMFAttributeName, SMFAttribute> without_sj =
+        header_by_name.removeKeys(
+          name -> s_names.containsKey(name) || j_names.containsKey(name));
+      final SortedMap<SMFAttributeName, SMFAttribute> with_accepted =
+        without_sj.filterKeys(config.auxiliarySelector());
+      return SMFByteBufferPackingConfiguration.of(with_accepted.values());
     }
 
     private static SMFByteBufferPackingConfiguration
@@ -464,6 +469,7 @@ public final class CaMeshDeformableCPUSMFProvider
           createMeshJointPackingConfiguration(header);
         final SMFByteBufferPackingConfiguration aux_b =
           createMeshAuxiliaryPackingConfiguration(
+            this.config,
             header,
             mesh_source_config,
             mesh_joint_config);

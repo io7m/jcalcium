@@ -443,6 +443,73 @@ public final class CaMeshDeformableCPUSMFTest
   }
 
   @Test
+  public void testStandardAsAuxiliary()
+    throws Exception
+  {
+    final SMFParserProviderType provider = new SMFFormatText();
+    final SMFSchemaValidatorType validator = new SMFSchemaValidator();
+    final SMFParserEventsMetaType meta = SMFParserEventsMeta.ignore();
+    final CaMeshDeformableCPUSMFConfiguration config =
+      CaMeshDeformableCPUSMFConfiguration.builder()
+        .build();
+
+    final Path path = Paths.get(
+      "/com/io7m/jcalcium/tests/deformation/smf/standard.smft");
+
+    try (final InputStream stream =
+           CaMeshDeformableCPUSMFTest.class.getResourceAsStream(path.toString())) {
+
+      final Validation<List<SMFErrorType>, CPUMesh> results =
+        CaMeshDeformableCPUSMFProvider.createFromStream(
+          provider, validator, meta, config, new CPUMeshEvents(), path, stream);
+      Assert.assertTrue(results.isValid());
+      final CPUMesh mesh = results.get();
+
+      {
+        final SMFByteBufferPackingConfiguration aux_config =
+          mesh.aux_data.set().configuration();
+        final SortedMap<SMFAttributeName, SMFByteBufferPackedAttribute> aux_by_name =
+          aux_config.packedAttributesByName();
+        LOG.debug("aux: {}", aux_by_name.keySet());
+
+        Assert.assertTrue(aux_by_name.containsKey(SMFAttributeName.of(
+          "POSITION")));
+        Assert.assertTrue(aux_by_name.containsKey(SMFAttributeName.of(
+          "NORMAL")));
+        Assert.assertTrue(aux_by_name.containsKey(SMFAttributeName.of(
+          "TANGENT4")));
+
+        Assert.assertEquals(3L, (long) aux_by_name.size());
+      }
+
+      {
+        final SMFByteBufferPackingConfiguration source_config =
+          mesh.source_data.set().configuration();
+        final SortedMap<SMFAttributeName, SMFByteBufferPackedAttribute> source_by_name =
+          source_config.packedAttributesByName();
+        LOG.debug("source: {}", source_by_name.keySet());
+
+        Assert.assertEquals(0L, (long) source_by_name.size());
+      }
+
+      {
+        final SMFByteBufferPackingConfiguration joint_config =
+          mesh.joint_data.set().configuration();
+        final SortedMap<SMFAttributeName, SMFByteBufferPackedAttribute> joint_by_name =
+          joint_config.packedAttributesByName();
+        LOG.debug("joints: {}", joint_by_name.keySet());
+
+        Assert.assertTrue(joint_by_name.containsKey(SMFAttributeName.of(
+          "JOINT_INDICES")));
+        Assert.assertTrue(joint_by_name.containsKey(SMFAttributeName.of(
+          "JOINT_WEIGHTS")));
+        Assert.assertEquals(
+          2L, (long) joint_by_name.size());
+      }
+    }
+  }
+
+  @Test
   public void testBadAllocationJoint()
     throws Exception
   {

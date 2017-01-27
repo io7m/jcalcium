@@ -18,6 +18,7 @@ package com.io7m.jcalcium.mesh.deformation.smf;
 
 import com.io7m.jcalcium.core.CaImmutableStyleType;
 import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributeSourceSelection;
+import com.io7m.smfj.core.SMFAttributeName;
 import javaslang.collection.Seq;
 import javaslang.collection.SortedMap;
 import javaslang.collection.TreeMap;
@@ -25,6 +26,7 @@ import org.immutables.javaslang.encodings.JavaslangEncodingEnabled;
 import org.immutables.value.Value;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -37,15 +39,32 @@ import java.util.stream.Collectors;
 public interface CaMeshDeformableCPUSMFConfigurationType
 {
   /**
-   * A sequence of attributes that will be used as the source data for
+   * <p>A sequence of attributes that will be used as the source data for
    * deformation of the mesh. It an error to provide two or more attributes with
-   * the same name.
+   * the same name.</p>
    *
    * @return The set of attributes that will be subject to deformation
    */
 
   @Value.Parameter
   Seq<CaMeshDeformableAttributeSourceSelection> sourceAttributes();
+
+  /**
+   * <p>A predicate that will be evaluated for each auxiliary attribute that
+   * may be loaded. If the predicate returns {@code true}, the attribute will
+   * be included. Otherwise, the attribute will not be included.</p>
+   *
+   * <p>By default, a predicate that will accept all attributes is provided.</p>
+   *
+   * @return A predicate evaluated for each auxiliary attribute
+   */
+
+  @Value.Parameter
+  @Value.Default
+  default Predicate<SMFAttributeName> auxiliarySelector()
+  {
+    return name -> true;
+  }
 
   /**
    * @return The set of attributes that will be subject to deformation, by name
