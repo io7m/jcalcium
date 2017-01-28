@@ -20,6 +20,7 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.protobuf3.CaProtobuf3FormatProvider;
 import com.io7m.jcalcium.mesh.processing.smf.CaFilterCommandCompileMeshWeights;
@@ -70,6 +71,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
   CaMemoryMeshFilterContract
 {
   private static final Logger LOG;
+  private static final CaSkeletonHash DEFAULT_HASH = CaSkeletonHash.of(
+    "SHA2-256",
+    "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d");
 
   static {
     LOG = LoggerFactory.getLogger(CaFilterCommandCompileMeshWeightsTest.class);
@@ -216,8 +220,8 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -276,8 +280,8 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -336,8 +340,8 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -400,8 +404,8 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);

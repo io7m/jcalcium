@@ -51,6 +51,13 @@ public interface CaSkeletonType
   CaSkeletonName name();
 
   /**
+   * @return The hash of the skeleton
+   */
+
+  @Value.Parameter
+  CaSkeletonHash hash();
+
+  /**
    * @return The tree of joints for the skeleton
    */
 

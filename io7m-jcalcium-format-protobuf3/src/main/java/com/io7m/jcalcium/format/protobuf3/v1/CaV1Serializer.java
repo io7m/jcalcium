@@ -16,10 +16,12 @@
 
 package com.io7m.jcalcium.format.protobuf3.v1;
 
+import com.google.protobuf.ByteString;
 import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -37,6 +39,8 @@ import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.parameterized.PVectorI3D;
 import com.io7m.junreachable.UnreachableCodeException;
 import javaslang.collection.IndexedSeq;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,11 +60,25 @@ final class CaV1Serializer implements CaCompiledSerializerType
   {
     final Skeleton.V1Skeleton.Builder b = Skeleton.V1Skeleton.newBuilder();
     b.setName(skeleton.name().value());
+    b.setHash(fromHash(skeleton.hash()));
     skeleton.actionsByName().forEach(
       p -> b.putActions(p._1.value(), fromAction(p._2)));
     skeleton.jointsByID().forEach(
       p -> b.putJoints(p._1.intValue(), fromJoint(p._2)));
     return b.build();
+  }
+
+  private static Skeleton.V1Hash fromHash(
+    final CaSkeletonHash hash)
+  {
+    try {
+      final Skeleton.V1Hash.Builder b = Skeleton.V1Hash.newBuilder();
+      b.setAlgorithm(hash.algorithm());
+      b.setValue(ByteString.copyFrom(Hex.decodeHex(hash.value().toCharArray())));
+      return b.build();
+    } catch (final DecoderException e) {
+      throw new UnreachableCodeException(e);
+    }
   }
 
   private static Skeleton.V1Joint fromJoint(

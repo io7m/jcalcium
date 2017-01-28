@@ -20,6 +20,7 @@ import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.compiler.api.CaCompileError;
 import com.io7m.jcalcium.compiler.api.CaCompileErrorCode;
+import com.io7m.jcalcium.compiler.api.CaCompilerSkeletonHashing;
 import com.io7m.jcalcium.core.CaActionName;
 import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
@@ -753,6 +754,7 @@ final class CaCompileTask
     final CaSkeleton.Builder b = CaSkeleton.builder();
     b.setActionsByName(actions);
     b.setJoints(index.joints);
+    b.setHash(CaCompilerSkeletonHashing.create(index.joints_by_id));
     b.setName(name);
     return b.build();
   }
@@ -832,7 +834,7 @@ final class CaCompileTask
     }
 
     public Validation<List<CaCompileError>, Unit> onCurveScale(
-      final CaDefinitionCurveScaleType orientation)
+      final CaDefinitionCurveScaleType scale)
     {
       if (this.joint_type_received.get(2)) {
         final StringBuilder sb = new StringBuilder(128);

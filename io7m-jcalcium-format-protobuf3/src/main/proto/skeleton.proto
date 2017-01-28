@@ -136,9 +136,16 @@ message V1Action
   }
 }
 
+message V1Hash
+{
+  string algorithm = 1;
+  bytes value      = 2;
+}
+
 message V1Skeleton
 {
   string                name    = 1;
-  map<uint32, V1Joint>  joints  = 2;
-  map<string, V1Action> actions = 3;
+  V1Hash                hash    = 2;
+  map<uint32, V1Joint>  joints  = 3;
+  map<string, V1Action> actions = 4;
 }

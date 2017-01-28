@@ -23,6 +23,7 @@ import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -47,6 +48,7 @@ import javaslang.collection.Array;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
 import javaslang.collection.TreeMap;
+import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -313,15 +315,24 @@ final class CaV1Loader
 
       final CaSkeleton.Builder cb = CaSkeleton.builder();
       cb.setJoints(node);
+      cb.setHash(hash(sk.getHash()));
       cb.setName(CaSkeletonName.of(sk.getName()));
       cb.setActionsByName(actions(sk.getActionsMap()));
 
       return cb.build();
     } catch (final IOException e) {
       throw new CaLoaderIOException(this.uri, e);
-    } catch (final IllegalArgumentException e) {
+    } catch (final Exception e) {
       throw new CaLoaderCorruptedData(this.uri, e, e.getMessage());
     }
+  }
+
+  private static CaSkeletonHash hash(
+    final Skeleton.V1Hash hash)
+  {
+    return CaSkeletonHash.of(
+      hash.getAlgorithm(),
+      Hex.encodeHexString(hash.getValue().toByteArray()));
   }
 
   private JOTreeNodeType<CaJoint> bones(

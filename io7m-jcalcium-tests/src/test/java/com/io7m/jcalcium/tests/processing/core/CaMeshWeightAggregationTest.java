@@ -21,6 +21,7 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
 import com.io7m.jcalcium.mesh.processing.core.CaMeshWeightAggregation;
 import com.io7m.jcalcium.mesh.processing.core.CaMeshWeightsAggregated;
 import com.io7m.jorchard.core.JOTreeNode;
@@ -42,6 +43,11 @@ import org.junit.rules.ExpectedException;
 
 public final class CaMeshWeightAggregationTest
 {
+  private static final CaSkeletonHash DEFAULT_HASH =
+    CaSkeletonHash.of(
+      "SHA2-256",
+      "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d");
+
   @Rule public ExpectedException expected = ExpectedException.none();
 
   @Test
@@ -57,8 +63,8 @@ public final class CaMeshWeightAggregationTest
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.of(CaJointName.of("root"), Vector.of(Double.valueOf(1.0)));
@@ -105,8 +111,8 @@ public final class CaMeshWeightAggregationTest
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
     joints.childAdd(JOTreeNode.create(joint_a));
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.ofEntries(
@@ -165,8 +171,8 @@ public final class CaMeshWeightAggregationTest
     joints.childAdd(JOTreeNode.create(joint_a));
     joints.childAdd(JOTreeNode.create(joint_b));
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.ofEntries(
@@ -235,8 +241,8 @@ public final class CaMeshWeightAggregationTest
     joints.childAdd(JOTreeNode.create(joint_b));
     joints.childAdd(JOTreeNode.create(joint_c));
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.ofEntries(
@@ -342,8 +348,8 @@ public final class CaMeshWeightAggregationTest
     joints.childAdd(JOTreeNode.create(joint_f));
     joints.childAdd(JOTreeNode.create(joint_g));
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.ofEntries(
@@ -392,8 +398,8 @@ public final class CaMeshWeightAggregationTest
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.empty();
@@ -417,8 +423,8 @@ public final class CaMeshWeightAggregationTest
 
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
-    final CaSkeleton skeleton =
-      CaSkeleton.of(CaSkeletonName.of("skeleton"), joints, TreeMap.empty());
+    final CaSkeleton skeleton = CaSkeleton.of(
+      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
 
     final SortedMap<CaJointName, Vector<Double>> weight_arrays =
       TreeMap.ofEntries(

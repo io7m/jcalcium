@@ -23,6 +23,7 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
@@ -147,6 +148,9 @@ public final class CaEvaluatorSingleDTest
     cb.setName(CaSkeletonName.of("skeleton"));
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
+    cb.setHash(CaSkeletonHash.of(
+      "SHA2-256",
+      "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d"));
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
     final CaSkeleton skeleton = cb.build();
@@ -317,6 +321,9 @@ public final class CaEvaluatorSingleDTest
     cb.setName(CaSkeletonName.of("skeleton"));
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
+    cb.setHash(CaSkeletonHash.of(
+      "SHA2-256",
+      "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d"));
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
 
@@ -520,6 +527,9 @@ public final class CaEvaluatorSingleDTest
     cb.setName(CaSkeletonName.of("skeleton"));
     cb.setJoints(node_0);
     cb.setActionsByName(actions_by_name);
+    cb.setHash(CaSkeletonHash.of(
+      "SHA2-256",
+      "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d"));
 
     final MatrixM4x4D.ContextMM4D context = new MatrixM4x4D.ContextMM4D();
 
