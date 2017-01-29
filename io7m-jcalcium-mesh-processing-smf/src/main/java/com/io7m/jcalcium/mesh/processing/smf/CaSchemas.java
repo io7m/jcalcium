@@ -17,6 +17,7 @@
 package com.io7m.jcalcium.mesh.processing.smf;
 
 import com.io7m.jcalcium.mesh.deformation.cpu.CaMeshDeformableAttributes;
+import com.io7m.jcalcium.mesh.meta.CaMeshMetas;
 import com.io7m.jcoords.core.conversion.CAxis;
 import com.io7m.jcoords.core.conversion.CAxisSystem;
 import com.io7m.junreachable.UnreachableCodeException;
@@ -101,7 +102,11 @@ public final class CaSchemas
   {
     final SMFSchema.Builder builder = SMFSchema.builder();
     builder.setSchemaIdentifier(
-      SMFSchemaIdentifier.of(0x494F374D, 0x63610000, 1, 0));
+      SMFSchemaIdentifier.of(
+        CaMeshMetas.VENDOR_ID,
+        CaMeshMetas.PRODUCT_ID,
+        1,
+        0));
 
     builder.setRequiredCoordinateSystem(SMFCoordinateSystem.of(
       CAxisSystem.of(

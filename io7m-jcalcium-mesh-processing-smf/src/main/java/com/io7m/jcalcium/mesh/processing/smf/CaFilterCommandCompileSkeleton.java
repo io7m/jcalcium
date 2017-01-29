@@ -211,6 +211,30 @@ public final class CaFilterCommandCompileSkeleton implements
     throw new UnsupportedOperationException("No available skeleton parser");
   }
 
+  private static List<SMFProcessingError> processingErrorOfCompileAll(
+    final List<CaCompileError> error)
+  {
+    return error.map(CaFilterCommandCompileSkeleton::processingErrorOfCompile);
+  }
+
+  private static SMFProcessingError processingErrorOfCompile(
+    final CaCompileError error)
+  {
+    return SMFProcessingError.of(error.message(), Optional.empty());
+  }
+
+  private static List<SMFProcessingError> processingErrorOfParseAll(
+    final List<CaParseError> error)
+  {
+    return error.map(CaFilterCommandCompileSkeleton::processingErrorOfParse);
+  }
+
+  private static SMFProcessingError processingErrorOfParse(
+    final CaParseError error)
+  {
+    return SMFProcessingError.of(error.message(), Optional.empty());
+  }
+
   @Override
   public String name()
   {
@@ -267,29 +291,5 @@ public final class CaFilterCommandCompileSkeleton implements
     }
 
     return Validation.invalid(errors);
-  }
-
-  private static List<SMFProcessingError> processingErrorOfCompileAll(
-    final List<CaCompileError> error)
-  {
-    return error.map(CaFilterCommandCompileSkeleton::processingErrorOfCompile);
-  }
-
-  private static SMFProcessingError processingErrorOfCompile(
-    final CaCompileError error)
-  {
-    return SMFProcessingError.of(error.message(), Optional.empty());
-  }
-
-  private static List<SMFProcessingError> processingErrorOfParseAll(
-    final List<CaParseError> error)
-  {
-    return error.map(CaFilterCommandCompileSkeleton::processingErrorOfParse);
-  }
-
-  private static SMFProcessingError processingErrorOfParse(
-    final CaParseError error)
-  {
-    return SMFProcessingError.of(error.message(), Optional.empty());
   }
 }

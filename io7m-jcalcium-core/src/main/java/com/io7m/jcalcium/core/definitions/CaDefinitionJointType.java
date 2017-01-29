@@ -16,8 +16,8 @@
 
 package com.io7m.jcalcium.core.definitions;
 
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.VectorI3D;

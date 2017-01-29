@@ -134,7 +134,7 @@ public final class CaMeshDeformableCPUSMFProvider
   {
     NullCheck.notNull(parser_provider, "Parser provider");
     NullCheck.notNull(validator, "Validator");
-    NullCheck.notNull(meta, "Meta");
+    NullCheck.notNull(meta, "AddMetadata");
     NullCheck.notNull(config, "Config");
     NullCheck.notNull(events, "Events");
     NullCheck.notNull(path, "Path");

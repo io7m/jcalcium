@@ -26,6 +26,7 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonMetadata;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -754,8 +755,9 @@ final class CaCompileTask
     final CaSkeleton.Builder b = CaSkeleton.builder();
     b.setActionsByName(actions);
     b.setJoints(index.joints);
-    b.setHash(CaCompilerSkeletonHashing.create(index.joints_by_id));
-    b.setName(name);
+    b.setMeta(CaSkeletonMetadata.of(
+      name,
+      CaCompilerSkeletonHashing.create(index.joints_by_id)));
     return b.build();
   }
 

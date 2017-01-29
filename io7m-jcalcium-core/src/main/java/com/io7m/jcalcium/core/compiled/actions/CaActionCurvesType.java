@@ -18,8 +18,8 @@ package com.io7m.jcalcium.core.compiled.actions;
 
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jfunctional.PartialBiFunctionType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.IndexedSeq;

@@ -53,6 +53,7 @@ import com.io7m.jcalcium.mesh.deformation.smf.CaSetAuxiliaryType;
 import com.io7m.jcalcium.mesh.deformation.smf.CaSetJointType;
 import com.io7m.jcalcium.mesh.deformation.smf.CaSetSourceType;
 import com.io7m.jcalcium.mesh.deformation.smf.CaSetTargetType;
+import com.io7m.jcalcium.mesh.processing.smf.CaMeshMetadataChecker;
 import com.io7m.jcamera.JCameraContext;
 import com.io7m.jcamera.JCameraSpherical;
 import com.io7m.jcamera.JCameraSphericalInput;
@@ -362,7 +363,7 @@ public final class MeshViewNewCmdline implements Runnable, KeyListener
           CaMeshDeformableCPUSMFProvider.createFromStream(
             provider,
             new SMFSchemaValidator(),
-            SMFParserEventsMeta.ignore(),
+            CaMeshMetadataChecker.create(this.skeleton.meta()),
             config,
             events,
             path,

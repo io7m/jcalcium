@@ -132,7 +132,7 @@ public abstract class CaLoaderContract
 
     this.dumpCompile(valid(sk_l));
 
-    Assert.assertEquals(sk_c.name(), sk_l.name());
+    Assert.assertEquals(sk_c.meta(), sk_l.meta());
 
     {
       final SortedMap<CaActionName, CaActionType> c_actions = sk_c.actionsByName();

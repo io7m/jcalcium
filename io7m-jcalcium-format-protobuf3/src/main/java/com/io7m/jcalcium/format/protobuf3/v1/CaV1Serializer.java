@@ -22,6 +22,7 @@ import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
+import com.io7m.jcalcium.core.compiled.CaSkeletonMetadata;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurvesType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -58,9 +59,10 @@ final class CaV1Serializer implements CaCompiledSerializerType
   private static Skeleton.V1Skeleton fromSkeleton(
     final CaSkeleton skeleton)
   {
+    final CaSkeletonMetadata meta = skeleton.meta();
     final Skeleton.V1Skeleton.Builder b = Skeleton.V1Skeleton.newBuilder();
-    b.setName(skeleton.name().value());
-    b.setHash(fromHash(skeleton.hash()));
+    b.setName(meta.name().value());
+    b.setHash(fromHash(meta.hash()));
     skeleton.actionsByName().forEach(
       p -> b.putActions(p._1.value(), fromAction(p._2)));
     skeleton.jointsByID().forEach(

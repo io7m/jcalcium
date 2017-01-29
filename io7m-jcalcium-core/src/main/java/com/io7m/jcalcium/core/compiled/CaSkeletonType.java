@@ -18,9 +18,8 @@ package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jcalcium.core.CaActionName;
-import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.CaSkeletonName;
+import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import javaslang.collection.SortedMap;
@@ -44,18 +43,11 @@ import static com.io7m.jfunctional.Unit.unit;
 public interface CaSkeletonType
 {
   /**
-   * @return The name of the skeleton
+   * @return The skeleton metadata
    */
 
   @Value.Parameter
-  CaSkeletonName name();
-
-  /**
-   * @return The hash of the skeleton
-   */
-
-  @Value.Parameter
-  CaSkeletonHash hash();
+  CaSkeletonMetadata meta();
 
   /**
    * @return The tree of joints for the skeleton

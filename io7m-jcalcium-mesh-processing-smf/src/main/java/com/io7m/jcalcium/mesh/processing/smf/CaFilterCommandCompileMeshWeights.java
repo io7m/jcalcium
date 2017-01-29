@@ -21,6 +21,7 @@ import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.loader.api.CaLoaderException;
 import com.io7m.jcalcium.loader.api.CaLoaderFormatProviderType;
 import com.io7m.jcalcium.loader.api.CaLoaderType;
+import com.io7m.jcalcium.mesh.meta.CaMeshMetas;
 import com.io7m.jcalcium.mesh.processing.core.CaMeshWeightAggregation;
 import com.io7m.jcalcium.mesh.processing.core.CaMeshWeightsAggregated;
 import com.io7m.jlexing.core.LexicalPosition;
@@ -37,6 +38,7 @@ import com.io7m.smfj.processing.api.SMFFilterCommandContext;
 import com.io7m.smfj.processing.api.SMFFilterCommandParsing;
 import com.io7m.smfj.processing.api.SMFMemoryMesh;
 import com.io7m.smfj.processing.api.SMFMemoryMeshFilterType;
+import com.io7m.smfj.processing.api.SMFMetadata;
 import com.io7m.smfj.processing.api.SMFProcessingError;
 import javaslang.collection.List;
 import javaslang.collection.Map;
@@ -86,18 +88,20 @@ public final class CaFilterCommandCompileMeshWeights implements
   static {
     LOG = LoggerFactory.getLogger(CaFilterCommandCompileMeshWeights.class);
     NAME = "compile-mesh-weights";
-    SYNTAX = "<skeleton> <indices-attribute> <weights-attribute> <pattern>";
+    SYNTAX = "<skeleton> <indices-attribute> <weights-attribute> ('meta' | 'no-meta') <pattern>";
   }
 
   private final SMFAttributeName attr_name_indices;
   private final SMFAttributeName attr_name_weights;
   private final Pattern source_pattern;
   private final Path skeleton_file;
+  private final AddMetadata meta;
 
   private CaFilterCommandCompileMeshWeights(
     final Path in_skeleton,
     final SMFAttributeName in_attr_name_indices,
     final SMFAttributeName in_attr_name_weights,
+    final AddMetadata in_meta,
     final Pattern in_source_pattern)
   {
     this.skeleton_file =
@@ -106,6 +110,8 @@ public final class CaFilterCommandCompileMeshWeights implements
       NullCheck.notNull(in_attr_name_indices, "Indices");
     this.attr_name_weights =
       NullCheck.notNull(in_attr_name_weights, "Weights");
+    this.meta =
+      NullCheck.notNull(in_meta, "AddMetadata");
     this.source_pattern =
       NullCheck.notNull(in_source_pattern, "Source pattern");
   }
@@ -120,6 +126,8 @@ public final class CaFilterCommandCompileMeshWeights implements
    *                             joint weights
    * @param in_source_pattern    A regular expression used to match input
    *                             attribute names
+   * @param in_meta              Whether or not metadata should be introduced
+   *                             into the mesh
    *
    * @return A new filter
    */
@@ -128,12 +136,14 @@ public final class CaFilterCommandCompileMeshWeights implements
     final Path in_skeleton,
     final SMFAttributeName in_attr_name_indices,
     final SMFAttributeName in_attr_name_weights,
+    final AddMetadata in_meta,
     final Pattern in_source_pattern)
   {
     return new CaFilterCommandCompileMeshWeights(
       in_skeleton,
       in_attr_name_indices,
       in_attr_name_weights,
+      in_meta,
       in_source_pattern);
   }
 
@@ -160,7 +170,7 @@ public final class CaFilterCommandCompileMeshWeights implements
     NullCheck.notNull(file, "file");
     NullCheck.notNull(text, "text");
 
-    if (text.length() == 4) {
+    if (text.length() == 5) {
       try {
         final Path skeleton_file =
           Paths.get(text.get(0));
@@ -168,16 +178,19 @@ public final class CaFilterCommandCompileMeshWeights implements
           SMFAttributeName.of(text.get(1));
         final SMFAttributeName attr_weights =
           SMFAttributeName.of(text.get(2));
+        final AddMetadata meta =
+          AddMetadata.of(text.get(3));
         final Pattern pattern =
-          Pattern.compile(text.get(3));
+          Pattern.compile(text.get(4));
 
-        LOG.debug("skeleton file: {}", skeleton_file);
+        LOG.debug("skeleton file:     {}", skeleton_file);
         LOG.debug("attribute indices: {}", attr_indices.value());
         LOG.debug("attribute weights: {}", attr_weights.value());
-        LOG.debug("pattern: {}", pattern.pattern());
+        LOG.debug("meta:              {}", meta);
+        LOG.debug("pattern:           {}", pattern.pattern());
 
         return Validation.valid(new CaFilterCommandCompileMeshWeights(
-          skeleton_file, attr_indices, attr_weights, pattern));
+          skeleton_file, attr_indices, attr_weights, meta, pattern));
       } catch (final PatternSyntaxException e) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("Incorrect command syntax.");
@@ -358,11 +371,11 @@ public final class CaFilterCommandCompileMeshWeights implements
       final SMFAttribute attr_weights =
         SMFAttribute.of(this.attr_name_weights, ELEMENT_TYPE_FLOATING, 4, 32);
 
-      final SMFHeader header_new = SMFHeader.builder()
-        .from(mesh.header())
-        .addAttributesInOrder(attr_indices)
-        .addAttributesInOrder(attr_weights)
-        .build();
+      final SMFHeader.Builder header_builder =
+        SMFHeader.builder()
+          .from(mesh.header())
+          .addAttributesInOrder(attr_indices)
+          .addAttributesInOrder(attr_weights);
 
       final Map<SMFAttributeName, SMFAttributeArrayType> arrays_new =
         mesh.arrays().put(
@@ -371,11 +384,68 @@ public final class CaFilterCommandCompileMeshWeights implements
           this.attr_name_weights,
           SMFAttributeArrayFloating4.of(packed.vertexWeights()));
 
-      return SMFMemoryMesh.builder()
-        .from(mesh)
-        .setArrays(arrays_new)
-        .setHeader(header_new)
-        .build();
+      final SMFMemoryMesh.Builder mesh_builder =
+        SMFMemoryMesh.builder()
+          .from(mesh)
+          .setArrays(arrays_new);
+
+      switch (this.meta) {
+        case META: {
+          header_builder.setMetaCount(mesh.header().metaCount() + 1L);
+          mesh_builder.addMetadata(SMFMetadata.of(
+            Integer.toUnsignedLong(CaMeshMetas.VENDOR_ID),
+            Integer.toUnsignedLong(CaMeshMetas.PRODUCT_ID),
+            CaMeshMetas.serialize(skeleton.meta(), 1, 0)));
+          break;
+        }
+        case NO_META: {
+          break;
+        }
+      }
+
+      return mesh_builder.setHeader(header_builder.build()).build();
+    }
+  }
+
+  /**
+   * A specification of whether or not skeleton metadata should be added to the
+   * mesh.
+   */
+
+  public enum AddMetadata
+  {
+    /**
+     * Metadata should be added.
+     */
+
+    META,
+
+    /**
+     * Metadata should not be added.
+     */
+
+    NO_META;
+
+    /**
+     * Parse a specification from a string
+     *
+     * @param text Must be "meta" or "no-meta"
+     *
+     * @return A specification
+     */
+
+    public static AddMetadata of(
+      final String text)
+    {
+      switch (text) {
+        case "meta":
+          return META;
+        case "no-meta":
+          return NO_META;
+        default: {
+          throw new IllegalArgumentException("Expected 'meta' or 'no-meta'.");
+        }
+      }
     }
   }
 

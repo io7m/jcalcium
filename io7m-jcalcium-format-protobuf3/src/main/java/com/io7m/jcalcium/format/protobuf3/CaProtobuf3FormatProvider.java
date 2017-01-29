@@ -171,8 +171,7 @@ public final class CaProtobuf3FormatProvider implements
       out.write(buffer);
 
       new CaV1Protobuf3Format().serializeCompiledSkeletonToStream(
-        skeleton,
-        out);
+        skeleton, out);
     }
   }
 

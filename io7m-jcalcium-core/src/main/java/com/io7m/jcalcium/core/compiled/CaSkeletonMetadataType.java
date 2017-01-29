@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,53 +17,28 @@
 package com.io7m.jcalcium.core.compiled;
 
 import com.io7m.jcalcium.core.CaImmutableStyleType;
-import com.io7m.jcalcium.core.CaJointName;
-import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
-import com.io7m.jtensors.QuaternionI4D;
-import com.io7m.jtensors.VectorI3D;
-import com.io7m.jtensors.parameterized.PVectorI3D;
+import com.io7m.jcalcium.core.CaSkeletonName;
 import org.immutables.value.Value;
 
 /**
- * The type of compiled joints.
+ * The type of skeleton metadata.
  */
 
-@Value.Immutable
 @CaImmutableStyleType
-public interface CaJointType
+@Value.Immutable
+public interface CaSkeletonMetadataType
 {
   /**
-   * @return The joint name
+   * @return The skeleton name
    */
 
   @Value.Parameter
-  CaJointName name();
+  CaSkeletonName name();
 
   /**
-   * @return The joint ID
+   * @return The skeleton hash value
    */
 
   @Value.Parameter
-  int id();
-
-  /**
-   * @return The parent-relative offset for the joint
-   */
-
-  @Value.Parameter
-  PVectorI3D<CaSpaceJointType> translation();
-
-  /**
-   * @return The parent-relative orientation of the joint
-   */
-
-  @Value.Parameter
-  QuaternionI4D orientation();
-
-  /**
-   * @return The parent-relative scale of the joint
-   */
-
-  @Value.Parameter
-  VectorI3D scale();
+  CaSkeletonHash hash();
 }

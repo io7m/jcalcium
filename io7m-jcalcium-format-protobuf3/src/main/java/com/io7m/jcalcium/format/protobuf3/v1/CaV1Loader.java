@@ -24,6 +24,7 @@ import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
+import com.io7m.jcalcium.core.compiled.CaSkeletonMetadata;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.compiled.actions.CaActionType;
 import com.io7m.jcalcium.core.compiled.actions.CaCurveKeyframeOrientation;
@@ -49,6 +50,8 @@ import javaslang.collection.IndexedSeq;
 import javaslang.collection.SortedMap;
 import javaslang.collection.TreeMap;
 import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +63,12 @@ import java.util.stream.Collectors;
 
 final class CaV1Loader
 {
+  private static final Logger LOG;
+
+  static {
+    LOG = LoggerFactory.getLogger(CaV1Loader.class);
+  }
+
   private final URI uri;
   private final InputStream stream;
 
@@ -315,8 +324,15 @@ final class CaV1Loader
 
       final CaSkeleton.Builder cb = CaSkeleton.builder();
       cb.setJoints(node);
-      cb.setHash(hash(sk.getHash()));
-      cb.setName(CaSkeletonName.of(sk.getName()));
+
+      final CaSkeletonHash hash = hash(sk.getHash());
+      final CaSkeletonName name = CaSkeletonName.of(sk.getName());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("skeleton name: {}", name.value());
+        LOG.debug("skeleton hash: {} {}", hash.algorithm(), hash.value());
+      }
+
+      cb.setMeta(CaSkeletonMetadata.of(name, hash));
       cb.setActionsByName(actions(sk.getActionsMap()));
 
       return cb.build();

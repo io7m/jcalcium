@@ -29,8 +29,9 @@
     <module>io7m-jcalcium-format-protobuf3</module>
     <module>io7m-jcalcium-generators</module>
     <module>io7m-jcalcium-loader-api</module>
-    <module>io7m-jcalcium-mesh-deformation-smf</module>
     <module>io7m-jcalcium-mesh-deformation-cpu</module>
+    <module>io7m-jcalcium-mesh-deformation-smf</module>
+    <module>io7m-jcalcium-mesh-meta</module>
     <module>io7m-jcalcium-mesh-processing-core</module>
     <module>io7m-jcalcium-mesh-processing-smf</module>
     <module>io7m-jcalcium-parser-api</module>
@@ -173,47 +174,47 @@
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-processing-api</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-processing-main</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-frontend</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-format-text</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-format-binary</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-bytebuffer</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-parser-api</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-validation-api</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-validation-main</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.immutables.javaslang</groupId>

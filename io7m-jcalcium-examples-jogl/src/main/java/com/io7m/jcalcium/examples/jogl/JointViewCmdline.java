@@ -26,6 +26,8 @@ import com.io7m.jcalcium.core.CaJointName;
 import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
+import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
+import com.io7m.jcalcium.core.compiled.CaSkeletonMetadata;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPose;
 import com.io7m.jcalcium.core.compiled.CaSkeletonRestPoseDType;
 import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
@@ -432,7 +434,9 @@ public final class JointViewCmdline implements Runnable, KeyListener
         .build();
 
     final CaSkeleton.Builder sb = CaSkeleton.builder();
-    sb.setName(CaSkeletonName.of("skeleton"));
+    sb.setMeta(CaSkeletonMetadata.of(
+      CaSkeletonName.of("skeleton"),
+      CaSkeletonHash.of("SHA2-256", "3cb4e2c9e926cce1aa345f1e1724db8683a2aa1056b236ecd7c3aba318a9416d")));
     sb.setJoints(tree_root);
     sb.putActionsByName(action.name(), action);
     return sb.build();

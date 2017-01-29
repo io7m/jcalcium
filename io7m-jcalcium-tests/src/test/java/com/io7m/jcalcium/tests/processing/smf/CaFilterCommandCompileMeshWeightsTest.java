@@ -21,6 +21,7 @@ import com.io7m.jcalcium.core.CaSkeletonName;
 import com.io7m.jcalcium.core.compiled.CaJoint;
 import com.io7m.jcalcium.core.compiled.CaSkeleton;
 import com.io7m.jcalcium.core.compiled.CaSkeletonHash;
+import com.io7m.jcalcium.core.compiled.CaSkeletonMetadata;
 import com.io7m.jcalcium.core.definitions.CaFormatVersion;
 import com.io7m.jcalcium.format.protobuf3.CaProtobuf3FormatProvider;
 import com.io7m.jcalcium.mesh.processing.smf.CaFilterCommandCompileMeshWeights;
@@ -65,6 +66,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static com.io7m.jcalcium.mesh.processing.smf.CaFilterCommandCompileMeshWeights.AddMetadata.META;
 import static com.io7m.smfj.core.SMFComponentType.ELEMENT_TYPE_FLOATING;
 
 public final class CaFilterCommandCompileMeshWeightsTest extends
@@ -191,7 +193,7 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       CaFilterCommandCompileMeshWeights.parse(
         Optional.empty(),
         1,
-        List.of("a", "b", "c", "d"));
+        List.of("a", "b", "c", "meta", "d"));
     Assert.assertTrue(r.isValid());
   }
 
@@ -202,7 +204,18 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
       CaFilterCommandCompileMeshWeights.parse(
         Optional.empty(),
         1,
-        List.of("a", "b", "c", " "));
+        List.of("a", "b", "c", "meta", " "));
+    Assert.assertTrue(r.isValid());
+  }
+
+  @Test
+  public void testParseCorrect2()
+  {
+    final Validation<List<SMFParseError>, SMFMemoryMeshFilterType> r =
+      CaFilterCommandCompileMeshWeights.parse(
+        Optional.empty(),
+        1,
+        List.of("a", "b", "c", "no-meta", " "));
     Assert.assertTrue(r.isValid());
   }
 
@@ -221,7 +234,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
     final CaSkeleton skeleton = CaSkeleton.of(
-      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
+      CaSkeletonMetadata.of(CaSkeletonName.of("skeleton"), DEFAULT_HASH),
+      joints,
+      TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -233,7 +248,11 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final SMFMemoryMeshFilterType filter =
       CaFilterCommandCompileMeshWeights.create(
-        path, attr_indices_output, attr_weights_output, Pattern.compile(" "));
+        path,
+        attr_indices_output,
+        attr_weights_output,
+        META,
+        Pattern.compile(" "));
 
     final List<SMFAttribute> attributes =
       List.of(
@@ -281,7 +300,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
     final CaSkeleton skeleton = CaSkeleton.of(
-      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
+      CaSkeletonMetadata.of(CaSkeletonName.of("skeleton"), DEFAULT_HASH),
+      joints,
+      TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -293,7 +314,11 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
 
     final SMFMemoryMeshFilterType filter =
       CaFilterCommandCompileMeshWeights.create(
-        path, attr_indices_output, attr_weights_output, Pattern.compile(" "));
+        path,
+        attr_indices_output,
+        attr_weights_output,
+        META,
+        Pattern.compile(" "));
 
     final List<SMFAttribute> attributes =
       List.of(
@@ -341,7 +366,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
     final CaSkeleton skeleton = CaSkeleton.of(
-      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
+      CaSkeletonMetadata.of(CaSkeletonName.of("skeleton"), DEFAULT_HASH),
+      joints,
+      TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -358,6 +385,7 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
         path,
         attr_indices_output,
         attr_weights_output,
+        META,
         Pattern.compile(".*"));
 
     final List<SMFAttribute> attributes =
@@ -405,7 +433,9 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
     final JOTreeNodeType<CaJoint> joints = JOTreeNode.create(joint_root);
 
     final CaSkeleton skeleton = CaSkeleton.of(
-      CaSkeletonName.of("skeleton"), DEFAULT_HASH, joints, TreeMap.empty());
+      CaSkeletonMetadata.of(CaSkeletonName.of("skeleton"), DEFAULT_HASH),
+      joints,
+      TreeMap.empty());
 
     final Path path =
       this.writeSkeleton(skeleton);
@@ -422,6 +452,7 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
         path,
         attr_indices_output,
         attr_weights_output,
+        META,
         Pattern.compile("notmatching"));
 
     final List<SMFAttribute> attributes =
@@ -471,6 +502,7 @@ public final class CaFilterCommandCompileMeshWeightsTest extends
         this.filesystem.getPath("nonexistent"),
         attr_indices_output,
         attr_weights_output,
+        META,
         Pattern.compile(".*"));
 
     final List<SMFAttribute> attributes =
