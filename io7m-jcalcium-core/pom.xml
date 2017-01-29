@@ -85,6 +85,8 @@
           <instructions>
             <Export-Package>
               com.io7m.jcalcium.core,
+              com.io7m.jcalcium.core.compiled,
+              com.io7m.jcalcium.core.compiled.actions,
               com.io7m.jcalcium.core.definitions,
               com.io7m.jcalcium.core.definitions.actions,
               com.io7m.jcalcium.core.spaces
