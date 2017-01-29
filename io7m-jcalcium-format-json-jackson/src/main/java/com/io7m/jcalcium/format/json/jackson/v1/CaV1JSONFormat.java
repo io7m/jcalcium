@@ -930,6 +930,7 @@ public final class CaV1JSONFormat implements CaDefinitionParserType,
             return CaCurveEasing.CURVE_EASING_IN_OUT;
           default: {
             // Nothing
+            break;
           }
         }
       }
