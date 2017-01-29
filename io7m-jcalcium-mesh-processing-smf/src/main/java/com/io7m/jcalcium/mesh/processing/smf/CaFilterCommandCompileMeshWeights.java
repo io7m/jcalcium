@@ -40,6 +40,8 @@ import com.io7m.smfj.processing.api.SMFMemoryMesh;
 import com.io7m.smfj.processing.api.SMFMemoryMeshFilterType;
 import com.io7m.smfj.processing.api.SMFMetadata;
 import com.io7m.smfj.processing.api.SMFProcessingError;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.SortedMap;
@@ -252,28 +254,38 @@ public final class CaFilterCommandCompileMeshWeights implements
     NullCheck.notNull(mesh, "mesh");
 
     List<SMFProcessingError> errors = List.empty();
-
     final Map<SMFAttributeName, SMFAttributeArrayType> arrays = mesh.arrays();
-    if (arrays.containsKey(this.attr_name_indices)) {
-      final StringBuilder sb = new StringBuilder(128);
-      sb.append("Output attribute already exists.");
-      sb.append(System.lineSeparator());
-      sb.append("  Attribute: ");
-      sb.append(this.attr_name_indices.value());
-      sb.append(System.lineSeparator());
-      errors = errors.append(SMFProcessingError.of(sb.toString(), empty()));
-    }
+    errors = this.checkOutputAttributes(errors, arrays);
+    final Tuple2<List<SMFProcessingError>, SortedMap<String, Vector<Double>>> result =
+      this.selectSourceAttributes(errors, mesh, arrays);
+    errors = result._1;
 
-    if (arrays.containsKey(this.attr_name_weights)) {
-      final StringBuilder sb = new StringBuilder(128);
-      sb.append("Output attribute already exists.");
-      sb.append(System.lineSeparator());
-      sb.append("  Attribute: ");
-      sb.append(this.attr_name_weights.value());
-      sb.append(System.lineSeparator());
-      errors = errors.append(SMFProcessingError.of(sb.toString(), empty()));
+    if (errors.isEmpty()) {
+      try {
+        return Validation.valid(this.process(context, mesh, result._2));
+      } catch (final CaLoaderException e) {
+        return Validation.invalid(List.of(
+          SMFProcessingError.of(e.getMessage(), Optional.of(e))));
+      } catch (final NoSuchFileException e) {
+        return Validation.invalid(List.of(
+          SMFProcessingError.of(
+            "No such file: " + e.getMessage(),
+            Optional.of(e))));
+      } catch (final IOException e) {
+        return Validation.invalid(List.of(
+          SMFProcessingError.of(e.getMessage(), Optional.of(e))));
+      }
     }
+    return Validation.invalid(errors);
+  }
 
+  private Tuple2<List<SMFProcessingError>, SortedMap<String, Vector<Double>>>
+  selectSourceAttributes(
+    final List<SMFProcessingError> errors,
+    final SMFMemoryMesh mesh,
+    final Map<SMFAttributeName, SMFAttributeArrayType> arrays)
+  {
+    List<SMFProcessingError> new_errors = errors;
     SortedMap<String, Vector<Double>> sources = TreeMap.empty();
     for (final SMFAttributeName name : arrays.keySet()) {
       if (name.value().startsWith(GROUP_ATTRIBUTE_PREFIX)) {
@@ -303,9 +315,8 @@ public final class CaFilterCommandCompileMeshWeights implements
             sb.append(" ");
             sb.append(attr.componentSizeBits());
             sb.append(System.lineSeparator());
-            errors = errors.append(SMFProcessingError.of(
-              sb.toString(),
-              empty()));
+            new_errors = new_errors.append(
+              SMFProcessingError.of(sb.toString(), empty()));
           }
         } else {
           LOG.debug("did not match attribute {}", name.value());
@@ -320,26 +331,40 @@ public final class CaFilterCommandCompileMeshWeights implements
       sb.append("  Pattern: ");
       sb.append(this.source_pattern.pattern());
       sb.append(System.lineSeparator());
-      errors = errors.append(SMFProcessingError.of(sb.toString(), empty()));
+      new_errors = new_errors.append(
+        SMFProcessingError.of(sb.toString(), empty()));
     }
 
-    if (errors.isEmpty()) {
-      try {
-        return Validation.valid(this.process(context, mesh, sources));
-      } catch (final CaLoaderException e) {
-        return Validation.invalid(List.of(
-          SMFProcessingError.of(e.getMessage(), Optional.of(e))));
-      } catch (final NoSuchFileException e) {
-        return Validation.invalid(List.of(
-          SMFProcessingError.of(
-            "No such file: " + e.getMessage(),
-            Optional.of(e))));
-      } catch (final IOException e) {
-        return Validation.invalid(List.of(
-          SMFProcessingError.of(e.getMessage(), Optional.of(e))));
-      }
+    return Tuple.of(new_errors, sources);
+  }
+
+  private List<SMFProcessingError> checkOutputAttributes(
+    final List<SMFProcessingError> errors,
+    final Map<SMFAttributeName, SMFAttributeArrayType> arrays)
+  {
+    List<SMFProcessingError> errors_extra = errors;
+    if (arrays.containsKey(this.attr_name_indices)) {
+      final StringBuilder sb = new StringBuilder(128);
+      sb.append("Output attribute already exists.");
+      sb.append(System.lineSeparator());
+      sb.append("  Attribute: ");
+      sb.append(this.attr_name_indices.value());
+      sb.append(System.lineSeparator());
+      errors_extra = errors_extra.append(
+        SMFProcessingError.of(sb.toString(), empty()));
     }
-    return Validation.invalid(errors);
+
+    if (arrays.containsKey(this.attr_name_weights)) {
+      final StringBuilder sb = new StringBuilder(128);
+      sb.append("Output attribute already exists.");
+      sb.append(System.lineSeparator());
+      sb.append("  Attribute: ");
+      sb.append(this.attr_name_weights.value());
+      sb.append(System.lineSeparator());
+      errors_extra = errors_extra.append(
+        SMFProcessingError.of(sb.toString(), empty()));
+    }
+    return errors_extra;
   }
 
   private SMFMemoryMesh process(
