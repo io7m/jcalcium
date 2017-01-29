@@ -174,47 +174,47 @@
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-processing-api</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-processing-main</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-frontend</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-format-text</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-format-binary</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-bytebuffer</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-parser-api</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-validation-api</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.smfj</groupId>
         <artifactId>io7m-smfj-validation-main</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>org.immutables.javaslang</groupId>
