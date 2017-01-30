@@ -1165,7 +1165,10 @@ public final class MeshViewNewCmdline implements Runnable, KeyListener
 
       case KeyEvent.VK_N: {
         this.actions_index = (this.actions_index + 1) % this.actions_ordered.size();
-        LOG.debug("action: {}", Integer.valueOf(this.actions_index));
+        LOG.debug(
+          "action: {} ({})",
+          Integer.valueOf(this.actions_index),
+          this.actions_ordered.get(this.actions_index).value());
         break;
       }
 
