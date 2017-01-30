@@ -43,4 +43,15 @@ public interface CaEvaluationContextType
    */
 
   CaEvaluationContextMatricesType newMatrices();
+
+  /**
+   * Create a new set of vector and quaternion contexts. The method is allowed
+   * to return the same instance as has been returned previously if and only if
+   * the {@link AutoCloseable#close()} method has been called on the returned
+   * instance.
+   *
+   * @return A new set of vector and quaternion contexts
+   */
+
+  CaEvaluationContextVectorsType newVectors();
 }

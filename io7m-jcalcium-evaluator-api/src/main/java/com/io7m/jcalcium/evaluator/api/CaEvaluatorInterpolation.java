@@ -20,6 +20,7 @@ import com.io7m.jcalcium.core.CaCurveEasing;
 import com.io7m.jcalcium.core.CaCurveInterpolation;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.Quaternion4DType;
+import com.io7m.jtensors.QuaternionM4D;
 import com.io7m.jtensors.QuaternionReadable4DType;
 import com.io7m.jtensors.VectorReadable3DType;
 import com.io7m.jtensors.VectorWritable3DType;
@@ -138,6 +139,7 @@ public final class CaEvaluatorInterpolation
    * to {@code x_out}.
    * </p>
    *
+   * @param c       Preallocated quaternion storage
    * @param easing  The easing type
    * @param interp  The interpolation type
    * @param alpha   The alpha factor
@@ -147,6 +149,7 @@ public final class CaEvaluatorInterpolation
    */
 
   public static void interpolateQuaternion4D(
+    final QuaternionM4D.ContextQM4D c,
     final CaCurveEasing easing,
     final CaCurveInterpolation interp,
     final double alpha,
@@ -166,11 +169,8 @@ public final class CaEvaluatorInterpolation
         return;
       }
       case CURVE_INTERPOLATION_LINEAR: {
-        q_out.set4D(
-          interpolateLinear(q_lower.getXD(), q_upper.getXD(), alpha),
-          interpolateLinear(q_lower.getYD(), q_upper.getYD(), alpha),
-          interpolateLinear(q_lower.getZD(), q_upper.getZD(), alpha),
-          interpolateLinear(q_lower.getWD(), q_upper.getWD(), alpha));
+        QuaternionM4D.interpolateSphericalLinear(
+          c, q_lower, q_upper, alpha, q_out);
         return;
       }
       case CURVE_INTERPOLATION_QUADRATIC:

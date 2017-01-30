@@ -47,6 +47,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleType
   private final PVector3DType<CaSpaceJointType> temp_translation;
   private final Vector3DType temp_scale;
   private final CaEvaluatedSkeletonMutableDType skeleton;
+  private final CaEvaluationContextType context;
   private ActionKind kind;
   private CaActionEvaluatorCurvesDType eval_curves;
   private long frame_start;
@@ -59,7 +60,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleType
     final CaActionType in_action,
     final int global_fps)
   {
-    NullCheck.notNull(in_context, "Context");
+    this.context = NullCheck.notNull(in_context, "Context");
     this.skeleton = NullCheck.notNull(in_skeleton, "Skeleton");
     NullCheck.notNull(in_action, "Action");
 
@@ -70,6 +71,7 @@ public final class CaEvaluatorSingleD implements CaEvaluatorSingleType
     in_action.matchAction(this, (t, curves) -> {
       t.kind = ActionKind.ACTION_CURVES;
       t.eval_curves = CaActionEvaluatorCurves.createD(
+        t.context,
         t.skeleton.restPose().skeleton(),
         curves,
         global_fps);

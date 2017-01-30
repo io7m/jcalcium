@@ -26,6 +26,8 @@ import com.io7m.jcalcium.core.compiled.actions.CaActionCurves;
 import com.io7m.jcalcium.core.definitions.CaDefinitionSkeleton;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContext;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
 import com.io7m.jcalcium.evaluator.main.CaActionEvaluatorCurves;
 import com.io7m.jcalcium.format.json.jackson.CaJSONFormatProvider;
 import com.io7m.jcalcium.parser.api.CaDefinitionParserFormatProviderType;
@@ -83,12 +85,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleTranslateLinear()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -96,6 +99,8 @@ public final class CaActionEvaluatorCurvesTest
       new PVectorM3D<>();
     final Quaternion4DType q_out =
       new QuaternionM4D();
+    final QuaternionM4D.ContextQM4D c =
+      new QuaternionM4D.ContextQM4D();
 
     eval.evaluateScale3DForGlobalFrame(0, 0L, 0L, 1.0, s_out);
     Assert.assertEquals(1.0, s_out.getXD(), 0.0);
@@ -137,12 +142,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleTranslateLinearScaled0_5()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
@@ -197,12 +203,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleTranslateLinearScaled2_0()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final PVector3DType<CaSpaceJointType> t_out =
       new PVectorM3D<>();
@@ -257,12 +264,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleScaleLinear()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-scale-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -311,12 +319,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleScaleLinearScaled0_5()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-scale-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -371,12 +380,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleScaleLinearScaled2_0()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-scale-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -431,12 +441,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleOrientLinear()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-orient-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();
@@ -461,10 +472,10 @@ public final class CaActionEvaluatorCurvesTest
     Assert.assertEquals(1.0, q_out.getWD(), 0.0);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 10L, 1.0, q_out);
-    Assert.assertEquals(0.707, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getXD(), 0.000001);
     Assert.assertEquals(0.0, q_out.getYD(), 0.0);
     Assert.assertEquals(0.0, q_out.getZD(), 0.0);
-    Assert.assertEquals(0.707, q_out.getWD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getWD(), 0.000001);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 20L, 1.0, q_out);
     Assert.assertEquals(1.0, q_out.getXD(), 0.0);
@@ -477,12 +488,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleOrientLinearScaled0_5()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-orient-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Quaternion4DType q_out =
       new QuaternionM4D();
@@ -494,16 +506,16 @@ public final class CaActionEvaluatorCurvesTest
     Assert.assertEquals(1.0, q_out.getWD(), 0.0);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 10L, 0.5, q_out);
-    Assert.assertEquals(0.3535, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.38268, q_out.getXD(), 0.00001);
     Assert.assertEquals(0.0, q_out.getYD(), 0.0);
     Assert.assertEquals(0.0, q_out.getZD(), 0.0);
-    Assert.assertEquals(0.85349, q_out.getWD(), 0.00001);
+    Assert.assertEquals(0.92387, q_out.getWD(), 0.00001);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 20L, 0.5, q_out);
-    Assert.assertEquals(0.707, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getXD(), 0.00001);
     Assert.assertEquals(0.0, q_out.getYD(), 0.0);
     Assert.assertEquals(0.0, q_out.getZD(), 0.0);
-    Assert.assertEquals(0.707, q_out.getWD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getWD(), 0.00001);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 40L, 0.5, q_out);
     Assert.assertEquals(1.0, q_out.getXD(), 0.0);
@@ -516,12 +528,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testSingleOrientLinearScaled2_0()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-orient-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Quaternion4DType q_out =
       new QuaternionM4D();
@@ -533,10 +546,10 @@ public final class CaActionEvaluatorCurvesTest
     Assert.assertEquals(1.0, q_out.getWD(), 0.0);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 5L, 2.0, q_out);
-    Assert.assertEquals(0.707, q_out.getXD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getXD(), 0.00001);
     Assert.assertEquals(0.0, q_out.getYD(), 0.0);
     Assert.assertEquals(0.0, q_out.getZD(), 0.0);
-    Assert.assertEquals(0.707, q_out.getWD(), 0.0);
+    Assert.assertEquals(0.707106, q_out.getWD(), 0.00001);
 
     eval.evaluateOrientation4DForGlobalFrame(0, 0L, 10L, 2.0, q_out);
     Assert.assertEquals(1.0, q_out.getXD(), 0.0);
@@ -549,12 +562,13 @@ public final class CaActionEvaluatorCurvesTest
   public void testExtremeTimes()
     throws IOException
   {
+    final CaEvaluationContextType context = CaEvaluationContext.create();
     final CaSkeleton skel =
       this.compile("single-translate-linear.csj");
     final CaActionCurves act =
       (CaActionCurves) skel.actionsByName().get(CaActionName.of("action0")).get();
     final CaActionEvaluatorCurvesDType eval =
-      CaActionEvaluatorCurves.createD(skel, act, 60);
+      CaActionEvaluatorCurves.createD(context, skel, act, 60);
 
     final Vector3DType s_out =
       new VectorM3D();

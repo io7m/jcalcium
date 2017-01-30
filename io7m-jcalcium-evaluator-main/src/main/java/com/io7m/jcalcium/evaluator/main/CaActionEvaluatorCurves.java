@@ -30,12 +30,15 @@ import com.io7m.jcalcium.core.compiled.actions.CaCurveType;
 import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jcalcium.evaluator.api.CaActionEvaluatorCurvesDType;
 import com.io7m.jcalcium.evaluator.api.CaActionKeyframeCurrent;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextType;
+import com.io7m.jcalcium.evaluator.api.CaEvaluationContextVectorsType;
 import com.io7m.jcalcium.evaluator.api.CaEvaluatorInterpolation;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jnull.Nullable;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jtensors.Quaternion4DType;
 import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.QuaternionM4D;
 import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.VectorWritable3DType;
 import com.io7m.jtensors.parameterized.PVectorReadable3DType;
@@ -63,12 +66,15 @@ public final class CaActionEvaluatorCurves
   }
 
   private final JointTracks[] joint_tracks;
+  private final CaEvaluationContextType context;
 
   private CaActionEvaluatorCurves(
+    final CaEvaluationContextType in_context,
     final CaSkeleton in_skeleton,
     final CaActionCurvesType in_action,
     final int global_fps)
   {
+    this.context = NullCheck.notNull(in_context, "Context");
     NullCheck.notNull(in_skeleton, "Skeleton");
     NullCheck.notNull(in_action, "Action");
 
@@ -128,13 +134,14 @@ public final class CaActionEvaluatorCurves
      */
 
     for (int index = 0; index < this.joint_tracks.length; ++index) {
-      NullCheck.notNull(this.joint_tracks[index], "this.joint_tracks[index]");
+      NullCheck.notNull(this.joint_tracks[index], "Joint track");
     }
   }
 
   /**
    * Create a new evaluator for the given skeleton and action.
    *
+   * @param in_context  An evaluation context
    * @param in_skeleton The skeleton
    * @param in_action   The action
    * @param global_fps  The global FPS rate
@@ -143,11 +150,16 @@ public final class CaActionEvaluatorCurves
    */
 
   public static CaActionEvaluatorCurvesDType createD(
+    final CaEvaluationContextType in_context,
     final CaSkeleton in_skeleton,
     final CaActionCurvesType in_action,
     final int global_fps)
   {
-    return new CaActionEvaluatorCurves(in_skeleton, in_action, global_fps);
+    return new CaActionEvaluatorCurves(
+      in_context,
+      in_skeleton,
+      in_action,
+      global_fps);
   }
 
   @Override
@@ -182,8 +194,10 @@ public final class CaActionEvaluatorCurves
     final double time_scale,
     final Quaternion4DType out)
   {
-    this.joint_tracks[joint_id].evaluateOrientation4D(
-      frame_start, frame_current, time_scale, out);
+    try (final CaEvaluationContextVectorsType v = this.context.newVectors()) {
+      this.joint_tracks[joint_id].evaluateOrientation4D(
+        v.quaternionContext4D(), frame_start, frame_current, time_scale, out);
+    }
   }
 
   private static final class JointTracks
@@ -294,6 +308,7 @@ public final class CaActionEvaluatorCurves
     }
 
     private void evaluateOrientation4D(
+      final QuaternionM4D.ContextQM4D c,
       final long frame_start,
       final long frame_current,
       final double time_scale,
@@ -317,7 +332,7 @@ public final class CaActionEvaluatorCurves
         final QuaternionI4D val_next = kf_next.orientation();
 
         CaEvaluatorInterpolation.interpolateQuaternion4D(
-          easing, interp, r.progress(), val_prev, val_next, out);
+          c, easing, interp, r.progress(), val_prev, val_next, out);
       } else {
         out.copyFrom4D(this.joint.orientation());
       }
