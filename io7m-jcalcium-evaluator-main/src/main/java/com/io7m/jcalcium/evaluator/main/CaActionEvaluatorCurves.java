@@ -376,11 +376,5 @@ public final class CaActionEvaluatorCurves
         keyframes_scale,
         last_frame);
     }
-
-    private void populate(
-      final IndexedSeq<CaCurveType> curves)
-    {
-
-    }
   }
 }
