@@ -96,7 +96,7 @@ public final class CaLoaderProtobuf3Test extends CaLoaderContract
     final CaSkeleton skel_c =
       cc.compile(skel_d).get();
 
-    final int max_count = 1000;
+    final int max_count = 100;
     int fail_count = 0;
 
     final Random rand = new Random();

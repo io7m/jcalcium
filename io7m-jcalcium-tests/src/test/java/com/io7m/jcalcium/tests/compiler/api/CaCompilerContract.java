@@ -993,7 +993,7 @@ public abstract class CaCompilerContract
     final JointTree tree = gen.next();
 
     QuickCheck.forAll(
-      100,
+      25,
       new CaDefinitionSkeletonGenerator(tree),
       new AbstractCharacteristic<CaDefinitionSkeleton>()
       {
