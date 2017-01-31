@@ -1,0 +1,5 @@
+error_keyframe_no_corresponding.blend          failure
+error_keyframe_interpolation_unsupported.blend failure
+error_keyframe_no_corresponding.blend          failure
+error_wrong_keyframe_count.blend               failure
+trivial0.blend                                 success
