@@ -71,8 +71,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_ACTION_INVALID_BONE;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_ACTION_INVALID_FPS;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_CYCLE;
 import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NONEXISTENT_PARENT;
 import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_NO_ROOT;
+import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM;
 import static com.io7m.jcalcium.compiler.api.CaCompileErrorCode.ERROR_MULTIPLE_ROOT_JOINTS;
 import static javaslang.control.Validation.invalid;
 import static javaslang.control.Validation.valid;
@@ -153,7 +159,7 @@ final class CaCompileTask
         sb.append(parent_name.value());
         sb.append(System.lineSeparator());
         return invalid(
-          errorsFor(CaCompileErrorCode.ERROR_JOINT_CYCLE, sb.toString()));
+          errorsFor(ERROR_JOINT_CYCLE, sb.toString()));
       }
     }
 
@@ -245,7 +251,9 @@ final class CaCompileTask
 
     {
       final double dot =
-        Math.abs(1.0 - QuaternionI4D.dotProduct(root.orientation(), QuaternionI4D.IDENTITY));
+        Math.abs(1.0 - QuaternionI4D.dotProduct(
+          root.orientation(),
+          QuaternionI4D.IDENTITY));
       if (dot > 0.00001) {
         final StringBuilder sb = new StringBuilder(128);
         sb.append("The root joint has a non-identity orientation.");
@@ -260,7 +268,7 @@ final class CaCompileTask
           "  Possible solution: Give the root joint an identity orientation.");
         sb.append(System.lineSeparator());
         errors = errors.append(CaCompileError.of(
-          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
           sb.toString()));
       }
     }
@@ -282,7 +290,7 @@ final class CaCompileTask
           "  Possible solution: Give the root joint an identity scale.");
         sb.append(System.lineSeparator());
         errors = errors.append(CaCompileError.of(
-          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
           sb.toString()));
       }
     }
@@ -304,7 +312,7 @@ final class CaCompileTask
           "  Possible solution: Give the root joint an identity translation.");
         sb.append(System.lineSeparator());
         errors = errors.append(CaCompileError.of(
-          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
           sb.toString()));
       }
     }
@@ -580,7 +588,7 @@ final class CaCompileTask
       sb.append("translation");
       sb.append(System.lineSeparator());
       return invalid(errorsFor(
-        CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
+        ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
     }
 
     final CaCurveKeyframeTranslation.Builder result_keyframe_builder =
@@ -622,7 +630,7 @@ final class CaCompileTask
       sb.append("orientation");
       sb.append(System.lineSeparator());
       return invalid(errorsFor(
-        CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
+        ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
     }
 
     final CaCurveKeyframeOrientation.Builder result_keyframe_builder =
@@ -664,7 +672,7 @@ final class CaCompileTask
       sb.append("scale");
       sb.append(System.lineSeparator());
       return invalid(errorsFor(
-        CaCompileErrorCode.ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
+        ERROR_ACTION_DUPLICATE_KEYFRAME, sb.toString()));
     }
 
     final CaCurveKeyframeScale.Builder result_keyframe_builder =
@@ -699,7 +707,7 @@ final class CaCompileTask
     sb.append(joint_name.value());
     sb.append(System.lineSeparator());
     return invalid(errorsFor(
-      CaCompileErrorCode.ERROR_ACTION_INVALID_BONE, sb.toString()));
+      ERROR_ACTION_INVALID_BONE, sb.toString()));
   }
 
   private static Validation<List<CaCompileError>, CaCurveType>
@@ -820,7 +828,7 @@ final class CaCompileTask
       sb.append(fps);
       sb.append(System.lineSeparator());
       return invalid(errorsFor(
-        CaCompileErrorCode.ERROR_ACTION_INVALID_FPS, sb.toString()));
+        ERROR_ACTION_INVALID_FPS, sb.toString()));
     }
 
     return valid(Integer.valueOf(fps));
@@ -884,7 +892,7 @@ final class CaCompileTask
         sb.append("  Type:   translation");
         sb.append(System.lineSeparator());
         return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
       this.joint_type_received.set(0, true);
@@ -907,7 +915,7 @@ final class CaCompileTask
         sb.append("  Type:   orientation");
         sb.append(System.lineSeparator());
         return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
       this.joint_type_received.set(1, true);
@@ -930,7 +938,7 @@ final class CaCompileTask
         sb.append("  Type:   scale");
         sb.append(System.lineSeparator());
         return invalid(errorsFor(
-          CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+          ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
           sb.toString()));
       }
       this.joint_type_received.set(2, true);
