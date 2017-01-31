@@ -67,9 +67,9 @@ public final class CaProtobuf3FormatProvider implements
     {
       MAGIC_NUMBER = new int[8];
       MAGIC_NUMBER[0] = 0x89;
-      MAGIC_NUMBER[1] = 'C';
-      MAGIC_NUMBER[2] = 'C';
-      MAGIC_NUMBER[3] = 'P';
+      MAGIC_NUMBER[1] = (int) 'C';
+      MAGIC_NUMBER[2] = (int) 'C';
+      MAGIC_NUMBER[3] = (int) 'P';
       MAGIC_NUMBER[4] = 0x0D;
       MAGIC_NUMBER[5] = 0x0A;
       MAGIC_NUMBER[6] = 0x1A;
