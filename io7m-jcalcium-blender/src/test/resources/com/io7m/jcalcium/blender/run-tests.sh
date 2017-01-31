@@ -45,12 +45,12 @@ echo "--------------------------------------------------------------------------
 
 case ${TEST_FAILURES} in
   0)
-    echo "All tests passed"
+    printf "PASS: %d of %d tests passed\n" "${TEST_COUNT}" "${TEST_COUNT}"
     exit 0
     ;;
 
   *)
-    echo "One or more tests failed"
+    printf "FAIL: %d of %d tests failed\n" "${TEST_FAILURES}" "${TEST_COUNT}"
     exit 1
     ;;
 esac

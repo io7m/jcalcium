@@ -6,9 +6,9 @@
     "joints": [
       {
         "name": "joint.000",
-        "translation": [1.0, 2.0, 3.0],
-        "orientation-xyzw": [10.0, 20.0, 30.0, 40.0],
-        "scale": [100.0, 200.0, 300.0]
+        "translation": [0.0, 0.0, 0.0],
+        "orientation-xyzw": [0.0, 0.0, 0.0, 1.0],
+        "scale": [1.0, 1.0, 1.0]
       },
       {
         "name": "joint.001",

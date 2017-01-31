@@ -22,9 +22,12 @@ import com.io7m.jcalcium.core.spaces.CaSpaceJointType;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
 import com.io7m.jorchard.generators.JOTreeNodeGenerator;
+import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.VectorI3D;
 import com.io7m.jtensors.generators.QuaternionI4DGenerator;
 import com.io7m.jtensors.generators.VectorI3DGenerator;
 import com.io7m.jtensors.generators.parameterized.PVectorI3DGenerator;
+import com.io7m.jtensors.parameterized.PVectorI3D;
 import net.java.quickcheck.Generator;
 import net.java.quickcheck.generator.support.IntegerGenerator;
 
@@ -78,6 +81,10 @@ public final class JointTreeGenerator implements Generator<JointTree>
         if (parent_opt.isPresent()) {
           final JOTreeNodeReadableType<CaJointName> parent_name = parent_opt.get();
           b.setParent(parent_name.value());
+        } else {
+          b.setOrientation(new QuaternionI4D());
+          b.setTranslation(new PVectorI3D<>());
+          b.setScale(new VectorI3D(1.0, 1.0, 1.0));
         }
 
         return b.build();

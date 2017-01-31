@@ -53,6 +53,8 @@ import com.io7m.jorchard.core.JOTreeExceptionCycle;
 import com.io7m.jorchard.core.JOTreeNode;
 import com.io7m.jorchard.core.JOTreeNodeReadableType;
 import com.io7m.jorchard.core.JOTreeNodeType;
+import com.io7m.jtensors.QuaternionI4D;
+import com.io7m.jtensors.VectorI3D;
 import javaslang.collection.Array;
 import javaslang.collection.IndexedSeq;
 import javaslang.collection.List;
@@ -233,7 +235,84 @@ final class CaCompileTask
       return invalid(errorsFor(ERROR_MULTIPLE_ROOT_JOINTS, sb.toString()));
     }
 
-    return valid(roots.values().apply(Integer.valueOf(0)));
+    return compileCheckRoot(roots.values().apply(Integer.valueOf(0)));
+  }
+
+  private static Validation<List<CaCompileError>, CaDefinitionJoint> compileCheckRoot(
+    final CaDefinitionJoint root)
+  {
+    List<CaCompileError> errors = List.empty();
+
+    {
+      final double dot =
+        Math.abs(1.0 - QuaternionI4D.dotProduct(root.orientation(), QuaternionI4D.IDENTITY));
+      if (dot > 0.00001) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("The root joint has a non-identity orientation.");
+        sb.append(System.lineSeparator());
+        sb.append("  Joint: ");
+        sb.append(root.name().value());
+        sb.append(System.lineSeparator());
+        sb.append("  Orientation: ");
+        sb.append(root.orientation());
+        sb.append(System.lineSeparator());
+        sb.append(
+          "  Possible solution: Give the root joint an identity orientation.");
+        sb.append(System.lineSeparator());
+        errors = errors.append(CaCompileError.of(
+          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          sb.toString()));
+      }
+    }
+
+    {
+      final VectorI3D diff =
+        VectorI3D.subtract(root.scale(), new VectorI3D(1.0, 1.0, 1.0));
+      if (VectorI3D.magnitudeSquared(diff) > 0.00001) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("The root joint has a non-identity scale.");
+        sb.append(System.lineSeparator());
+        sb.append("  Joint: ");
+        sb.append(root.name().value());
+        sb.append(System.lineSeparator());
+        sb.append("  Scale: ");
+        sb.append(root.scale());
+        sb.append(System.lineSeparator());
+        sb.append(
+          "  Possible solution: Give the root joint an identity scale.");
+        sb.append(System.lineSeparator());
+        errors = errors.append(CaCompileError.of(
+          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          sb.toString()));
+      }
+    }
+
+    {
+      final VectorI3D diff =
+        VectorI3D.subtract(root.translation(), new VectorI3D(0.0, 0.0, 0.0));
+      if (VectorI3D.magnitudeSquared(diff) > 0.00001) {
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("The root joint has a non-identity translation.");
+        sb.append(System.lineSeparator());
+        sb.append("  Joint: ");
+        sb.append(root.name().value());
+        sb.append(System.lineSeparator());
+        sb.append("  Translation: ");
+        sb.append(root.translation());
+        sb.append(System.lineSeparator());
+        sb.append(
+          "  Possible solution: Give the root joint an identity translation.");
+        sb.append(System.lineSeparator());
+        errors = errors.append(CaCompileError.of(
+          CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+          sb.toString()));
+      }
+    }
+
+    if (errors.isEmpty()) {
+      return valid(root);
+    }
+    return invalid(errors);
   }
 
   private static Validation<List<CaCompileError>, JOTreeNodeType<CaJoint>>

@@ -957,6 +957,37 @@ class CalciumExporter:
   #end
 
   #
+  # Check that a given bone is an identity transform.
+  #
+
+  def __checkBoneMatrixIsIdentity(self, bone_matrix):
+    assert type(bone_matrix) == mathutils.Matrix
+
+    #
+    # For whatever reason, comparing the matrix with an identity matrix
+    # just isn't enough. This is likely due to numerical imprecision within
+    # Blender.
+    #
+
+    id_scale = mathutils.Vector((1.0, 1.0, 1.0))
+    id_trans = mathutils.Vector((0.0, 0.0, 0.0))
+    id_orien = mathutils.Quaternion((0.0, 1.0, 0.0), 0.0)
+
+    diff_orient = 1.0 - bone_matrix.to_quaternion().dot(id_orien)
+    diff_scale  = bone_matrix.to_scale() - id_scale
+    diff_trans  = bone_matrix.to_translation() - id_trans
+
+    ok_orient = diff_orient <= 0.00001
+    self.__logger.debug("check orient %s %s" % (ok_orient, diff_orient))
+    ok_scale = diff_scale == mathutils.Vector((0.0, 0.0, 0.0))
+    self.__logger.debug("check scale %s %s" % (ok_scale, diff_scale))
+    ok_trans = diff_trans == mathutils.Vector((0.0, 0.0, 0.0))
+    self.__logger.debug("check translation %s %s" % (ok_trans, diff_trans))
+
+    return ok_orient and ok_scale and ok_trans
+  #end
+
+  #
   # Construct a list of bones for the given armature.
   #
 
@@ -991,6 +1022,18 @@ class CalciumExporter:
       bone_parent = None
       if bone.parent != None:
         bone_parent = bone.parent.name
+      else:
+        #
+        # If a bone does not have a parent, then it should not have a transform.
+        #
+        if not self.__checkBoneMatrixIsIdentity(bone_matrix):
+          text  = "A root joint has a non-identity transform.\n"
+          text += "This is almost certainly a mistake!\n"
+          text += "  Joint:             %s\n" % bone.name
+          text += "  Transform:         %s\n" % bone_matrix
+          text += "  Possible solution: Place the joint at the origin of the model\n"
+          self.__logger.error(text)
+        #endif
       #endif
 
       calcium_joints.append(CalciumJoint(bone.name, bone_parent, bone_trans, bone_orient, bone_scale))

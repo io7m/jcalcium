@@ -133,14 +133,14 @@ public abstract class CaCompilerContract
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
     final CaJointName bone_1_name = CaJointName.of("root1");
     final CaDefinitionJoint bone_1 = CaDefinitionJoint.of(
       bone_1_name,
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -171,7 +171,7 @@ public abstract class CaCompilerContract
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
     final CaJointName bone_1_name = CaJointName.of("root1");
     final CaJointName bone_2_name = CaJointName.of("root2");
     final CaDefinitionJoint bone_1 = CaDefinitionJoint.of(
@@ -179,7 +179,7 @@ public abstract class CaCompilerContract
       Optional.of(bone_2_name),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -210,7 +210,7 @@ public abstract class CaCompilerContract
       Optional.empty(),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
 
     final CaJointName bone_1_name = CaJointName.of("root1");
     final CaJointName bone_2_name = CaJointName.of("root2");
@@ -219,13 +219,13 @@ public abstract class CaCompilerContract
       Optional.of(bone_2_name),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
     final CaDefinitionJoint bone_2 = CaDefinitionJoint.of(
       bone_2_name,
       Optional.of(bone_1_name),
       new PVectorI3D<>(),
       new QuaternionI4D(),
-      new VectorI3D());
+      new VectorI3D(1.0, 1.0, 1.0));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -271,7 +271,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -314,7 +314,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -376,7 +376,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -438,7 +438,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -466,7 +466,7 @@ public abstract class CaCompilerContract
     kf_b.setIndex(0);
     kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
     kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
-    kf_b.setScale(new VectorI3D());
+    kf_b.setScale(new VectorI3D(1.0, 1.0, 1.0));
 
     List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
     curve_keyframes = curve_keyframes.append(kf_b.build());
@@ -500,7 +500,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -581,7 +581,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -662,7 +662,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -693,7 +693,7 @@ public abstract class CaCompilerContract
       kf_b.setIndex(0);
       kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
       kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
-      kf_b.setScale(new VectorI3D());
+      kf_b.setScale(new VectorI3D(1.0, 1.0, 1.0));
 
       List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
       curve_keyframes = curve_keyframes.append(kf_b.build());
@@ -711,7 +711,7 @@ public abstract class CaCompilerContract
       kf_b.setIndex(0);
       kf_b.setInterpolation(CaCurveInterpolation.CURVE_INTERPOLATION_LINEAR);
       kf_b.setEasing(CaCurveEasing.CURVE_EASING_IN_OUT);
-      kf_b.setScale(new VectorI3D());
+      kf_b.setScale(new VectorI3D(1.0, 1.0, 1.0));
 
       List<CaDefinitionCurveKeyframeScaleType> curve_keyframes = List.empty();
       curve_keyframes = curve_keyframes.append(kf_b.build());
@@ -743,7 +743,7 @@ public abstract class CaCompilerContract
         Optional.empty(),
         new PVectorI3D<>(),
         new QuaternionI4D(),
-        new VectorI3D()));
+        new VectorI3D(1.0, 1.0, 1.0)));
 
     final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
     b.setName(CaSkeletonName.of("skeleton"));
@@ -758,6 +758,117 @@ public abstract class CaCompilerContract
     Assert.assertTrue(r.isInvalid());
     Assert.assertEquals(
       CaCompileErrorCode.ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileRootOrientationNotIdentity()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(HashMap.empty());
+
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
+    bones = bones.put(
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(2.0, 3.0, 4.0, 5.0),
+        new VectorI3D(1.0, 1.0, 1.0)));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(HashMap.empty());
+    b.setJoints(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeleton> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileRootScaleNotIdentity()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(HashMap.empty());
+
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
+    bones = bones.put(
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(),
+        new QuaternionI4D(),
+        new VectorI3D(2.0, 2.0, 2.0)));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(HashMap.empty());
+    b.setJoints(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeleton> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+      r.getError().get(0).code());
+  }
+
+  @Test
+  public void testCompileRootTranslateNotIdentity()
+  {
+    final CaCompilerType cc = this.create();
+
+    final CaDefinitionActionCurves.Builder act_b =
+      CaDefinitionActionCurves.builder();
+    act_b.setName(CaActionName.of("act0"));
+    act_b.setFramesPerSecond(60);
+    act_b.setCurves(HashMap.empty());
+
+    Map<CaJointName, CaDefinitionJoint> bones = HashMap.empty();
+    bones = bones.put(
+      CaJointName.of("bone0"),
+      CaDefinitionJoint.of(
+        CaJointName.of("bone0"),
+        Optional.empty(),
+        new PVectorI3D<>(2.0, 2.0, 3.0),
+        new QuaternionI4D(),
+        new VectorI3D(1.0, 1.0, 1.0)));
+
+    final CaDefinitionSkeleton.Builder b = CaDefinitionSkeleton.builder();
+    b.setName(CaSkeletonName.of("skeleton"));
+    b.setActions(HashMap.empty());
+    b.setJoints(bones);
+
+    final CaDefinitionSkeleton s = b.build();
+    final Validation<List<CaCompileError>, CaSkeleton> r =
+      cc.compile(s);
+
+    dump(r);
+    Assert.assertTrue(r.isInvalid());
+    Assert.assertEquals(
+      CaCompileErrorCode.ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
       r.getError().get(0).code());
   }
 
@@ -793,7 +904,17 @@ public abstract class CaCompilerContract
         cb.setScale(vgen.next());
         cb.setOrientation(qgen.next());
         cb.setTranslation(pvgen.next());
-        node.parentReadable().map(p -> cb.setParent(p.value()));
+
+        final Optional<JOTreeNodeReadableType<CaJointName>> parent_opt =
+          node.parentReadable();
+        if (parent_opt.isPresent()) {
+          cb.setParent(parent_opt.get().value());
+        } else {
+          cb.setScale(new VectorI3D(1.0, 1.0, 1.0));
+          cb.setOrientation(new QuaternionI4D());
+          cb.setTranslation(new PVectorI3D<>());
+        }
+
         return Tuple.of(bone_name, cb.build());
       });
 

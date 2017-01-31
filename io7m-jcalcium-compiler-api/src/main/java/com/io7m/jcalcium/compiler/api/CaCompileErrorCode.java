@@ -65,6 +65,12 @@ public enum CaCompileErrorCode
   ERROR_ACTION_MULTIPLE_CURVES_SAME_TYPE,
 
   /**
+   * The root joint of a skeleton has a non-identity transform.
+   */
+
+  ERROR_JOINT_ROOT_NOT_IDENTITY_TRANSFORM,
+
+  /**
    * An action has an invalid frames per second count.
    */
 
