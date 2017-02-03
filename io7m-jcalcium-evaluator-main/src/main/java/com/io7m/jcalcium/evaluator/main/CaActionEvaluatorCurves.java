@@ -40,6 +40,7 @@ import com.io7m.jtensors.Quaternion4DType;
 import com.io7m.jtensors.QuaternionI4D;
 import com.io7m.jtensors.QuaternionM4D;
 import com.io7m.jtensors.VectorI3D;
+import com.io7m.jtensors.VectorM3D;
 import com.io7m.jtensors.VectorWritable3DType;
 import com.io7m.jtensors.parameterized.PVectorReadable3DType;
 import com.io7m.jtensors.parameterized.PVectorWritable3DType;
@@ -170,8 +171,10 @@ public final class CaActionEvaluatorCurves
     final double time_scale,
     final PVectorWritable3DType<CaSpaceJointType> out)
   {
-    this.joint_tracks[joint_id].evaluateTranslation3D(
-      frame_start, frame_current, time_scale, out);
+    try (final CaEvaluationContextVectorsType v = this.context.newVectors()) {
+      this.joint_tracks[joint_id].evaluateTranslation3D(
+        v.vectorContext3D(), frame_start, frame_current, time_scale, out);
+    }
   }
 
   @Override
@@ -182,8 +185,10 @@ public final class CaActionEvaluatorCurves
     final double time_scale,
     final VectorWritable3DType out)
   {
-    this.joint_tracks[joint_id].evaluateScale3D(
-      frame_start, frame_current, time_scale, out);
+    try (final CaEvaluationContextVectorsType v = this.context.newVectors()) {
+      this.joint_tracks[joint_id].evaluateScale3D(
+        v.vectorContext3D(), frame_start, frame_current, time_scale, out);
+    }
   }
 
   @Override
@@ -246,6 +251,7 @@ public final class CaActionEvaluatorCurves
     }
 
     private void evaluateTranslation3D(
+      final VectorM3D.ContextVM3D c,
       final long frame_start,
       final long frame_current,
       final double time_scale,
@@ -271,13 +277,14 @@ public final class CaActionEvaluatorCurves
           kf_next.translation();
 
         CaEvaluatorInterpolation.interpolateVector3D(
-          easing, interp, r.progress(), trans_prev, trans_next, out);
+          c, easing, interp, r.progress(), trans_prev, trans_next, out);
       } else {
         out.copyFromTyped3D(this.joint.translation());
       }
     }
 
     private void evaluateScale3D(
+      final VectorM3D.ContextVM3D c,
       final long frame_start,
       final long frame_current,
       final double time_scale,
@@ -301,7 +308,7 @@ public final class CaActionEvaluatorCurves
         final VectorI3D val_next = kf_next.scale();
 
         CaEvaluatorInterpolation.interpolateVector3D(
-          easing, interp, r.progress(), val_prev, val_next, out);
+          c, easing, interp, r.progress(), val_prev, val_next, out);
       } else {
         out.copyFrom3D(this.joint.scale());
       }

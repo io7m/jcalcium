@@ -17,6 +17,7 @@
 package com.io7m.jcalcium.evaluator.api;
 
 import com.io7m.jtensors.QuaternionM4D;
+import com.io7m.jtensors.VectorM3D;
 
 /**
  * A set of temporary matrices.
@@ -39,4 +40,10 @@ public interface CaEvaluationContextVectorsType extends AutoCloseable
    */
 
   QuaternionM4D.ContextQM4D quaternionContext4D();
+
+  /**
+   * @return A 3D vector context
+   */
+
+  VectorM3D.ContextVM3D vectorContext3D();
 }

@@ -22,6 +22,7 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.jtensors.Quaternion4DType;
 import com.io7m.jtensors.QuaternionM4D;
 import com.io7m.jtensors.QuaternionReadable4DType;
+import com.io7m.jtensors.VectorM3D;
 import com.io7m.jtensors.VectorReadable3DType;
 import com.io7m.jtensors.VectorWritable3DType;
 import com.io7m.junreachable.UnimplementedCodeException;
@@ -88,6 +89,7 @@ public final class CaEvaluatorInterpolation
    * to {@code x_out}.
    * </p>
    *
+   * @param c       Preallocated vector storage
    * @param easing  The easing type
    * @param interp  The interpolation type
    * @param alpha   The alpha factor
@@ -97,6 +99,7 @@ public final class CaEvaluatorInterpolation
    */
 
   public static void interpolateVector3D(
+    final VectorM3D.ContextVM3D c,
     final CaCurveEasing easing,
     final CaCurveInterpolation interp,
     final double alpha,
@@ -116,10 +119,7 @@ public final class CaEvaluatorInterpolation
         return;
       }
       case CURVE_INTERPOLATION_LINEAR: {
-        x_out.set3D(
-          interpolateLinear(x_lower.getXD(), x_upper.getXD(), alpha),
-          interpolateLinear(x_lower.getYD(), x_upper.getYD(), alpha),
-          interpolateLinear(x_lower.getZD(), x_upper.getZD(), alpha));
+        VectorM3D.interpolateLinear(c, x_lower, x_upper, alpha, x_out);
         return;
       }
       case CURVE_INTERPOLATION_QUADRATIC:

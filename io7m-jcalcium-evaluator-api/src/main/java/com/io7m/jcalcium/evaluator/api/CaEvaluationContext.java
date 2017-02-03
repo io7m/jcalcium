@@ -19,6 +19,7 @@ package com.io7m.jcalcium.evaluator.api;
 import com.io7m.jtensors.Matrix4x4DType;
 import com.io7m.jtensors.MatrixHeapArrayM4x4D;
 import com.io7m.jtensors.QuaternionM4D;
+import com.io7m.jtensors.VectorM3D;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import org.slf4j.Logger;
@@ -126,12 +127,14 @@ public final class CaEvaluationContext implements CaEvaluationContextType
     implements CaEvaluationContextVectorsType
   {
     private final QuaternionM4D.ContextQM4D quaternion_m4d;
+    private final VectorM3D.ContextVM3D vector_m3d;
 
     private Vectors(
       final ReferencePool<Vectors> in_pool)
     {
       super(in_pool);
       this.quaternion_m4d = new QuaternionM4D.ContextQM4D();
+      this.vector_m3d = new VectorM3D.ContextVM3D();
     }
 
     @Override
@@ -139,6 +142,13 @@ public final class CaEvaluationContext implements CaEvaluationContextType
     {
       super.checkOpen();
       return this.quaternion_m4d;
+    }
+
+    @Override
+    public VectorM3D.ContextVM3D vectorContext3D()
+    {
+      super.checkOpen();
+      return this.vector_m3d;
     }
   }
 
